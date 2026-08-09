@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>团队照片网站</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            font-weight: 300;
+            margin-bottom: 30px;
+        }
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 20px;
+        }
+        .photo-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 300px;
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        .photo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        .photo-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+        .photo-info {
+            padding: 12px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .photo-title {
+            font-weight: bold;
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+        .photo-description {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            text-align: left;
+        }
+        .download-btn {
+            display: inline-block;
+            background: #5a9;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+            align-self: flex-start;
+            margin-top: auto;
+        }
+        .download-btn:hover {
+            background: #489;
+        }
+    </style>
+</head>
+<body>
+    <h1>📷 华南气象爱好者team追风照片展览</h1>
+    
+    <div class="gallery">
+        <!-- 照片卡片模板：从这里开始复制修改 -->
+        <div class="photo-card">
+            <img src="photo1.jpg" alt="清晨的阳光">
+            <div class="photo-info">
+                <div>
+                    <div class="photo-title">清晨的阳光</div>
+                    <div class="photo-description">
+                        拍摄于老家阳台，那天的朝霞特别温柔，光线刚好穿过纱帘。
+                    </div>
+                </div>
+                <a class="download-btn" href="photo1.jpg" download>⬇ 下载原图</a>
+            </div>
+        </div>
+
+        <div class="photo-card">
+            <img src="photo2.jpg" alt="街角的咖啡馆">
+            <div class="photo-info">
+                <div>
+                    <div class="photo-title">街角的咖啡馆</div>
+                    <div class="photo-description">
+                        在巴黎街头偶遇的复古咖啡馆，橱窗倒映着秋日的梧桐树。
+                    </div>
+                </div>
+                <a class="download-btn" href="photo2.jpg" download>⬇ 下载原图</a>
+            </div>
+        </div>
+
+<div class="photo-card">
+    <img src="photo3.jpg" alt="海边的日落">
+    <div class="photo-info">
+        <div>
+            <div class="photo-title">海边的日落</div>
+            <div class="photo-description">
+                金色的余晖洒在浪花上，海风里带着咸味，安静得只剩快门声。
+            </div>
+        </div>
+        <a class="download-btn" href="sunset.jpg" download>⬇ 下载原图</a>
+    </div>
+</div>
+        <!-- 照片卡片模板：到这里结束 -->
+    </div>
+</body>
+</html>
