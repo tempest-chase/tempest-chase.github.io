@@ -5,268 +5,241 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tempest Chase</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #f7f8fa;
-            color: #333;
-        }
-        /* 头部区域 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f7f8fa; color: #333; }
+
+        /* 顶部导航 */
         .site-header {
-            background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            padding: 20px 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 15px 40px; display: flex; align-items: center;
+            justify-content: space-between; flex-wrap: wrap; position: sticky; top: 0; z-index: 100;
         }
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #e0e0e0; }
+        .site-title { font-size: 1.6rem; font-weight: 300; letter-spacing: 2px; color: #222; }
+        .back-btn {
+            background: none; border: 1px solid #ddd; padding: 6px 16px; border-radius: 20px;
+            cursor: pointer; font-size: 0.9rem; color: #555; transition: 0.2s; display: none;
         }
-        .logo-img {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #e0e0e0;
-        }
-        .site-title {
-            font-size: 1.6rem;
-            font-weight: 300;
-            letter-spacing: 2px;
-            color: #222;
-        }
-        /* 搜索框 */
+        .back-btn:hover { background: #f0f0f0; }
         .search-box input {
-            padding: 8px 16px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            width: 220px;
-            font-size: 0.9rem;
-            outline: none;
-            transition: 0.2s;
+            padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; width: 220px;
+            font-size: 0.9rem; outline: none; transition: 0.2s;
         }
-        .search-box input:focus {
-            border-color: #5a9;
-            box-shadow: 0 0 0 3px rgba(85,170,153,0.15);
+        .search-box input:focus { border-color: #5a9; box-shadow: 0 0 0 3px rgba(85,170,153,0.15); }
+
+        /* 介绍文字 */
+        .intro { text-align: center; padding: 40px 20px 20px; max-width: 700px; margin: 0 auto; color: #555; font-size: 1.1rem; line-height: 1.7; }
+        .intro strong { color: #333; }
+
+        /* 相册网格 */
+        .albums-container, .photos-container {
+            display: flex; flex-wrap: wrap; justify-content: center; max-width: 1200px;
+            margin: 0 auto; padding: 20px; gap: 24px;
         }
-        /* 网站介绍 */
-        .intro {
-            text-align: center;
-            padding: 40px 20px 20px;
-            max-width: 700px;
-            margin: 0 auto;
-            color: #555;
-            font-size: 1.1rem;
-            line-height: 1.7;
+        .photos-container { display: none; } /* 默认隐藏 */
+
+        .album-card, .photo-card {
+            background: white; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            overflow: hidden; width: 300px; transition: transform 0.25s, box-shadow 0.25s; cursor: pointer;
         }
-        .intro strong {
-            color: #333;
-        }
-        /* 照片网格 */
-        .gallery {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 20px;
-            gap: 24px;
-        }
-        .photo-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-            overflow: hidden;
-            width: 300px;
-            transition: transform 0.25s, box-shadow 0.25s;
-            display: flex;
-            flex-direction: column;
-        }
-        .photo-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 28px rgba(0,0,0,0.12);
-        }
-        .photo-card img {
-            width: 100%;
-            height: 240px;
-            object-fit: cover;
-            display: block;
-        }
-        .photo-info {
-            padding: 16px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .photo-title {
-            font-weight: 600;
-            font-size: 1rem;
-            color: #222;
-            margin-bottom: 6px;
-        }
-        .photo-desc {
-            font-size: 0.85rem;
-            color: #666;
-            line-height: 1.5;
-            margin-bottom: 14px;
-        }
+        .album-card:hover, .photo-card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,0.12); }
+        .album-card img, .photo-card img { width: 100%; height: 220px; object-fit: cover; display: block; }
+        .album-info, .photo-info { padding: 16px; }
+        .album-title, .photo-title { font-weight: 600; font-size: 1rem; color: #222; margin-bottom: 6px; }
+        .album-desc, .photo-desc { font-size: 0.85rem; color: #666; line-height: 1.5; }
+        .photo-desc { margin-bottom: 12px; }
         .download-btn {
-            align-self: flex-start;
-            background: #5a9;
-            color: white;
-            text-decoration: none;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            transition: background 0.2s;
-            margin-top: auto;
+            display: inline-block; background: #5a9; color: white; text-decoration: none;
+            padding: 6px 16px; border-radius: 20px; font-size: 0.8rem; transition: 0.2s;
         }
-        .download-btn:hover {
-            background: #489;
-        }
-        /* 无搜索结果提示 */
-        .no-result {
-            text-align: center;
-            padding: 60px 20px;
-            color: #aaa;
-            font-size: 1.2rem;
-            display: none;
-        }
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            color: #bbb;
-            font-size: 0.85rem;
-        }
+        .download-btn:hover { background: #489; }
+
+        .no-result { text-align: center; padding: 60px 20px; color: #aaa; font-size: 1.2rem; display: none; }
+        footer { text-align: center; padding: 40px 20px; color: #bbb; font-size: 0.85rem; }
     </style>
 </head>
 <body>
-
-    <!-- 头部：Logo + 标题 + 搜索 -->
     <header class="site-header">
         <div class="logo-area">
-            <!-- 把下面 src 的 "logo.jpg" 换成你自己的 Logo 图片文件名 -->
-            <img class="logo-img" src="logo.jpg" alt="网站Logo">
+            <img class="logo-img" src="logo.jpg" alt="Logo">
             <span class="site-title">华南气象爱好者team-追风小分队</span>
         </div>
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="搜索照片…">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="back-btn" id="backBtn" onclick="goBackToAlbums()">← 返回相册列表</button>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索…">
+            </div>
         </div>
     </header>
 
-    <!-- 网站介绍语 -->
-    <div class="intro">
-        <p>📷 这里是<strong>华南气象爱好者team的追风影像展厅</strong>。</p>
-        <p>这里记录着所有小队追击的影像资料，用相机记录着自然之伟力。所有照片在不商用的前提下可自取，欢迎带走你喜欢的画面。</p>
+    <div class="intro" id="introText">
+        <p>📷 这里是<strong>华南气象爱好者的追风小分队</strong>。</p>
+        <p>记录团队追逐过的风暴。点击相册浏览照片，所有图片均可下载。</p>
+        <p><strong>(网站搭建中，敬请期待）</strong></p>
     </div>
 
-    <!-- 照片画廊 -->
-    <div class="gallery" id="galleryContainer">
-        <!-- 照片卡片模板，复制这一块来添加新照片 -->
-        <div class="photo-card" data-keywords="清晨 阳光 老家">
-            <img src="photo1.jpg" alt="中气旋">
-            <div class="photo-info">
-                <div>
-                    <div class="photo-title">中气旋</div>
-                    <div class="photo-desc">一张被用来充数的照片，也不知道什么时候拍的。</div>
-                </div>
-                <a class="download-btn" href="photo1.jpg" download>⬇ 下载原图</a>
-            </div>
-        </div>
+    <!-- 相册列表（首页） -->
+    <div class="albums-container" id="albumsContainer"></div>
 
-        <div class="photo-card" data-keywords="咖啡馆 巴黎 街角">
-            <img src="photo2.jpg" alt="风飑照片">
-            <div class="photo-info">
-                <div>
-                    <div class="photo-title">风飑照片</div>
-                    <div class="photo-desc">深圳315过程拍摄的照片。</div>
-                </div>
-                <a class="download-btn" href="photo2.jpg" download>⬇ 下载原图</a>
-            </div>
-        </div>
-        <div class="photo-card" data-keywords="咖啡馆 巴黎 街角">
-            <img src="photo3.jpg" alt="台风麦德姆">
-            <div class="photo-info">
-                <div>
-                    <div class="photo-title">台风麦德姆</div>
-                    <div class="photo-desc">这是历史性的一刻！小队首次进入台风眼。</div>
-                </div>
-                <a class="download-btn" href="photo2.jpg" download>⬇ 下载原图</a>
-            </div>
-        </div>
-        <div class="photo-card" data-keywords="咖啡馆 巴黎 街角">
-            <img src="photo7.jpg" alt="台风巴威">
-            <div class="photo-info">
-                <div>
-                    <div class="photo-title">台风巴威</div>
-                    <div class="photo-desc">2026年登陆华东地区的台风。</div>
-                </div>
-                <a class="download-btn" href="photo2.jpg" download>⬇ 下载原图</a>
-            </div>
-        </div>
-        <div class="photo-card" data-keywords="咖啡馆 巴黎 街角">
-            <img src="photo6.jpg" alt="追风者的背影">
-            <div class="photo-info">
-                <div>
-                    <div class="photo-title">追风者的背影</div>
-                    <div class="photo-desc">一些追风小队的照片锦集。</div>
-                </div>
-                <a class="download-btn" href="photo2.jpg" download>⬇ 下载原图</a>
-            </div>
-        </div>
-        <div class="photo-card" data-keywords="清晨 阳光 老家">
-            <img src="photo5.png" alt="清晨的阳光">
-            <div class="photo-info">
-                <div>
-                    <div class="photo-title">虎门仔特供</div>
-                    <div class="photo-desc">还没有想到简介。</div>
-                </div>
-                <a class="download-btn" href="photo1.jpg" download>⬇ 下载原图</a>
-            </div>
-        </div>
-        <!-- 结束模板 -->
-    </div>
+    <!-- 单个相册的照片视图 -->
+    <div class="photos-container" id="photosContainer"></div>
 
-    <!-- 无结果提示 -->
-    <div class="no-result" id="noResult">😕 没有找到匹配的照片，换个关键词试试吧。</div>
-
+    <div class="no-result" id="noResult">😕 没有找到匹配的项目，换个关键词试试吧。</div>
     <footer>© 2026 Tempest Chase · 所有照片均可自由下载</footer>
 
-    <!-- 搜索功能脚本 -->
     <script>
-        const searchInput = document.getElementById('searchInput');
-        const cards = document.querySelectorAll('.photo-card');
-        const noResult = document.getElementById('noResult');
+        // =============================================
+        // 👇 只需要修改这里的数据，添加你的相册和照片
+        // =============================================
+        const albums = [
+            {
+                id: 'city',
+                title: '台风桦加沙',
+                description: '珠三角自2018年以来影响最强台风。',
+                cover: 'photo8.jpg',  // 封面图片，放在仓库根目录
+                keywords: '桦加沙',
+                photos: [
+                    { src: 'city1.jpg', title: '黄昏的天际线', desc: '在金融区拍下的金色时刻。' },
+                    { src: 'city2.jpg', title: '老城区小巷', desc: '雨后湿漉漉的石板路。' },
+                    { src: 'city3.jpg', title: '玻璃幕墙', desc: '倒映着流动的云。' }
+                ]
+            },
+            {
+                id: 'nature',
+                title: '台风麦德姆',
+                description: '团队首次进入成熟的台风眼区',
+                cover: 'photo3.jpg',
+                keywords: '麦德姆',
+                photos: [
+                    { src: 'nature1.jpg', title: '日出云海', desc: '凌晨4点爬山，等来一片金黄。' },
+                    { src: 'nature2.jpg', title: '静谧湖泊', desc: '没有一丝风的午后。' }
+                ]
+            },
+            {
+                id: 'nature',
+                title: '台风巴威',
+                description: '暂时没有更多简介。',
+                cover: 'album2_cover.jpg',
+                keywords: '巴威',
+                photos: [
+                    { src: 'nature1.jpg', title: '日出云海', desc: '凌晨4点爬山，等来一片金黄。' },
+                    { src: 'nature2.jpg', title: '静谧湖泊', desc: '没有一丝风的午后。' }
+                ]
+            },
+            {
+                id: 'nature',
+                title: '强对流合集',
+                description: '暂时没有更多简介。',
+                cover: 'photo5.jpg',
+                keywords: '强对流 雷暴',
+                photos: [
+                    { src: 'nature1.jpg', title: '日出云海', desc: '凌晨4点爬山，等来一片金黄。' },
+                    { src: 'nature2.jpg', title: '静谧湖泊', desc: '没有一丝风的午后。' }
+                ]
+            }
+            // 可以继续添加更多相册，格式完全一样，逗号分隔
+        ];
 
-        searchInput.addEventListener('input', function() {
-            const keyword = this.value.trim().toLowerCase();
+        // =============================================
+        // 下面的代码是引擎，你不需要动
+        // =============================================
+        let currentAlbumId = null;
+
+        // 渲染相册封面列表
+        function renderAlbums(filterKeyword = '') {
+            const container = document.getElementById('albumsContainer');
+            container.innerHTML = '';
+            const keyword = filterKeyword.toLowerCase().trim();
             let hasVisible = false;
-
-            cards.forEach(card => {
-                const keywords = card.getAttribute('data-keywords').toLowerCase();
-                if (keyword === '' || keywords.includes(keyword)) {
-                    card.style.display = '';
-                    hasVisible = true;
-                } else {
-                    card.style.display = 'none';
+            albums.forEach(album => {
+                if (keyword && !album.keywords.toLowerCase().includes(keyword) && !album.title.toLowerCase().includes(keyword)) {
+                    return;
                 }
+                hasVisible = true;
+                const card = document.createElement('div');
+                card.className = 'album-card';
+                card.setAttribute('data-keywords', album.keywords);
+                card.innerHTML = `
+                    <img src="${album.cover}" alt="${album.title}">
+                    <div class="album-info">
+                        <div class="album-title">${album.title}</div>
+                        <div class="album-desc">${album.description}</div>
+                    </div>
+                `;
+                card.addEventListener('click', () => openAlbum(album.id));
+                container.appendChild(card);
             });
+            document.getElementById('noResult').style.display = hasVisible ? 'none' : 'block';
+            if (!hasVisible) document.getElementById('noResult').textContent = '😕 没有找到匹配的相册，换个关键词试试吧。';
+        }
 
-            noResult.style.display = hasVisible ? 'none' : 'block';
+        // 打开某个相册，显示其照片
+        function openAlbum(albumId) {
+            const album = albums.find(a => a.id === albumId);
+            if (!album) return;
+            currentAlbumId = albumId;
+            document.getElementById('albumsContainer').style.display = 'none';
+            document.getElementById('introText').style.display = 'none';
+            document.getElementById('photosContainer').style.display = 'flex';
+            document.getElementById('backBtn').style.display = 'inline-block';
+            document.getElementById('searchInput').value = ''; // 清空搜索框
+            renderPhotos(album);
+        }
+
+        // 返回相册列表
+        function goBackToAlbums() {
+            currentAlbumId = null;
+            document.getElementById('albumsContainer').style.display = 'flex';
+            document.getElementById('introText').style.display = 'block';
+            document.getElementById('photosContainer').style.display = 'none';
+            document.getElementById('backBtn').style.display = 'none';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('noResult').style.display = 'none';
+            renderAlbums(); // 恢复显示全部相册
+        }
+
+        // 渲染某个相册的照片
+        function renderPhotos(album, filterKeyword = '') {
+            const container = document.getElementById('photosContainer');
+            container.innerHTML = '';
+            const keyword = filterKeyword.toLowerCase().trim();
+            let hasVisible = false;
+            album.photos.forEach(photo => {
+                const combined = (photo.title + ' ' + photo.desc).toLowerCase();
+                if (keyword && !combined.includes(keyword)) return;
+                hasVisible = true;
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.innerHTML = `
+                    <img src="${photo.src}" alt="${photo.title}">
+                    <div class="photo-info">
+                        <div class="photo-title">${photo.title}</div>
+                        <div class="photo-desc">${photo.desc}</div>
+                        <a class="download-btn" href="${photo.src}" download>⬇ 下载原图</a>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            document.getElementById('noResult').style.display = hasVisible ? 'none' : 'block';
+            if (!hasVisible) document.getElementById('noResult').textContent = '😕 这个相册里没有匹配的照片，换个词试试。';
+        }
+
+        // 搜索功能
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const keyword = e.target.value;
+            if (currentAlbumId === null) {
+                // 在相册列表页搜索
+                renderAlbums(keyword);
+            } else {
+                // 在相册内搜索
+                const album = albums.find(a => a.id === currentAlbumId);
+                if (album) renderPhotos(album, keyword);
+            }
         });
-    </script>
 
+        // 初次加载
+        renderAlbums();
+    </script>
 </body>
 </html>
