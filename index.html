@@ -15,8 +15,17 @@
             justify-content: space-between; flex-wrap: wrap; position: sticky; top: 0; z-index: 100;
         }
         .logo-area { display: flex; align-items: center; gap: 15px; }
-        .logo-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #e0e0e0; }
-        .site-title { font-size: 1.6rem; font-weight: 300; letter-spacing: 2px; color: #222; }
+        .logo-img { 
+            width: 48px; height: 48px; border-radius: 50%; object-fit: cover; 
+            /* 去掉了原来的 border 属性，取消了白色外框 */
+        }
+        .site-title { 
+            font-family: "Microsoft YaHei", "微软雅黑", sans-serif;  /* 改为微软雅黑 */
+            font-size: 0.9rem;      /* 与搜索框字号一致 */
+            font-weight: bold;      /* 加粗 */
+            letter-spacing: 2px; 
+            color: #222; 
+        }
         .back-btn {
             background: none; border: 1px solid #ddd; padding: 6px 16px; border-radius: 20px;
             cursor: pointer; font-size: 0.9rem; color: #555; transition: 0.2s; display: none;
@@ -94,10 +103,10 @@
         // =============================================
         const albums = [
             {
-                id: 'city',
+                id: 'mujigae',           // 已改为唯一 ID（原为 city，不影响显示）
                 title: '台风桦加沙',
                 description: '珠三角自2018年以来影响最强台风。',
-                cover: 'photo8.jpg',  // 封面图片，放在仓库根目录
+                cover: 'photo.8.jpg',
                 keywords: '桦加沙',
                 photos: [
                     { src: 'city1.jpg', title: '黄昏的天际线', desc: '在金融区拍下的金色时刻。' },
@@ -106,7 +115,7 @@
                 ]
             },
             {
-                id: 'nature',
+                id: 'matmo',             // 已改为唯一 ID（原为 nature）
                 title: '台风麦德姆',
                 description: '团队首次进入成熟的台风眼区',
                 cover: 'photo3.jpg',
@@ -117,7 +126,7 @@
                 ]
             },
             {
-                id: 'nature',
+                id: 'bavi',              // 已改为唯一 ID
                 title: '台风巴威',
                 description: '暂时没有更多简介。',
                 cover: 'photo6.jpg',
@@ -128,10 +137,10 @@
                 ]
             },
             {
-                id: 'nature',
+                id: 'thunderstorm',      // 已改为唯一 ID
                 title: '雷暴合集',
                 description: '暂时没有更多简介。',
-                cover: 'photo5.jpg',
+                cover: 'photo5.png',
                 keywords: '强对流 雷暴',
                 photos: [
                     { src: 'nature1.jpg', title: '日出云海', desc: '凌晨4点爬山，等来一片金黄。' },
@@ -139,7 +148,7 @@
                 ]
             },
             {
-                id: 'nature',
+                id: 'snow',              // 已改为唯一 ID
                 title: '雪原合集',
                 description: '暂时没有更多简介。',
                 cover: 'photo7.jpg',
