@@ -6,38 +6,60 @@
     <title>Tempest Chase</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f7f8fa; color: #333; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #ffffff;
+            color: #333;
+        }
 
+        /* 顶部导航 */
         .site-header {
-            background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            padding: 15px 40px; display: flex; align-items: center;
-            justify-content: space-between; flex-wrap: wrap; position: sticky; top: 0; z-index: 100;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 12px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .logo-area { display: flex; align-items: center; gap: 15px; }
-        .logo-img { 
-            width: 48px; height: 48px; border-radius: 50%; object-fit: cover; 
-        }
-        .site-title { 
-            font-family: "Microsoft YaHei", "微软雅黑", sans-serif;
-            font-size: 1rem;
-            font-weight: bold;
-            letter-spacing: 2px; 
-            color: #222; 
-        }
-        /* 原来的返回按钮已移除，相关样式也可删除，这里保留但按钮不会出现 */
-        .search-box input {
-            padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; width: 220px;
-            font-size: 0.9rem; outline: none; transition: 0.2s;
-        }
-        .search-box input:focus { border-color: #5a9; box-shadow: 0 0 0 3px rgba(85,170,153,0.15); }
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .site-title { font-size: 1rem; font-weight: bold; letter-spacing: 1px; color: #222; }
 
-        .intro { text-align: center; padding: 40px 20px 20px; max-width: 700px; margin: 0 auto; color: #555; font-size: 1.1rem; line-height: 1.7; }
+        .nav-menu { display: flex; gap: 30px; list-style: none; }
+        .nav-menu a { text-decoration: none; color: #555; font-size: 0.95rem; cursor: pointer; }
+        .nav-menu a:hover { color: #222; }
+        .nav-menu a.active { font-weight: bold; color: #000; border-bottom: 2px solid #5a9; padding-bottom: 4px; }
+
+        /* 搜索区域 */
+        .search-section { text-align: center; padding: 24px 20px 12px; }
+        .search-box-wrapper {
+            display: inline-flex; align-items: center;
+            border: 1px solid #ddd; border-radius: 30px;
+            background: white; width: 50%; max-width: 500px;
+            transition: 0.2s;
+        }
+        .search-box-wrapper:focus-within { border-color: #5a9; box-shadow: 0 0 0 3px rgba(85,170,153,0.15); }
+        .search-box-wrapper input {
+            flex: 1; padding: 12px 20px; border: none; outline: none;
+            font-size: 1rem; font-family: inherit; background: transparent;
+        }
+        .search-btn {
+            background: none; border: none; padding: 0 16px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; color: #888;
+        }
+        .search-btn:hover { color: #5a9; }
+        .search-btn svg { width: 20px; height: 20px; }
+
+        /* 介绍文字 */
+        .intro { text-align: center; padding: 10px 20px 30px; max-width: 700px; margin: 0 auto; color: #555; font-size: 1rem; line-height: 1.7; }
         .intro strong { color: #333; }
 
-        .albums-container {
-            display: flex; flex-wrap: wrap; justify-content: center; max-width: 1200px;
-            margin: 0 auto; padding: 20px; gap: 24px;
-        }
+        /* 相册容器 */
+        .albums-container { display: flex; flex-wrap: wrap; justify-content: center; max-width: 1200px; margin: 0 auto; padding: 20px; gap: 24px; }
         .photos-container { display: none; }
 
         .album-card, .photo-card {
@@ -50,89 +72,72 @@
         .album-title, .photo-title { font-weight: 600; font-size: 1rem; color: #222; margin-bottom: 6px; }
         .album-desc, .photo-desc { font-size: 0.85rem; color: #666; line-height: 1.5; }
         .photo-desc { margin-bottom: 12px; }
-        .download-btn {
-            display: inline-block; background: #5a9; color: white; text-decoration: none;
-            padding: 6px 16px; border-radius: 20px; font-size: 0.8rem; transition: 0.2s;
+
+        /* 照片操作按钮 */
+        .photo-actions { display: flex; gap: 10px; margin-top: auto; }
+        .action-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px; border-radius: 50%;
+            background: transparent; border: 1px solid #ccc;
+            cursor: pointer; transition: 0.2s; color: #666;
         }
-        .download-btn:hover { background: #489; }
+        .action-btn:hover { border-color: #888; color: #333; }
+        .action-btn svg { width: 18px; height: 18px; }
 
         .no-result { text-align: center; padding: 60px 20px; color: #aaa; font-size: 1.2rem; display: none; }
         footer { text-align: center; padding: 40px 20px; color: #bbb; font-size: 0.85rem; }
 
-        .album-intro {
-            max-width: 1200px;
-            margin: 40px auto 20px;
-            padding: 20px 20px 10px;
-            text-align: center;
-            font-size: 1rem;
-            color: #333;
-            line-height: 1.8;
-            background: #f0f8ff;
-        }
-        .album-intro .intro-bracket {
-            color: #007bff;
-            font-size: 1.3em;
-            font-weight: bold;
-            vertical-align: middle;
-            margin: 0 0.4em;
-        }
+        /* 团队介绍 / 友情链接 */
+        .page-content { max-width: 800px; margin: 30px auto; padding: 20px; font-size: 1rem; line-height: 1.8; color: #333; }
+        .page-content h2 { font-size: 1.6rem; margin-bottom: 20px; text-align: center; color: #222; }
+        .page-content p { margin-bottom: 16px; }
+        .page-content a { color: #5a9; text-decoration: none; }
+        .page-content a:hover { text-decoration: underline; }
 
-        .video-link-wrapper {
-            text-align: center;
-            margin: 20px auto 30px;
-            max-width: 1200px;
-            padding: 0 20px;
+        /* 相册内页介绍栏 */
+        .album-intro {
+            max-width: 1200px; margin: 40px auto 20px; padding: 20px 20px 10px;
+            text-align: center; font-size: 1rem; color: #333; line-height: 1.8; background: #f0f8ff;
         }
+        .album-intro .intro-bracket { color: #007bff; font-size: 1.3em; font-weight: bold; vertical-align: middle; margin: 0 0.4em; }
+        .video-link-wrapper { text-align: center; margin: 20px auto 30px; max-width: 1200px; padding: 0 20px; }
         .video-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #fb7299;
-            color: white;
-            text-decoration: none;
-            padding: 10px 28px;
-            border-radius: 30px;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: background 0.2s, transform 0.2s;
+            display: inline-flex; align-items: center; gap: 6px; background: #fb7299;
+            color: white; text-decoration: none; padding: 10px 28px; border-radius: 30px;
+            font-size: 1rem; font-weight: 500; transition: background 0.2s, transform 0.2s;
         }
-        .video-btn:hover {
-            background: #e05a7f;
-            transform: scale(1.03);
-        }
-        .bili-tv-icon {
-            display: inline-block;
-            width: 1.2em;
-            height: 1.2em;
-            vertical-align: middle;
-        }
+        .video-btn:hover { background: #e05a7f; transform: scale(1.03); }
+        .bili-tv-icon { display: inline-block; width: 1.2em; height: 1.2em; vertical-align: middle; }
 
         .photos-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 300px);
-            gap: 24px;
-            justify-content: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px 20px;
+            display: grid; grid-template-columns: repeat(3, 300px); gap: 24px;
+            justify-content: center; max-width: 1200px; margin: 0 auto; padding: 0 20px 20px;
         }
 
-        /* 手机端相册左右滑动 */
+        /* 图片预览模态框 */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 200;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-overlay img {
+            max-width: 90%; max-height: 90%; border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .modal-close {
+            position: absolute; top: 20px; right: 30px;
+            color: white; font-size: 36px; cursor: pointer; font-weight: 300;
+        }
+
         @media (max-width: 768px) {
             .photos-grid {
-                display: flex;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                gap: 16px;
-                padding: 0 16px 20px;
-                scroll-snap-type: x mandatory;
-                -webkit-overflow-scrolling: touch;
+                display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 16px;
+                padding: 0 16px 20px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
             }
-            .photos-grid .photo-card {
-                flex: 0 0 auto;
-                width: 280px;
-                scroll-snap-align: start;
-            }
+            .photos-grid .photo-card { flex: 0 0 auto; width: 280px; scroll-snap-align: start; }
+            .site-header { padding: 12px 16px; flex-direction: column; align-items: flex-start; }
+            .nav-menu { margin-top: 10px; gap: 20px; }
+            .search-box-wrapper { width: 80%; }
         }
     </style>
 </head>
@@ -142,26 +147,61 @@
             <img class="logo-img" src="logo.jpg" alt="Logo">
             <span class="site-title">Tempest Chase V1</span>
         </div>
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="搜索…">
-        </div>
+        <ul class="nav-menu" id="navMenu">
+            <li><a data-page="home" class="active">首页</a></li>
+            <li><a data-page="about">关于</a></li>
+            <li><a data-page="links">友情链接</a></li>
+        </ul>
     </header>
 
-    <div class="intro" id="introText">
-        <p>📷 这里是<strong>华南气象爱好者的追风小分队</strong></p>
-        <p>记录团队追逐过的风暴。点击相册浏览照片，所有图片均可下载</p>
-        <p><strong>(网站搭建中，敬请期待）</strong></p>
+    <div class="search-section" id="searchSection">
+        <div class="search-box-wrapper">
+            <input type="text" id="searchInput" placeholder="搜索相册或照片…">
+            <button class="search-btn" id="searchBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+            </button>
+        </div>
     </div>
 
-    <div class="albums-container" id="albumsContainer"></div>
+    <div id="homeView">
+        <div class="intro">
+            <p>📷 这里是<strong>华南气象爱好者的追风小分队</strong></p>
+            <p>记录团队追逐过的风暴。点击相册浏览照片，所有图片均可下载</p>
+            <p><strong>(网站搭建中，敬请期待）</strong></p>
+        </div>
+        <div class="albums-container" id="albumsContainer"></div>
+    </div>
+
     <div class="photos-container" id="photosContainer"></div>
+
+    <div id="aboutView" style="display: none;">
+        <div class="page-content">
+            <h2>关于我们</h2>
+            <p><strong>华南气象爱好者追风小分队</strong>成立于2025年，是一群热爱气象、追逐风暴的年轻人。我们穿梭于台风、暴雨、雷暴和雪原之间，用镜头记录大自然的狂暴与温柔。</p>
+            <p>团队成员来自珠三角各地，有气象专业的学生，也有业余的摄影爱好者。我们相信，每一次追风都是一次与自然的对话。</p>
+            <p>如果你也热爱天气，欢迎加入我们！</p>
+            <h2>友情提醒</h2>
+            <p><strong>追风行为系在经验丰富和科学保障的前提下进行的</strong>，请勿随意模仿，本站无宣扬追风行为意思，遇台风天或雷暴天需注意个人安全</p>
+        </div>
+    </div>
+
+    <div id="linksView" style="display: none;">
+        <div class="page-content">
+            <h2>🔗 友情链接</h2>
+            <p><a href="http://www.nmc.cn/" target="_blank">中国气象局</a> — 官方天气预报与预警</p>
+            <p><a href="https://tf.121.com.cn/index.html" target="_blank">深圳台风网</a> — 实时台风路径追踪</p>
+            <p><a href="https://space.bilibili.com/1095244956?spm_id_from=333.1007.0.0" target="_blank">哔哩哔哩</a> — 我们的视频频道</p>
+            <p><a href="https://www.smca.fun/" target="_blank">团队天气栈</a> — 各式各样的预报与实况查询平台</p>
+        </div>
+    </div>
+
     <div class="no-result" id="noResult">😕 没有找到匹配的项目，换个关键词试试吧。</div>
     <footer>© 2026 Tempest Chase · 所有照片均可自由下载</footer>
 
     <script>
-        // =============================================
-        // 👇 相册数据
-        // =============================================
+        // 相册数据
         const albums = [
             {
                 id: 'mujigae',
@@ -265,147 +305,160 @@
             }
         ];
 
-        // ================ 引擎 ================
+        // 状态管理
         let currentAlbumId = null;
+        let currentView = 'home';
 
-        // 渲染相册封面列表
+        const navLinks = document.querySelectorAll('.nav-menu a');
+        const homeView = document.getElementById('homeView');
+        const photosContainer = document.getElementById('photosContainer');
+        const aboutView = document.getElementById('aboutView');
+        const linksView = document.getElementById('linksView');
+        const searchSection = document.getElementById('searchSection');
+        const noResult = document.getElementById('noResult');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+
+        // 搜索
+        function performSearch() {
+            const keyword = searchInput.value;
+            if (currentView === 'home') renderAlbums(keyword);
+            else if (currentView === 'album') {
+                const album = albums.find(a => a.id === currentAlbumId);
+                if (album) renderPhotos(album, keyword);
+            }
+        }
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') performSearch(); });
+        searchInput.addEventListener('input', performSearch);
+
+        // 视图切换
+        function switchView(viewName, albumId = null) {
+            homeView.style.display = 'none'; photosContainer.style.display = 'none';
+            aboutView.style.display = 'none'; linksView.style.display = 'none'; noResult.style.display = 'none';
+
+            if (viewName === 'home') { homeView.style.display = 'block'; searchSection.style.display = 'block'; renderAlbums(); }
+            else if (viewName === 'about') { aboutView.style.display = 'block'; searchSection.style.display = 'none'; }
+            else if (viewName === 'links') { linksView.style.display = 'block'; searchSection.style.display = 'none'; }
+            else if (viewName === 'album') {
+                photosContainer.style.display = 'block'; searchSection.style.display = 'block';
+                if (albumId) {
+                    const album = albums.find(a => a.id === albumId);
+                    if (album) { currentAlbumId = albumId; renderPhotos(album); }
+                }
+            }
+            currentView = viewName;
+            updateNavActive(viewName === 'album' ? 'home' : viewName);
+        }
+
+        function updateNavActive(page) {
+            navLinks.forEach(link => {
+                if (link.getAttribute('data-page') === page) link.classList.add('active');
+                else link.classList.remove('active');
+            });
+        }
+
+        navLinks.forEach(link => link.addEventListener('click', function() {
+            location.hash = this.getAttribute('data-page');
+        }));
+
+        window.addEventListener('hashchange', () => {
+            const hash = location.hash.slice(1);
+            if (hash === 'about') switchView('about');
+            else if (hash === 'links') switchView('links');
+            else if (hash.startsWith('album/')) switchView('album', hash.replace('album/', ''));
+            else switchView('home');
+        });
+
+        function openAlbum(albumId) { location.hash = 'album/' + albumId; }
+
+        // 渲染首页相册列表
         function renderAlbums(filterKeyword = '') {
             const container = document.getElementById('albumsContainer');
             container.innerHTML = '';
             const keyword = filterKeyword.toLowerCase().trim();
             let hasVisible = false;
             albums.forEach(album => {
-                if (keyword && !album.keywords.toLowerCase().includes(keyword) && !album.title.toLowerCase().includes(keyword)) {
-                    return;
-                }
+                if (keyword && !album.keywords.toLowerCase().includes(keyword) && !album.title.toLowerCase().includes(keyword)) return;
                 hasVisible = true;
                 const card = document.createElement('div');
                 card.className = 'album-card';
-                card.setAttribute('data-keywords', album.keywords);
-                card.innerHTML = `
-                    <img src="${album.cover}" alt="${album.title}">
-                    <div class="album-info">
-                        <div class="album-title">${album.title}</div>
-                        <div class="album-desc">${album.description}</div>
-                    </div>
-                `;
+                card.innerHTML = `<img src="${album.cover}" alt="${album.title}"><div class="album-info"><div class="album-title">${album.title}</div><div class="album-desc">${album.description}</div></div>`;
                 card.addEventListener('click', () => openAlbum(album.id));
                 container.appendChild(card);
             });
-            document.getElementById('noResult').style.display = hasVisible ? 'none' : 'block';
-            if (!hasVisible) document.getElementById('noResult').textContent = '😕 没有找到匹配的相册，换个关键词试试吧。';
+            noResult.style.display = hasVisible ? 'none' : 'block';
+            if (!hasVisible) noResult.textContent = '😕 没有找到匹配的相册，换个关键词试试吧。';
         }
 
-        // 打开相册（同时修改 URL hash）
-        function openAlbum(albumId) {
-            const album = albums.find(a => a.id === albumId);
-            if (!album) return;
-            // 修改 hash，触发 popstate 不会重复打开，所以我们直接调用显示逻辑
-            location.hash = 'album/' + albumId;
+        // 图标SVG
+        function getDownloadIcon() {
+            return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+        }
+        function getEyeIcon() {
+            return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
         }
 
-        // 返回首页（清除 hash）
-        function goToHome() {
-            if (location.hash) {
-                history.back(); // 利用浏览器历史返回
-            } else {
-                showHomeView();
-            }
+        // 预览弹窗
+        function showPreview(src) {
+            const existing = document.querySelector('.modal-overlay');
+            if (existing) existing.remove();
+
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `<span class="modal-close">&times;</span><img src="${src}" onclick="event.stopPropagation()">`;
+            overlay.addEventListener('click', () => overlay.remove());
+            document.body.appendChild(overlay);
         }
 
-        // 显示首页视图
-        function showHomeView() {
-            currentAlbumId = null;
-            document.getElementById('albumsContainer').style.display = 'flex';
-            document.getElementById('introText').style.display = 'block';
-            document.getElementById('photosContainer').style.display = 'none';
-            document.getElementById('searchInput').value = '';
-            document.getElementById('noResult').style.display = 'none';
-            renderAlbums();
-        }
-
-        // 显示相册视图
-        function showAlbumView(albumId) {
-            const album = albums.find(a => a.id === albumId);
-            if (!album) {
-                showHomeView();
-                return;
-            }
-            currentAlbumId = albumId;
-            document.getElementById('albumsContainer').style.display = 'none';
-            document.getElementById('introText').style.display = 'none';
-            document.getElementById('photosContainer').style.display = 'block';
-            document.getElementById('searchInput').value = '';
-            renderPhotos(album);
-        }
-
-        // 监听浏览器后退/前进（hash 变化）
-        window.addEventListener('hashchange', function() {
-            const hash = location.hash;
-            if (hash.startsWith('#album/')) {
-                const id = hash.replace('#album/', '');
-                showAlbumView(id);
-            } else {
-                showHomeView();
-            }
-        });
-
-        // 初始加载时，根据当前 hash 决定显示哪个页面
-        function initPage() {
-            const hash = location.hash;
-            if (hash.startsWith('#album/')) {
-                const id = hash.replace('#album/', '');
-                showAlbumView(id);
-            } else {
-                showHomeView();
-            }
-        }
-
-        // 渲染相册内页
+        // 渲染相册内页照片
         function renderPhotos(album, filterKeyword = '') {
             const container = document.getElementById('photosContainer');
             container.innerHTML = '';
 
+            // 介绍栏
             const introText = album.introDetail || album.description;
             const introDiv = document.createElement('div');
             introDiv.className = 'album-intro';
             introDiv.innerHTML = `<span class="intro-bracket">「</span>${introText}<span class="intro-bracket">」</span>`;
             container.appendChild(introDiv);
 
+            // B站视频按钮
             if (album.videoTitle && album.videoUrl) {
                 const linkWrapper = document.createElement('div');
                 linkWrapper.className = 'video-link-wrapper';
-                linkWrapper.innerHTML = `
-                    <a class="video-btn" href="${album.videoUrl}" target="_blank">
-                        ${getBiliTvIcon()}
-                        ${album.videoTitle}
-                    </a>`;
+                linkWrapper.innerHTML = `<a class="video-btn" href="${album.videoUrl}" target="_blank">${getBiliTvIcon()} ${album.videoTitle}</a>`;
                 container.appendChild(linkWrapper);
             }
 
+            // 照片网格
             const gridDiv = document.createElement('div');
             gridDiv.className = 'photos-grid';
             const keyword = filterKeyword.toLowerCase().trim();
             let hasVisible = false;
+
             album.photos.forEach(photo => {
                 const combined = (photo.title + ' ' + photo.desc).toLowerCase();
                 if (keyword && !combined.includes(keyword)) return;
                 hasVisible = true;
+
                 const card = document.createElement('div');
                 card.className = 'photo-card';
                 card.innerHTML = `
-                    <img src="${photo.src}" alt="${photo.title}">
+                    <img src="${photo.src}" alt="${photo.title}" onclick="showPreview('${photo.src}')">
                     <div class="photo-info">
                         <div class="photo-title">${photo.title}</div>
                         <div class="photo-desc">${photo.desc}</div>
-                        <a class="download-btn" href="${photo.src}" download>⬇ 下载原图</a>
+                        <div class="photo-actions">
+                            <a class="action-btn" href="${photo.src}" download title="下载原图">${getDownloadIcon()}</a>
+                            <button class="action-btn" onclick="event.stopPropagation(); showPreview('${photo.src}')" title="预览照片">${getEyeIcon()}</button>
+                        </div>
                     </div>
                 `;
                 gridDiv.appendChild(card);
             });
             container.appendChild(gridDiv);
 
-            const noResult = document.getElementById('noResult');
             if (!hasVisible && keyword !== '') {
                 noResult.style.display = 'block';
                 noResult.textContent = '😕 这个相册里没有匹配的照片，换个词试试。';
@@ -415,28 +468,15 @@
         }
 
         function getBiliTvIcon() {
-            return `
-            <svg class="bili-tv-icon" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-                <rect x="2" y="4" width="20" height="15" rx="2" fill="none" stroke="white" stroke-width="2"/>
-                <polygon points="10,8 16,12 10,16" fill="white"/>
-                <line x1="5" y1="20" x2="19" y2="20" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                <line x1="7" y1="22" x2="17" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/>
-            </svg>`;
+            return `<svg class="bili-tv-icon" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="4" width="20" height="15" rx="2" fill="none" stroke="white" stroke-width="2"/><polygon points="10,8 16,12 10,16" fill="white"/><line x1="5" y1="20" x2="19" y2="20" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="7" y1="22" x2="17" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`;
         }
 
-        // 搜索功能
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const keyword = e.target.value;
-            if (currentAlbumId === null) {
-                renderAlbums(keyword);
-            } else {
-                const album = albums.find(a => a.id === currentAlbumId);
-                if (album) renderPhotos(album, keyword);
-            }
-        });
-
-        // 启动页面
-        initPage();
+        // 启动
+        const initHash = location.hash.slice(1);
+        if (initHash === 'about') switchView('about');
+        else if (initHash === 'links') switchView('links');
+        else if (initHash.startsWith('album/')) switchView('album', initHash.replace('album/', ''));
+        else switchView('home');
     </script>
 </body>
 </html>
