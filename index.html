@@ -38,7 +38,7 @@
         .search-section { text-align: center; padding: 24px 20px 12px; }
         .search-box-wrapper {
             display: inline-flex; align-items: center;
-            border: 1px solid #ddd; border-radius: 30px;
+            border: 1px solid #ddd; border-radius: 8px;
             background: white; width: 50%; max-width: 500px;
             transition: 0.2s;
         }
@@ -63,7 +63,8 @@
         .photos-container { display: none; }
 
         .album-card, .photo-card {
-            background: white; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            background: white; border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
             overflow: hidden; width: 300px; transition: transform 0.25s, box-shadow 0.25s; cursor: pointer;
         }
         .album-card:hover, .photo-card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,0.12); }
@@ -121,7 +122,7 @@
             display: flex; align-items: center; justify-content: center;
         }
         .modal-overlay img {
-            max-width: 90%; max-height: 90%; border-radius: 8px;
+            max-width: 90%; max-height: 90%; border-radius: 6px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         .modal-close {
@@ -129,12 +130,48 @@
             color: white; font-size: 36px; cursor: pointer; font-weight: 300;
         }
 
+        /* ========== 手机端适配 ========== */
         @media (max-width: 768px) {
+            /* 相册内照片网格：改为两列，去掉滚动 */
             .photos-grid {
-                display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 16px;
-                padding: 0 16px 20px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                padding: 0 12px 20px;
+                overflow-x: visible;
+                scroll-snap-type: none;
             }
-            .photos-grid .photo-card { flex: 0 0 auto; width: 280px; scroll-snap-align: start; }
+            .photos-grid .photo-card {
+                width: auto;
+                flex: none;
+                scroll-snap-align: none;
+                border-radius: 8px;
+            }
+            .photo-card img {
+                height: auto;
+                aspect-ratio: 4/3; /* 保持图片比例，可按喜好调整 */
+                object-fit: cover;
+            }
+            .photo-info {
+                padding: 12px;
+            }
+            .photo-title {
+                font-size: 0.9rem;
+            }
+            .photo-desc {
+                font-size: 0.75rem;
+                margin-bottom: 8px;
+            }
+            .action-btn {
+                width: 32px;
+                height: 32px;
+            }
+            .action-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            /* 顶部导航 */
             .site-header { padding: 12px 16px; flex-direction: column; align-items: flex-start; }
             .nav-menu { margin-top: 10px; gap: 20px; }
             .search-box-wrapper { width: 80%; }
@@ -189,7 +226,7 @@
 
     <div id="linksView" style="display: none;">
         <div class="page-content">
-            <h2>🔗 友情链接</h2>
+            <h2>友情链接</h2>
             <p><a href="http://www.nmc.cn/" target="_blank">中国气象局</a> — 官方天气预报与预警</p>
             <p><a href="https://tf.121.com.cn/index.html" target="_blank">深圳台风网</a> — 实时台风路径追踪</p>
             <p><a href="https://space.bilibili.com/1095244956?spm_id_from=333.1007.0.0" target="_blank">哔哩哔哩</a> — 我们的视频频道</p>
@@ -201,7 +238,7 @@
     <footer>© 2026 Tempest Chase · 所有照片均可自由下载</footer>
 
     <script>
-        // 相册数据
+        // 相册数据（保持不变）
         const albums = [
             {
                 id: 'mujigae',
