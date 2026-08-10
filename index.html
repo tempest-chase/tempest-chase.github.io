@@ -24,11 +24,7 @@
             letter-spacing: 2px; 
             color: #222; 
         }
-        .back-btn {
-            background: none; border: 1px solid #ddd; padding: 6px 16px; border-radius: 20px;
-            cursor: pointer; font-size: 0.9rem; color: #555; transition: 0.2s; display: none;
-        }
-        .back-btn:hover { background: #f0f0f0; }
+        /* 原来的返回按钮已移除，相关样式也可删除，这里保留但按钮不会出现 */
         .search-box input {
             padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; width: 220px;
             font-size: 0.9rem; outline: none; transition: 0.2s;
@@ -120,6 +116,24 @@
             margin: 0 auto;
             padding: 0 20px 20px;
         }
+
+        /* 手机端相册左右滑动 */
+        @media (max-width: 768px) {
+            .photos-grid {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                gap: 16px;
+                padding: 0 16px 20px;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+            }
+            .photos-grid .photo-card {
+                flex: 0 0 auto;
+                width: 280px;
+                scroll-snap-align: start;
+            }
+        }
     </style>
 </head>
 <body>
@@ -128,11 +142,8 @@
             <img class="logo-img" src="logo.jpg" alt="Logo">
             <span class="site-title">Tempest Chase V1</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <button class="back-btn" id="backBtn" onclick="goBackToAlbums()">← 返回相册列表</button>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="搜索…">
-            </div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="搜索…">
         </div>
     </header>
 
@@ -149,7 +160,7 @@
 
     <script>
         // =============================================
-        // 👇 相册数据（文件夹名和文件名已改为英文）
+        // 👇 相册数据
         // =============================================
         const albums = [
             {
@@ -257,6 +268,7 @@
         // ================ 引擎 ================
         let currentAlbumId = null;
 
+        // 渲染相册封面列表
         function renderAlbums(filterKeyword = '') {
             const container = document.getElementById('albumsContainer');
             container.innerHTML = '';
@@ -284,39 +296,72 @@
             if (!hasVisible) document.getElementById('noResult').textContent = '😕 没有找到匹配的相册，换个关键词试试吧。';
         }
 
+        // 打开相册（同时修改 URL hash）
         function openAlbum(albumId) {
             const album = albums.find(a => a.id === albumId);
             if (!album) return;
-            currentAlbumId = albumId;
-            document.getElementById('albumsContainer').style.display = 'none';
-            document.getElementById('introText').style.display = 'none';
-            document.getElementById('photosContainer').style.display = 'block';
-            document.getElementById('backBtn').style.display = 'inline-block';
-            document.getElementById('searchInput').value = '';
-            renderPhotos(album);
+            // 修改 hash，触发 popstate 不会重复打开，所以我们直接调用显示逻辑
+            location.hash = 'album/' + albumId;
         }
 
-        function goBackToAlbums() {
+        // 返回首页（清除 hash）
+        function goToHome() {
+            if (location.hash) {
+                history.back(); // 利用浏览器历史返回
+            } else {
+                showHomeView();
+            }
+        }
+
+        // 显示首页视图
+        function showHomeView() {
             currentAlbumId = null;
             document.getElementById('albumsContainer').style.display = 'flex';
             document.getElementById('introText').style.display = 'block';
             document.getElementById('photosContainer').style.display = 'none';
-            document.getElementById('backBtn').style.display = 'none';
             document.getElementById('searchInput').value = '';
             document.getElementById('noResult').style.display = 'none';
             renderAlbums();
         }
 
-        function getBiliTvIcon() {
-            return `
-            <svg class="bili-tv-icon" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-                <rect x="2" y="4" width="20" height="15" rx="2" fill="none" stroke="white" stroke-width="2"/>
-                <polygon points="10,8 16,12 10,16" fill="white"/>
-                <line x1="5" y1="20" x2="19" y2="20" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                <line x1="7" y1="22" x2="17" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/>
-            </svg>`;
+        // 显示相册视图
+        function showAlbumView(albumId) {
+            const album = albums.find(a => a.id === albumId);
+            if (!album) {
+                showHomeView();
+                return;
+            }
+            currentAlbumId = albumId;
+            document.getElementById('albumsContainer').style.display = 'none';
+            document.getElementById('introText').style.display = 'none';
+            document.getElementById('photosContainer').style.display = 'block';
+            document.getElementById('searchInput').value = '';
+            renderPhotos(album);
         }
 
+        // 监听浏览器后退/前进（hash 变化）
+        window.addEventListener('hashchange', function() {
+            const hash = location.hash;
+            if (hash.startsWith('#album/')) {
+                const id = hash.replace('#album/', '');
+                showAlbumView(id);
+            } else {
+                showHomeView();
+            }
+        });
+
+        // 初始加载时，根据当前 hash 决定显示哪个页面
+        function initPage() {
+            const hash = location.hash;
+            if (hash.startsWith('#album/')) {
+                const id = hash.replace('#album/', '');
+                showAlbumView(id);
+            } else {
+                showHomeView();
+            }
+        }
+
+        // 渲染相册内页
         function renderPhotos(album, filterKeyword = '') {
             const container = document.getElementById('photosContainer');
             container.innerHTML = '';
@@ -369,6 +414,17 @@
             }
         }
 
+        function getBiliTvIcon() {
+            return `
+            <svg class="bili-tv-icon" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="4" width="20" height="15" rx="2" fill="none" stroke="white" stroke-width="2"/>
+                <polygon points="10,8 16,12 10,16" fill="white"/>
+                <line x1="5" y1="20" x2="19" y2="20" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                <line x1="7" y1="22" x2="17" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>`;
+        }
+
+        // 搜索功能
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const keyword = e.target.value;
             if (currentAlbumId === null) {
@@ -379,7 +435,8 @@
             }
         });
 
-        renderAlbums();
+        // 启动页面
+        initPage();
     </script>
 </body>
 </html>
