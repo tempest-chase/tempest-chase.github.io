@@ -43,7 +43,8 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.3);
         }
         body.dark-mode .album-title, body.dark-mode .photo-title { color: #ddd; }
-        body.dark-mode .album-desc, body.dark-mode .photo-desc { color: #aaa; }
+        body.dark-mode .album-desc, body.dark-mode .photo-desc,
+        body.dark-mode .meta-author, body.dark-mode .meta-comment, body.dark-mode .meta-location { color: #aaa; }
         body.dark-mode .action-btn {
             border-color: #555;
             color: #aaa;
@@ -77,172 +78,104 @@
             z-index: 100;
             transition: background 0.3s, border-color 0.3s;
         }
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 0 0 auto;
-        }
-        .logo-img {
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .site-title {
-            font-size: 1rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #222;
-            line-height: 40px;
-        }
+        .logo-area { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
+        .logo-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .site-title { font-size: 1rem; font-weight: 700; letter-spacing: 1px; color: #222; line-height: 40px; }
 
-        .search-section {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            padding: 0 20px;
-        }
+        .search-section { flex: 1; display: flex; justify-content: center; padding: 0 20px; }
         .search-box-wrapper {
             display: inline-flex; align-items: center;
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            background: #fafafa;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);
-            width: 100%;
-            max-width: 400px;
+            border: 1px solid #e0e0e0; border-radius: 12px; background: #fafafa;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.03); width: 100%; max-width: 400px;
             transition: all 0.2s;
         }
         .search-box-wrapper:focus-within {
-            border-color: #5a9;
-            box-shadow: 0 0 0 3px rgba(85,170,153,0.1), inset 0 1px 3px rgba(0,0,0,0.05);
+            border-color: #5a9; box-shadow: 0 0 0 3px rgba(85,170,153,0.1), inset 0 1px 3px rgba(0,0,0,0.05);
         }
         .search-box-wrapper input {
             flex: 1; padding: 10px 16px; border: none; outline: none;
-            font-size: 0.95rem; font-family: inherit; background: transparent;
-            color: #333;
+            font-size: 0.95rem; font-family: inherit; background: transparent; color: #333;
         }
         .search-btn {
             background: none; border: none; padding: 0 14px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; color: #888;
-            transition: color 0.2s;
+            display: flex; align-items: center; justify-content: center; color: #888; transition: color 0.2s;
         }
         .search-btn:hover { color: #5a9; }
         .search-btn svg { width: 18px; height: 18px; }
 
         .nav-menu {
-            display: flex;
-            gap: 30px;
-            list-style: none;
-            padding-left: 0;
-            align-items: center;
-            flex: 0 0 auto;
+            display: flex; gap: 30px; list-style: none; padding-left: 0; align-items: center; flex: 0 0 auto;
         }
         .nav-menu a {
-            text-decoration: none;
-            color: #555;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: color 0.2s;
-            line-height: 40px;
-            display: flex;
-            align-items: center;
-            border-bottom: 2px solid transparent;
-            padding-bottom: 0;
+            text-decoration: none; color: #555; font-size: 0.95rem; cursor: pointer;
+            transition: color 0.2s; line-height: 40px; display: flex; align-items: center;
+            border-bottom: 2px solid transparent; padding-bottom: 0;
         }
         .nav-menu a:hover { color: #222; }
-        .nav-menu a.active {
-            font-weight: 600;
-            color: #000;
-            border-bottom-color: #000;
-        }
+        .nav-menu a.active { font-weight: 600; color: #000; border-bottom-color: #000; }
 
-        /* 分类筛选按钮 - 无边框纯文字 */
-        .filter-section {
-            max-width: 1300px;
-            margin: 30px auto 0;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
+        /* 分类筛选按钮 */
+        .filter-section { max-width: 1300px; margin: 30px auto 0; padding: 0 20px; display: flex; align-items: center; gap: 24px; }
         .filter-btn {
-            background: none;
-            border: none;
-            padding: 4px 0;
-            font-size: 1rem;
-            font-weight: 500;
-            color: #999;
-            cursor: pointer;
-            transition: color 0.2s, font-weight 0.2s;
-            font-family: inherit;
-            line-height: 1.5;
+            background: none; border: none; padding: 4px 0; font-size: 1rem; font-weight: 500;
+            color: #999; cursor: pointer; transition: color 0.2s, font-weight 0.2s; font-family: inherit; line-height: 1.5;
         }
-        .filter-btn:hover {
-            color: #666;
-        }
-        .filter-btn.active {
-            color: #000;
-            font-weight: 700;
-        }
+        .filter-btn:hover { color: #666; }
+        .filter-btn.active { color: #000; font-weight: 700; }
 
-        /* 相册与照片网格 - 弹性四列 */
-        .albums-container,
-        .photos-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-            justify-content: center;
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 20px;
+        /* 网格 */
+        .albums-container, .photos-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+            justify-content: center; max-width: 1300px; margin: 0 auto; padding: 20px;
         }
         .photos-container { display: none; }
 
         .album-card, .photo-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.08);
-            overflow: hidden;
-            width: 100%;
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
+            background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.08);
+            overflow: hidden; width: 100%; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;
         }
-        .album-card:hover, .photo-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 28px rgba(0,0,0,0.1), 0 2px 6px rgba(0,0,0,0.08);
-        }
-        .album-card img, .photo-card img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.4s;
-        }
+        .album-card:hover, .photo-card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,0.1), 0 2px 6px rgba(0,0,0,0.08); }
+        .album-card img, .photo-card img { width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.4s; }
         .album-card:hover img, .photo-card:hover img { transform: scale(1.03); }
         .album-info, .photo-info { padding: 16px; }
         .album-title, .photo-title { font-weight: 600; font-size: 1rem; color: #222; margin-bottom: 6px; }
         .album-desc, .photo-desc { font-size: 0.85rem; color: #666; line-height: 1.5; }
         .photo-desc { margin-bottom: 12px; }
 
+        /* 新元信息行：简介绝对居中，作者和地点左右对齐 */
+        .photo-meta {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* 作者和地点分布在两端 */
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 12px;
+            white-space: nowrap;
+        }
+        .meta-author { text-align: left; }
+        .meta-comment {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        .meta-location { text-align: right; }
+
         .photo-actions { display: flex; gap: 10px; margin-top: auto; }
         .action-btn {
             display: flex; align-items: center; justify-content: center;
-            width: 36px; height: 36px; border-radius: 50%;
-            background: transparent; border: 1px solid #ddd;
-            cursor: pointer; transition: all 0.2s; color: #666;
+            width: 36px; height: 36px; border-radius: 50%; background: transparent;
+            border: 1px solid #ddd; cursor: pointer; transition: all 0.2s; color: #666;
         }
         .action-btn:hover {
-            border-color: #aaa;
-            color: #333;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            border-color: #aaa; color: #333; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.08);
         }
         .action-btn svg { width: 18px; height: 18px; }
 
         .no-result { text-align: center; padding: 60px 20px; color: #aaa; font-size: 1.2rem; display: none; }
         footer { text-align: center; padding: 40px 20px; color: #bbb; font-size: 0.85rem; }
 
-        /* 页面内容 */
         .page-content { max-width: 800px; margin: 30px auto; padding: 20px; font-size: 1rem; line-height: 1.8; color: #333; }
         .page-content h2 { font-size: 1.6rem; margin-bottom: 20px; text-align: center; color: #222; }
         .page-content p { margin-bottom: 16px; }
@@ -254,124 +187,66 @@
         .setting-row { display: flex; align-items: center; justify-content: space-between; max-width: 400px; margin: 20px auto; }
         .toggle-label { font-weight: 500; }
         .toggle-btn {
-            position: relative; width: 50px; height: 26px;
-            background: #ccc; border-radius: 30px;
+            position: relative; width: 50px; height: 26px; background: #ccc; border-radius: 30px;
             cursor: pointer; transition: background 0.3s; border: none; padding: 0;
         }
         .toggle-btn::after {
-            content: ''; position: absolute; top: 3px; left: 3px;
-            width: 20px; height: 20px; background: white; border-radius: 50%;
-            transition: transform 0.3s;
+            content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px;
+            background: white; border-radius: 50%; transition: transform 0.3s;
         }
         body.dark-mode .toggle-btn { background: #5a9; }
         body.dark-mode .toggle-btn::after { transform: translateX(24px); }
 
-        /* 相册内页介绍栏 */
         .album-intro {
             max-width: 1200px; margin: 40px auto 20px; padding: 20px 20px 10px;
             text-align: center; font-size: 1rem; color: #333; line-height: 1.8;
-            background: transparent;
-            border-bottom: 1px dashed rgba(0,0,0,0.1);
+            background: transparent; border-bottom: 1px dashed rgba(0,0,0,0.1);
         }
-        .album-intro .intro-bracket {
-            color: #007bff; font-size: 1.3em; font-weight: bold;
-            vertical-align: middle; margin: 0 0.4em;
-        }
+        .album-intro .intro-bracket { color: #007bff; font-size: 1.3em; font-weight: bold; vertical-align: middle; margin: 0 0.4em; }
         .video-link-wrapper { text-align: center; margin: 20px auto 30px; max-width: 1200px; padding: 0 20px; }
         .video-btn {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: #fb7299; color: white; text-decoration: none;
-            padding: 10px 28px; border-radius: 30px;
-            font-size: 1rem; font-weight: 500;
-            transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 12px rgba(251,114,153,0.3);
+            display: inline-flex; align-items: center; gap: 6px; background: #fb7299; color: white;
+            text-decoration: none; padding: 10px 28px; border-radius: 30px; font-size: 1rem; font-weight: 500;
+            transition: background 0.2s, transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(251,114,153,0.3);
         }
-        .video-btn:hover {
-            background: #e05a7f; transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(251,114,153,0.4);
-        }
+        .video-btn:hover { background: #e05a7f; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(251,114,153,0.4); }
         .bili-tv-icon { display: inline-block; width: 1.2em; height: 1.2em; vertical-align: middle; }
 
-        /* 图片预览模态框 (及公告模态框复用样式) */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.75);
-            backdrop-filter: blur(10px);
-            z-index: 200;
-            display: flex; align-items: center; justify-content: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(10px); z-index: 200; display: flex; align-items: center; justify-content: center;
             animation: fadeIn 0.2s;
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .modal-overlay img {
-            max-width: 90%; max-height: 90%; border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            max-width: 90%; max-height: 90%; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             animation: scaleIn 0.25s;
         }
         @keyframes scaleIn { from { transform: scale(0.95); } to { transform: scale(1); } }
-        .modal-close {
-            position: absolute; top: 20px; right: 30px;
-            color: white; font-size: 36px; cursor: pointer; font-weight: 300;
-            transition: opacity 0.2s;
-        }
+        .modal-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 36px; cursor: pointer; font-weight: 300; }
         .modal-close:hover { opacity: 0.7; }
 
-        /* 公告模态框内的文字样式 */
         .announce-content {
-            background: white;
-            color: #333;
-            padding: 30px;
-            border-radius: 12px;
-            max-width: 500px;
-            width: 90%;
-            text-align: left;
-            line-height: 1.8;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            background: white; color: #333; padding: 30px; border-radius: 12px; max-width: 500px;
+            width: 90%; text-align: left; line-height: 1.8; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             animation: scaleIn 0.25s;
         }
-        body.dark-mode .announce-content {
-            background: #1e2a3a;
-            color: #ccc;
-        }
+        body.dark-mode .announce-content { background: #1e2a3a; color: #ccc; }
 
         /* 响应式 */
         @media (max-width: 1200px) {
-            .albums-container,
-            .photos-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
+            .albums-container, .photos-grid { grid-template-columns: repeat(3, 1fr); }
         }
         @media (max-width: 768px) {
-            .site-header {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 12px 16px;
-            }
-            .search-section {
-                width: 100%;
-                padding: 8px 0;
-                order: 3;
-            }
-            .nav-menu {
-                margin-top: 10px;
-                gap: 20px;
-                width: 100%;
-                justify-content: flex-start;
-            }
-            .filter-section {
-                margin-top: 20px;
-                padding: 0 16px;
-                gap: 20px;
-            }
-            .albums-container,
-            .photos-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-                padding: 12px;
-            }
+            .site-header { flex-direction: column; align-items: flex-start; padding: 12px 16px; }
+            .search-section { width: 100%; padding: 8px 0; order: 3; }
+            .nav-menu { margin-top: 10px; gap: 20px; width: 100%; justify-content: flex-start; }
+            .filter-section { margin-top: 20px; padding: 0 16px; gap: 20px; }
+            .albums-container, .photos-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
             .photo-card img { height: auto; aspect-ratio: 4/3; }
             .photo-info { padding: 12px; }
             .photo-title { font-size: 0.9rem; }
-            .photo-desc { font-size: 0.75rem; margin-bottom: 8px; }
+            .photo-meta { font-size: 0.7rem; }
             .action-btn { width: 32px; height: 32px; }
             .action-btn svg { width: 16px; height: 16px; }
         }
@@ -401,7 +276,6 @@
         </ul>
     </header>
 
-    <!-- 筛选栏：新增公告按钮在最左侧 -->
     <div class="filter-section" id="filterSection">
         <button class="filter-btn" id="announceBtn">公告</button>
         <button class="filter-btn active" data-type="all">全部</button>
@@ -466,10 +340,10 @@
                 videoTitle: '桦加沙追风视频',
                 videoUrl: 'https://www.bilibili.com/video/BV1GZHnzDEQk/',
                 photos: [
-                    { src: 'ragasa/ragasaphoto1.jpg', title: 'RAGASA-照片1', desc: '追风队-飞鹰&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;风毁&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;珠海' },
-                    { src: 'ragasa/ragasaphoto2.jpg', title: 'RAGASA-照片2', desc: '这里是照片简介' },
-                    { src: 'ragasa/ragasaphoto3.jpg', title: 'RAGASA-照片3', desc: '这里是照片简介' },
-                    { src: 'ragasa/ragasaphoto4.jpg', title: 'RAGASA-照片4', desc: '这里是照片简介' }
+                    { src: 'ragasa/ragasaphoto1.jpg', title: 'RAGASA-照片1', author: '飞鹰', comment: '风毁', location: '珠海' },
+                    { src: 'ragasa/ragasaphoto2.jpg', title: 'RAGASA-照片2', author: '拍摄者', comment: '简介', location: '地点' },
+                    { src: 'ragasa/ragasaphoto3.jpg', title: 'RAGASA-照片3', author: '拍摄者', comment: '简介', location: '地点' },
+                    { src: 'ragasa/ragasaphoto4.jpg', title: 'RAGASA-照片4', author: '拍摄者', comment: '简介', location: '地点' }
                 ]
             },
             {
@@ -482,10 +356,10 @@
                 videoTitle: '麦德姆追风视频',
                 videoUrl: 'https://www.bilibili.com/video/BV1Ea4ezCEwX/',
                 photos: [
-                    { src: 'matmo/matmophoto1.jpg', title: 'MATMO-照片1', desc: '追风队-CL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实况&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;湛江' },
-                    { src: 'matmo/matmophoto2.jpg', title: 'MATMO-照片2', desc: '这里是照片简介' },
-                    { src: 'matmo/matmophoto3.jpg', title: 'MATMO-照片3', desc: '这里是照片简介' },
-                    { src: 'matmo/matmophoto4.jpg', title: 'MATMO-照片4', desc: '这里是照片简介' }
+                    { src: 'matmo/matmophoto1.jpg', title: 'MATMO-照片1', author: 'CL', comment: '实况', location: '湛江' },
+                    { src: 'matmo/matmophoto2.jpg', title: 'MATMO-照片2', author: '拍摄者', comment: '简介', location: '地点' },
+                    { src: 'matmo/matmophoto3.jpg', title: 'MATMO-照片3', author: '拍摄者', comment: '简介', location: '地点' },
+                    { src: 'matmo/matmophoto4.jpg', title: 'MATMO-照片4', author: '拍摄者', comment: '简介', location: '地点' }
                 ]
             },
             {
@@ -498,14 +372,14 @@
                 videoTitle: '巴威地球风云系列视频',
                 videoUrl: 'https://www.bilibili.com/video/BV1n93463E3H/',
                 photos: [
-                    { src: 'bavi/baviphoto1.jpg', title: 'BAVI-照片1', desc: '追风队-飞鹰&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实况&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;台州' },
-                    { src: 'bavi/baviphoto2.jpg', title: 'BAVI-照片2', desc: '追风队-飞鹰&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实况&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;台州' },
-                    { src: 'bavi/baviphoto3.jpg', title: 'BAVI-照片3', desc: '追风队-飞鹰&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实况&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;台州' },
-                    { src: 'bavi/baviphoto4.jpg', title: 'BAVI-照片4', desc: '追风队-飞鹰&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;风毁&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;台州' },
-                    { src: 'bavi/baviphoto5.jpg', title: 'BAVI-照片5', desc: '追风队-飞鹰&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;风毁&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;台州' },
-                    { src: 'bavi/baviphoto6.jpg', title: 'BAVI-照片6', desc: '追风队-飞鹰&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;风毁&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;台州' },
-                    { src: 'bavi/baviphoto7.jpg', title: 'BAVI-照片7', desc: '追风队-飞鹰&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;风毁&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;台州' },
-                    { src: 'bavi/baviphoto8.jpg', title: 'BAVI-照片8', desc: '这里是照片简介' }
+                    { src: 'bavi/baviphoto1.jpg', title: 'BAVI-照片1', author: '飞鹰', comment: '实况', location: '台州' },
+                    { src: 'bavi/baviphoto2.jpg', title: 'BAVI-照片2', author: '飞鹰', comment: '实况', location: '台州' },
+                    { src: 'bavi/baviphoto3.jpg', title: 'BAVI-照片3', author: '飞鹰', comment: '实况', location: '台州' },
+                    { src: 'bavi/baviphoto4.jpg', title: 'BAVI-照片4', author: '飞鹰', comment: '风毁', location: '台州' },
+                    { src: 'bavi/baviphoto5.jpg', title: 'BAVI-照片5', author: '飞鹰', comment: '风毁', location: '台州' },
+                    { src: 'bavi/baviphoto6.jpg', title: 'BAVI-照片6', author: '飞鹰', comment: '风毁', location: '台州' },
+                    { src: 'bavi/baviphoto7.jpg', title: 'BAVI-照片7', author: '飞鹰', comment: '风毁', location: '台州' },
+                    { src: 'bavi/baviphoto8.jpg', title: 'BAVI-照片8', author: '拍摄者', comment: '简介', location: '地点' }
                 ]
             },
             {
@@ -518,10 +392,10 @@
                 videoTitle: '红霞追风视频',
                 videoUrl: 'https://www.bilibili.com/video/BV13Z3E6iE77/',
                 photos: [
-                    { src: 'noul/noulphoto1.jpg', title: 'NOUL-照片1', desc: '追风队-落帆星海&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;风毁&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;深汕' },
-                    { src: 'noul/noulphoto2.jpg', title: 'NOUL-照片2', desc: '这里是照片简介' },
-                    { src: 'noul/noulphoto3.jpg', title: 'NOUL-照片3', desc: '这里是照片简介' },
-                    { src: 'noul/noulphoto4.jpg', title: 'NOUL-照片4', desc: '这里是照片简介' }
+                    { src: 'noul/noulphoto1.jpg', title: 'NOUL-照片1', author: '落帆星海', comment: '风毁', location: '深汕' },
+                    { src: 'noul/noulphoto2.jpg', title: 'NOUL-照片2', author: '拍摄者', comment: '简介', location: '地点' },
+                    { src: 'noul/noulphoto3.jpg', title: 'NOUL-照片3', author: '拍摄者', comment: '简介', location: '地点' },
+                    { src: 'noul/noulphoto4.jpg', title: 'NOUL-照片4', author: '拍摄者', comment: '简介', location: '地点' }
                 ]
             },
             {
@@ -534,14 +408,14 @@
                 videoTitle: '2026雷暴追击视频',
                 videoUrl: 'https://www.bilibili.com/video/BV1AeL36CEGn/',
                 photos: [
-                    { src: 'storm/stormphoto1.jpg', title: 'STORM-照片1', desc: '追风队-TQM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实景&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;深圳' },
-                    { src: 'storm/stormphoto2.jpg', title: 'STORM-照片2', desc: '追风队-粤气爱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实景&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;深圳' },
-                    { src: 'storm/stormphoto3.jpg', title: 'STORM-照片3', desc: '追风队-TQM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实景&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;深圳' },
-                    { src: 'storm/stormphoto4.png', title: 'STORM-照片4', desc: '追风队-南超&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实景&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;东莞' },
-                    { src: 'storm/stormphoto5.png', title: 'STORM-照片5', desc: '追风队-南超&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实景&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;东莞' },
-                    { src: 'storm/stormphoto6.png', title: 'STORM-照片6', desc: '追风队-南超&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实景&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;东莞' },
-                    { src: 'storm/stormphoto7.png', title: 'STORM-照片7', desc: '这里是照片简介' },
-                    { src: 'storm/stormphoto8.png', title: 'STORM-照片8', desc: '这里是照片简介' }
+                    { src: 'storm/stormphoto1.jpg', title: 'STORM-照片1', author: 'TQM', comment: '实景', location: '深圳' },
+                    { src: 'storm/stormphoto2.jpg', title: 'STORM-照片2', author: '粤气爱', comment: '实景', location: '深圳' },
+                    { src: 'storm/stormphoto3.jpg', title: 'STORM-照片3', author: 'TQM', comment: '实景', location: '深圳' },
+                    { src: 'storm/stormphoto4.png', title: 'STORM-照片4', author: '南超', comment: '实景', location: '东莞' },
+                    { src: 'storm/stormphoto5.png', title: 'STORM-照片5', author: '南超', comment: '实景', location: '东莞' },
+                    { src: 'storm/stormphoto6.png', title: 'STORM-照片6', author: '南超', comment: '实景', location: '东莞' },
+                    { src: 'storm/stormphoto7.png', title: 'STORM-照片7', author: '拍摄者', comment: '简介', location: '地点' },
+                    { src: 'storm/stormphoto8.png', title: 'STORM-照片8', author: '拍摄者', comment: '简介', location: '地点' }
                 ]
             },
             {
@@ -554,14 +428,14 @@
                 videoTitle: '2026降雪追击视频',
                 videoUrl: 'https://www.bilibili.com/video/BV1rhkxBjExL/',
                 photos: [
-                    { src: 'snow/snowphoto1.jpg', title: 'SNOW-照片1', desc: '追风队-飞鹰&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实景&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;烟台' },
-                    { src: 'snow/snowphoto2.jpg', title: 'SNOW-照片2', desc: '追风队-飞鹰&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实景&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;烟台' },
-                    { src: 'snow/snowphoto3.jpg', title: 'SNOW-照片3', desc: '追风队-飞鹰&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实景&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;烟台' },
-                    { src: 'snow/snowphoto4.jpg', title: 'SNOW-照片4', desc: '追风队-飞鹰&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实景&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;烟台' },
-                    { src: 'snow/snowphoto5.jpg', title: 'SNOW-照片5', desc: '追风队-飞鹰&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实景&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;烟台' },
-                    { src: 'snow/snowphoto6.jpg', title: 'SNOW-照片6', desc: '追风队-飞鹰&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实景&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;烟台' },
-                    { src: 'snow/snowphoto7.jpg', title: 'SNOW-照片7', desc: '这里是照片简介' },
-                    { src: 'snow/snowphoto8.jpg', title: 'SNOW-照片8', desc: '这里是照片简介' }
+                    { src: 'snow/snowphoto1.jpg', title: 'SNOW-照片1', author: '飞鹰', comment: '实景', location: '烟台' },
+                    { src: 'snow/snowphoto2.jpg', title: 'SNOW-照片2', author: '飞鹰', comment: '实景', location: '烟台' },
+                    { src: 'snow/snowphoto3.jpg', title: 'SNOW-照片3', author: '飞鹰', comment: '实景', location: '烟台' },
+                    { src: 'snow/snowphoto4.jpg', title: 'SNOW-照片4', author: '飞鹰', comment: '实景', location: '烟台' },
+                    { src: 'snow/snowphoto5.jpg', title: 'SNOW-照片5', author: '飞鹰', comment: '实景', location: '烟台' },
+                    { src: 'snow/snowphoto6.jpg', title: 'SNOW-照片6', author: '飞鹰', comment: '实景', location: '烟台' },
+                    { src: 'snow/snowphoto7.jpg', title: 'SNOW-照片7', author: '拍摄者', comment: '简介', location: '地点' },
+                    { src: 'snow/snowphoto8.jpg', title: 'SNOW-照片8', author: '拍摄者', comment: '简介', location: '地点' }
                 ]
             }
         ];
@@ -569,7 +443,6 @@
         let currentType = 'all';
         let currentKeyword = '';
 
-        // 黑夜模式
         const darkModeToggle = document.getElementById('darkModeToggle');
         function applyDarkMode(isDark) {
             if (isDark) document.body.classList.add('dark-mode');
@@ -594,17 +467,13 @@
         const noResult = document.getElementById('noResult');
         const searchInput = document.getElementById('searchInput');
         const searchBtn = document.getElementById('searchBtn');
-        const filterBtns = document.querySelectorAll('.filter-btn[data-type]'); // 只选择有 data-type 的按钮，排除公告
+        const filterBtns = document.querySelectorAll('.filter-btn[data-type]');
         const announceBtn = document.getElementById('announceBtn');
 
-        // 公告按钮点击事件
         if (announceBtn) {
-            announceBtn.addEventListener('click', () => {
-                showAnnouncement();
-            });
+            announceBtn.addEventListener('click', () => showAnnouncement());
         }
 
-        // 显示公告模态框
         function showAnnouncement() {
             const existing = document.querySelector('.modal-overlay');
             if (existing) existing.remove();
@@ -619,18 +488,14 @@
                     <p style="margin-top: 16px; font-size: 0.9rem; color: #888;">（点击遮罩或右上角关闭按钮退出）</p>
                 </div>
             `;
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) overlay.remove();
-            });
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
             document.body.appendChild(overlay);
         }
 
-        // 分类按钮点击事件
         filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 filterBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                // 同时移除公告的 active 状态（如果有）
                 announceBtn.classList.remove('active');
                 currentType = btn.dataset.type;
                 if (currentView === 'home') renderAlbums(currentKeyword);
@@ -768,16 +633,30 @@
             let hasVisible = false;
             album.photos.forEach(photo => {
                 if (currentType !== 'all' && getFileType(photo.src) !== currentType) return;
-                const combined = (photo.title + ' ' + photo.desc).toLowerCase();
+                const combined = (photo.title + ' ' + (photo.author||'') + ' ' + (photo.comment||'') + ' ' + (photo.location||'')).toLowerCase();
                 if (keyword && !combined.includes(keyword)) return;
                 hasVisible = true;
+
+                const hasMeta = photo.author !== undefined || photo.comment !== undefined || photo.location !== undefined;
+                let metaHTML = '';
+                if (hasMeta) {
+                    metaHTML = `
+                        <div class="photo-meta">
+                            <span class="meta-author">${photo.author || ''}</span>
+                            <span class="meta-comment">${photo.comment || ''}</span>
+                            <span class="meta-location">${photo.location || ''}</span>
+                        </div>`;
+                } else if (photo.desc) {
+                    metaHTML = `<div class="photo-desc">${photo.desc}</div>`;
+                }
+
                 const card = document.createElement('div');
                 card.className = 'photo-card';
                 card.innerHTML = `
                     <img src="${photo.src}" alt="${photo.title}" onclick="showPreview('${photo.src}')">
                     <div class="photo-info">
                         <div class="photo-title">${photo.title}</div>
-                        <div class="photo-desc">${photo.desc}</div>
+                        ${metaHTML}
                         <div class="photo-actions">
                             <a class="action-btn" href="${photo.src}" download title="下载原图">${getDownloadIcon()}</a>
                             <button class="action-btn" onclick="event.stopPropagation(); showPreview('${photo.src}')" title="预览照片">${getEyeIcon()}</button>
