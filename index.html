@@ -587,13 +587,13 @@
             </div>
             <p style="text-align: center; font-size: 0.9rem; color: #888;">切换后自动保存您的偏好</p>
 
-            <!-- 背景设置模块（无emoji，按钮统一，隐藏文件输入） -->
+            <!-- 背景设置模块（按钮顺序：选择图片 | 重置 | 移除背景） -->
             <div class="bg-setting">
                 <p>自定义背景</p>
                 <div class="btn-row">
                     <button class="btn-sm" id="bgSelectBtn">选择图片</button>
-                    <button class="btn-sm" id="bgRemoveBtn">移除背景</button>
                     <button class="btn-sm" id="bgResetBtn">重置</button>
+                    <button class="btn-sm" id="bgRemoveBtn">移除背景</button>
                 </div>
                 <!-- 隐藏的原生文件输入 -->
                 <input type="file" id="bgFileInput" accept="image/*">
@@ -612,7 +612,7 @@
         // ========== 天地图密钥 ==========
         const TIANDITU_KEY = '7af52769cf10860155e93786bb66db9d';
 
-        // ========== 相册数据（已恢复完整内容） ==========
+        // ========== 相册数据 ==========
         const albums = [
             {
                 id: 'mujigae',
