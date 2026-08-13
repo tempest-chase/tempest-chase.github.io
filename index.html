@@ -85,12 +85,14 @@
         body.dark-mode .filter-btn { color: #aaa; }
         body.dark-mode .filter-btn.active { color: #fff; }
         body.dark-mode .popup-btn {
-            background: rgba(22, 33, 62, 0.15);
+            background: rgba(22, 33, 62, 0.3);
             border-color: rgba(255,255,255,0.2);
             color: #ddd;
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
         }
         body.dark-mode .popup-btn:hover {
-            background: rgba(22, 33, 62, 0.25);
+            background: rgba(22, 33, 62, 0.5);
             border-color: #888;
         }
 
@@ -162,7 +164,6 @@
         }
         .photos-container { display: none; }
 
-        /* 卡片本身透明 */
         .album-card, .photo-card {
             background: transparent;
             border-radius: 8px;
@@ -173,7 +174,6 @@
         .album-card img, .photo-card img { width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.4s; }
         .album-card:hover img, .photo-card:hover img { transform: scale(1.03); }
 
-        /* 文字栏毛玻璃 30% */
         .album-info, .photo-info {
             padding: 16px;
             background: rgba(255, 255, 255, 0.3);
@@ -188,7 +188,6 @@
         .album-desc, .photo-desc { font-size: 0.85rem; color: #666; line-height: 1.5; }
         .photo-desc { margin-bottom: 12px; }
 
-        /* 元信息行 */
         .photo-meta {
             display: flex;
             align-items: center;
@@ -254,10 +253,12 @@
             border-color: rgba(255,255,255,0.1);
         }
         .bg-setting p { margin-bottom: 12px; font-size: 0.9rem; }
-        .bg-setting input[type="range"] {
-            width: 80%;
-            margin: 0 auto 12px;
-            display: block;
+        .bg-setting .btn-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
         }
         .bg-setting .btn-sm {
             padding: 6px 16px;
@@ -273,45 +274,19 @@
         .bg-setting .btn-sm:hover { background: #f5f5f5; }
         body.dark-mode .bg-setting .btn-sm { color: #ddd; border-color: #555; }
         body.dark-mode .bg-setting .btn-sm:hover { background: rgba(255,255,255,0.1); }
-
-        /* 背景设置一行三控件（居中靠拢） */
-        .bg-controls-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;  /* 居中 */
-            gap: 8px;
+        .bg-setting input[type="range"] {
+            width: 80%;
+            margin: 0 auto 12px;
+            display: block;
+        }
+        .bg-setting label {
+            display: block;
             margin-bottom: 12px;
-            flex-wrap: wrap;          /* 允许换行但尽量一行 */
+            font-size: 0.85rem;
+            color: #666;
         }
-        .bg-controls-row input[type="file"] {
-            color: transparent;
-            width: auto;
-            flex: 0 0 auto;
-        }
-        .bg-controls-row input[type="file"]::file-selector-button {
-            color: #555;
-            background: transparent;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            padding: 6px 16px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-family: inherit;
-            transition: all 0.2s;
-        }
-        .bg-controls-row input[type="file"]::file-selector-button:hover {
-            background: #f5f5f5;
-        }
-        body.dark-mode .bg-controls-row input[type="file"]::file-selector-button {
-            color: #ddd;
-            border-color: #555;
-        }
-        body.dark-mode .bg-controls-row input[type="file"]::file-selector-button:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        .bg-controls-row .btn-sm {
-            flex: 0 0 auto;
-            margin: 0;
+        .bg-setting input[type="file"] {
+            display: none; /* 隐藏原生文件输入，不显示文件名 */
         }
 
         .album-intro {
@@ -476,7 +451,7 @@
             margin: 0;
         }
 
-        /* 弹窗按钮：透明毛玻璃 */
+        /* 弹窗按钮：毛玻璃 30% */
         .popup-btn {
             display: block;
             width: 100%;
@@ -484,9 +459,9 @@
             padding: 8px 20px;
             border: 1px solid rgba(200,200,200,0.4);
             border-radius: 20px;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(255,255,255,0.3);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
             color: #333;
             text-decoration: none;
             font-size: 0.85rem;
@@ -496,7 +471,7 @@
             transition: background 0.2s, border-color 0.2s, transform 0.2s;
         }
         .popup-btn:hover {
-            background: rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.45);
             border-color: #aaa;
             transform: translateY(-1px);
         }
@@ -524,10 +499,6 @@
             .marker-square { width: 34px; height: 34px; border-radius: 6px; }
             .map-popup .photo-grid img, .photo-stack img { width: 56px; height: 56px; }
             .photo-stack { width: 56px; height: 56px; margin-right: 10px; }
-            .bg-controls-row {
-                flex-wrap: wrap; /* 移动端换行 */
-                justify-content: center;
-            }
         }
 
         /* 黑夜模式地图瓦片反转 */
@@ -616,14 +587,16 @@
             </div>
             <p style="text-align: center; font-size: 0.9rem; color: #888;">切换后自动保存您的偏好</p>
 
-            <!-- 背景设置模块 -->
+            <!-- 背景设置模块（无emoji，按钮统一，隐藏文件输入） -->
             <div class="bg-setting">
                 <p>自定义背景</p>
-                <div class="bg-controls-row">
-                    <input type="file" id="bgFileInput" accept="image/*">
-                    <button class="btn-sm" id="bgResetBtn">重置</button>
+                <div class="btn-row">
+                    <button class="btn-sm" id="bgSelectBtn">选择图片</button>
                     <button class="btn-sm" id="bgRemoveBtn">移除背景</button>
+                    <button class="btn-sm" id="bgResetBtn">重置</button>
                 </div>
+                <!-- 隐藏的原生文件输入 -->
+                <input type="file" id="bgFileInput" accept="image/*">
                 <label for="bgBlurRange">模糊程度：<span id="bgBlurValue">0</span>px</label>
                 <input type="range" id="bgBlurRange" min="0" max="30" value="0" step="1">
                 <p style="font-size: 0.75rem; color: #888; margin-top: 8px;">上传图片后浏览器会保存在本地，不会上传到服务器</p>
@@ -639,7 +612,7 @@
         // ========== 天地图密钥 ==========
         const TIANDITU_KEY = '7af52769cf10860155e93786bb66db9d';
 
-        // ========== 相册数据 ==========
+        // ========== 相册数据（已恢复完整内容） ==========
         const albums = [
             {
                 id: 'mujigae',
@@ -787,6 +760,11 @@
         const bgBlurValue = document.getElementById('bgBlurValue');
         const bgRemoveBtn = document.getElementById('bgRemoveBtn');
         const bgResetBtn = document.getElementById('bgResetBtn');
+        const bgSelectBtn = document.getElementById('bgSelectBtn');
+
+        if (bgSelectBtn && bgFileInput) {
+            bgSelectBtn.addEventListener('click', () => bgFileInput.click());
+        }
 
         function loadBgSettings() {
             const savedBg = localStorage.getItem('tempestBgImage');
@@ -990,13 +968,13 @@
 
         function openAlbum(albumId) { location.hash = 'album/' + albumId; }
 
-        // ========== 地图初始化（天地图，缩放按钮左下） ==========
+        // ========== 地图初始化（天地图） ==========
         function initMap() {
             if (!mapInitialized && typeof L !== 'undefined') {
                 map = L.map('map', {
                     center: [30.0, 115.0],
                     zoom: 5,
-                    zoomControl: false  // 禁用默认缩放控件，手动添加并放到左下角
+                    zoomControl: true
                 });
 
                 L.tileLayer(`https://t{s}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${TIANDITU_KEY}`, {
@@ -1009,11 +987,6 @@
                     subdomains: ['0','1','2','3','4','5','6','7'],
                     attribution: '© 天地图',
                     maxZoom: 18
-                }).addTo(map);
-
-                // 将缩放控件放在左下角
-                L.control.zoom({
-                    position: 'bottomleft'
                 }).addTo(map);
 
                 mapInitialized = true;
