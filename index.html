@@ -4,24 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tempest Chase</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #ffffff;
+            background-color: #ffffff;
             color: #333;
             transition: background 0.3s, color 0.3s;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* ========= 自定义背景层 ========= */
+        #bgLayer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(var(--bg-blur, 0px));
+            transform: scale(1.1);
+            z-index: -1;
+            transition: filter 0.3s;
+            pointer-events: none;
         }
 
         /* ========= 黑夜模式 ========= */
         body.dark-mode {
-            background: #1a1a2e;
+            background-color: #1a1a2e;
             color: #ccc;
         }
         body.dark-mode .site-header {
-            background: #16213e;
+            background: rgba(22, 33, 62, 0.3);
             border-bottom-color: #2a2a4a;
+            backdrop-filter: blur(10px);
         }
         body.dark-mode .site-title { color: #eee; }
         body.dark-mode .nav-menu a { color: #aaa; }
@@ -39,7 +61,7 @@
             color: #ccc;
         }
         body.dark-mode .album-card, body.dark-mode .photo-card {
-            background: #1e2a3a;
+            background: transparent;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.3);
         }
         body.dark-mode .album-title, body.dark-mode .photo-title { color: #ddd; }
@@ -62,11 +84,21 @@
         body.dark-mode .page-content h2 { color: #eee; }
         body.dark-mode .filter-btn { color: #aaa; }
         body.dark-mode .filter-btn.active { color: #fff; }
+        body.dark-mode .popup-btn {
+            background: rgba(22, 33, 62, 0.15);
+            border-color: rgba(255,255,255,0.2);
+            color: #ddd;
+        }
+        body.dark-mode .popup-btn:hover {
+            background: rgba(22, 33, 62, 0.25);
+            border-color: #888;
+        }
 
-        /* 顶部导航 */
+        /* 顶部导航（毛玻璃 30%） */
         .site-header {
-            background: rgba(255,255,255,0.95);
+            background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0,0,0,0.05);
             padding: 12px 40px;
             display: flex;
@@ -75,7 +107,7 @@
             flex-wrap: wrap;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
             transition: background 0.3s, border-color 0.3s;
         }
         .logo-area { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
@@ -130,19 +162,33 @@
         }
         .photos-container { display: none; }
 
+        /* 卡片本身透明 */
         .album-card, .photo-card {
-            background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.08);
+            background: transparent;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.08);
             overflow: hidden; width: 100%; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;
         }
         .album-card:hover, .photo-card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,0.1), 0 2px 6px rgba(0,0,0,0.08); }
         .album-card img, .photo-card img { width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.4s; }
         .album-card:hover img, .photo-card:hover img { transform: scale(1.03); }
-        .album-info, .photo-info { padding: 16px; }
+
+        /* 文字栏毛玻璃 30% */
+        .album-info, .photo-info {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: background 0.3s;
+        }
+        body.dark-mode .album-info, body.dark-mode .photo-info {
+            background: rgba(22, 33, 62, 0.3);
+        }
         .album-title, .photo-title { font-weight: 600; font-size: 1rem; color: #222; margin-bottom: 6px; }
         .album-desc, .photo-desc { font-size: 0.85rem; color: #666; line-height: 1.5; }
         .photo-desc { margin-bottom: 12px; }
 
-        /* 元信息行：作者居左，地点居右，简介在中间居中（自然填充） */
+        /* 元信息行 */
         .photo-meta {
             display: flex;
             align-items: center;
@@ -152,16 +198,9 @@
             white-space: nowrap;
             overflow: hidden;
         }
-        .meta-author {
-            text-align: left;
-        }
-        .meta-comment {
-            flex: 1;
-            text-align: center;
-        }
-        .meta-location {
-            text-align: right;
-        }
+        .meta-author { text-align: left; }
+        .meta-comment { flex: 1; text-align: center; }
+        .meta-location { text-align: right; }
 
         .photo-actions { display: flex; gap: 10px; margin-top: auto; }
         .action-btn {
@@ -197,6 +236,83 @@
         }
         body.dark-mode .toggle-btn { background: #5a9; }
         body.dark-mode .toggle-btn::after { transform: translateX(24px); }
+
+        /* 背景设置模块 */
+        .bg-setting {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 16px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        body.dark-mode .bg-setting {
+            background: rgba(30, 42, 58, 0.4);
+            border-color: rgba(255,255,255,0.1);
+        }
+        .bg-setting p { margin-bottom: 12px; font-size: 0.9rem; }
+        .bg-setting input[type="range"] {
+            width: 80%;
+            margin: 0 auto 12px;
+            display: block;
+        }
+        .bg-setting .btn-sm {
+            padding: 6px 16px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #555;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .bg-setting .btn-sm:hover { background: #f5f5f5; }
+        body.dark-mode .bg-setting .btn-sm { color: #ddd; border-color: #555; }
+        body.dark-mode .bg-setting .btn-sm:hover { background: rgba(255,255,255,0.1); }
+
+        /* 背景设置一行三控件（居中靠拢） */
+        .bg-controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;  /* 居中 */
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;          /* 允许换行但尽量一行 */
+        }
+        .bg-controls-row input[type="file"] {
+            color: transparent;
+            width: auto;
+            flex: 0 0 auto;
+        }
+        .bg-controls-row input[type="file"]::file-selector-button {
+            color: #555;
+            background: transparent;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 6px 16px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .bg-controls-row input[type="file"]::file-selector-button:hover {
+            background: #f5f5f5;
+        }
+        body.dark-mode .bg-controls-row input[type="file"]::file-selector-button {
+            color: #ddd;
+            border-color: #555;
+        }
+        body.dark-mode .bg-controls-row input[type="file"]::file-selector-button:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .bg-controls-row .btn-sm {
+            flex: 0 0 auto;
+            margin: 0;
+        }
 
         .album-intro {
             max-width: 1200px; margin: 40px auto 20px; padding: 20px 20px 10px;
@@ -234,7 +350,162 @@
         }
         body.dark-mode .announce-content { background: #1e2a3a; color: #ccc; }
 
-        /* 响应式 */
+        /* 地图视图 */
+        #mapView {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1;
+            margin: 0;
+            padding: 0;
+        }
+        #mapView #map {
+            height: 100%;
+            width: 100%;
+            border-radius: 0;
+        }
+
+        /* 标记样式 */
+        .custom-marker { background: transparent; border: none; }
+        .marker-square {
+            position: relative;
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            background: #ccc;
+            border: 2px solid #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            overflow: hidden;
+            transition: transform 0.2s;
+            padding: 0;
+        }
+        .marker-square:hover { transform: scale(1.15); }
+        .marker-square img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            margin: 0; padding: 0; border: none;
+        }
+
+        /* 地图弹窗毛玻璃 30% */
+        .leaflet-popup-content-wrapper,
+        .leaflet-popup-tip {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        body.dark-mode .leaflet-popup-content-wrapper,
+        body.dark-mode .leaflet-popup-tip {
+            background: rgba(22, 33, 62, 0.3);
+        }
+
+        .leaflet-popup-content {
+            padding: 10px 16px;
+            margin: 0;
+        }
+        .map-popup { width: fit-content; min-width: 0; }
+        .map-popup .popup-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            color: #333;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding-bottom: 6px;
+        }
+        .map-popup .photo-grid {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 6px;
+            align-items: flex-start;
+            max-width: 400px;
+            width: 100%;
+        }
+        .map-popup .photo-grid img {
+            width: 70px; height: 70px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+        .map-popup .photo-grid img:hover {
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+        body.dark-mode .map-popup .popup-title {
+            color: #ddd;
+            border-bottom-color: rgba(255,255,255,0.1);
+        }
+
+        /* 堆叠照片 */
+        .photo-stack {
+            position: relative;
+            width: 70px; height: 70px;
+            flex-shrink: 0;
+            cursor: pointer;
+            margin-right: 12px;
+        }
+        .photo-stack img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 70px; height: 70px;
+            object-fit: cover;
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .photo-stack img:nth-child(1) { z-index: 3; }
+        .photo-stack img:nth-child(2) { transform: translate(6px, 0); z-index: 2; }
+        .photo-stack img:nth-child(3) { transform: translate(12px, 0); z-index: 1; }
+        .photo-stack.expanded {
+            width: auto; height: auto;
+            display: flex; flex-wrap: wrap; gap: 6px;
+            margin-right: 0;
+        }
+        .photo-stack.expanded img {
+            position: relative;
+            transform: none !important;
+            margin: 0;
+        }
+
+        /* 弹窗按钮：透明毛玻璃 */
+        .popup-btn {
+            display: block;
+            width: 100%;
+            margin-top: 12px;
+            padding: 8px 20px;
+            border: 1px solid rgba(200,200,200,0.4);
+            border-radius: 20px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            color: #333;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-align: center;
+            box-sizing: border-box;
+            transition: background 0.2s, border-color 0.2s, transform 0.2s;
+        }
+        .popup-btn:hover {
+            background: rgba(255,255,255,0.25);
+            border-color: #aaa;
+            transform: translateY(-1px);
+        }
+        .popup-btn .arrow {
+            margin-left: 6px;
+            font-size: 1em;
+        }
+
+        /* ========= 响应式 ========= */
         @media (max-width: 1200px) {
             .albums-container, .photos-grid { grid-template-columns: repeat(3, 1fr); }
         }
@@ -250,14 +521,28 @@
             .photo-meta { font-size: 0.7rem; }
             .action-btn { width: 32px; height: 32px; }
             .action-btn svg { width: 16px; height: 16px; }
+            .marker-square { width: 34px; height: 34px; border-radius: 6px; }
+            .map-popup .photo-grid img, .photo-stack img { width: 56px; height: 56px; }
+            .photo-stack { width: 56px; height: 56px; margin-right: 10px; }
+            .bg-controls-row {
+                flex-wrap: wrap; /* 移动端换行 */
+                justify-content: center;
+            }
+        }
+
+        /* 黑夜模式地图瓦片反转 */
+        body.dark-mode .leaflet-tile {
+            filter: invert(1) hue-rotate(180deg) brightness(0.7) contrast(0.9);
         }
     </style>
 </head>
 <body>
+    <!-- 背景层 -->
+    <div id="bgLayer"></div>
+
     <header class="site-header">
         <div class="logo-area">
-            <!-- 👇 加上了版本参数，以后更新logo只需修改 ?v= 后面的数字 -->
-            <img class="logo-img" src="logo.jpg?v=3" alt="Logo">
+            <img class="logo-img" src="logo.jpg?v=2" alt="Logo">
             <span class="site-title">Tempest Chase V2</span>
         </div>
         <div class="search-section" id="searchSection">
@@ -272,6 +557,7 @@
         </div>
         <ul class="nav-menu" id="navMenu">
             <li><a data-page="home" class="active">首页</a></li>
+            <li><a data-page="map">地图</a></li>
             <li><a data-page="about">关于</a></li>
             <li><a data-page="links">友情链接</a></li>
             <li><a data-page="settings">设置</a></li>
@@ -287,6 +573,11 @@
 
     <div id="homeView">
         <div class="albums-container" id="albumsContainer"></div>
+    </div>
+
+    <!-- 地图视图 -->
+    <div id="mapView" style="display:none;">
+        <div id="map"></div>
     </div>
 
     <div class="photos-container" id="photosContainer"></div>
@@ -324,14 +615,31 @@
                 <button class="toggle-btn" id="darkModeToggle"></button>
             </div>
             <p style="text-align: center; font-size: 0.9rem; color: #888;">切换后自动保存您的偏好</p>
+
+            <!-- 背景设置模块 -->
+            <div class="bg-setting">
+                <p>自定义背景</p>
+                <div class="bg-controls-row">
+                    <input type="file" id="bgFileInput" accept="image/*">
+                    <button class="btn-sm" id="bgResetBtn">重置</button>
+                    <button class="btn-sm" id="bgRemoveBtn">移除背景</button>
+                </div>
+                <label for="bgBlurRange">模糊程度：<span id="bgBlurValue">0</span>px</label>
+                <input type="range" id="bgBlurRange" min="0" max="30" value="0" step="1">
+                <p style="font-size: 0.75rem; color: #888; margin-top: 8px;">上传图片后浏览器会保存在本地，不会上传到服务器</p>
+            </div>
         </div>
     </div>
 
     <div class="no-result" id="noResult">😕 没有找到匹配的项目，换个关键词试试吧。</div>
     <footer>© 2026 Tempest Chase · 逐风影像开源网站</footer>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // 相册数据（保持不变）
+        // ========== 天地图密钥 ==========
+        const TIANDITU_KEY = '7af52769cf10860155e93786bb66db9d';
+
+        // ========== 相册数据 ==========
         const albums = [
             {
                 id: 'mujigae',
@@ -389,7 +697,7 @@
                 id: 'noul',
                 title: '台风红霞',
                 description: '珠东地区自2003年以来影响最强台风',
-                introDetail: '通常，厄尔尼诺年的近岸盛行下沉支，台风在近岸难以有明显发展。但在今年，一个台风从菲东暖池中诞生后冲向广东，在近岸进行了一次如“天鸽”般的猛烈爆发',
+                introDetail: '通常，厄尔尼诺年的近岸盛行下沉支，台风在近岸难以有明显发展。但在今年，一个台风从菲东暖池中诞生后冲向广东，在近岸进行了一次如"天鸽"般的猛烈爆发',
                 cover: 'noul/noulphoto1.jpg',
                 keywords: '红霞',
                 videoTitle: '红霞追风视频',
@@ -411,13 +719,13 @@
                 videoTitle: '2026雷暴追击视频',
                 videoUrl: 'https://www.bilibili.com/video/BV1AeL36CEGn/',
                 photos: [
-                    { src: 'storm/stormphoto1.jpg', title: 'STORM-照片1', author: '追风队-TQM', comment: '实景', location: '深圳' },
+                    { src: 'storm/stormphoto1.jpg', title: 'STORM-照片1', author: '追风队-燕东', comment: '实景', location: '深圳' },
                     { src: 'storm/stormphoto2.jpg', title: 'STORM-照片2', author: '追风队-粤气爱', comment: '实景', location: '深圳' },
                     { src: 'storm/stormphoto3.jpg', title: 'STORM-照片3', author: '追风队-TQM', comment: '实景', location: '深圳' },
-                    { src: 'storm/stormphoto4.png', title: 'STORM-照片4', author: '追风队-南超', comment: '实景', location: '东莞' },
+                    { src: 'storm/stormphoto4.jpg', title: 'STORM-照片4', author: '追风队-TQM', comment: '实景', location: '深圳' },
                     { src: 'storm/stormphoto5.png', title: 'STORM-照片5', author: '追风队-南超', comment: '实景', location: '东莞' },
                     { src: 'storm/stormphoto6.png', title: 'STORM-照片6', author: '追风队-南超', comment: '实景', location: '东莞' },
-                    { src: 'storm/stormphoto7.png', title: 'STORM-照片7', author: '', comment: '', location: '' },
+                    { src: 'storm/stormphoto7.png', title: 'STORM-照片7', author: '追风队-南超', comment: '实景', location: '东莞' },
                     { src: 'storm/stormphoto8.png', title: 'STORM-照片8', author: '', comment: '', location: '' }
                 ]
             },
@@ -443,9 +751,23 @@
             }
         ];
 
+        // 城市坐标映射
+        const cityCoords = {
+            '珠海': [22.270978, 113.576677],
+            '湛江': [21.270702, 110.359377],
+            '台州': [28.65638, 121.42076],
+            '深汕': [22.8105, 115.1840],
+            '深圳': [22.543099, 114.057868],
+            '东莞': [23.0207, 113.7518],
+            '烟台': [37.4638, 121.4479]
+        };
+
         let currentType = 'all';
         let currentKeyword = '';
+        let mapInitialized = false;
+        let map;
 
+        // ========== 黑夜模式 ==========
         const darkModeToggle = document.getElementById('darkModeToggle');
         function applyDarkMode(isDark) {
             if (isDark) document.body.classList.add('dark-mode');
@@ -458,9 +780,88 @@
             darkModeToggle.addEventListener('click', () => applyDarkMode(!document.body.classList.contains('dark-mode')));
         }
 
+        // ========== 背景设置模块 ==========
+        const bgLayer = document.getElementById('bgLayer');
+        const bgFileInput = document.getElementById('bgFileInput');
+        const bgBlurRange = document.getElementById('bgBlurRange');
+        const bgBlurValue = document.getElementById('bgBlurValue');
+        const bgRemoveBtn = document.getElementById('bgRemoveBtn');
+        const bgResetBtn = document.getElementById('bgResetBtn');
+
+        function loadBgSettings() {
+            const savedBg = localStorage.getItem('tempestBgImage');
+            const savedBlur = localStorage.getItem('tempestBgBlur') || '0';
+            if (savedBg) {
+                bgLayer.style.backgroundImage = `url(${savedBg})`;
+            }
+            bgLayer.style.filter = `blur(${savedBlur}px)`;
+            bgBlurRange.value = savedBlur;
+            bgBlurValue.textContent = savedBlur;
+        }
+        loadBgSettings();
+
+        if (bgFileInput) {
+            bgFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const base64 = event.target.result;
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const maxW = 1920;
+                        const ratio = Math.min(1, maxW / img.width);
+                        canvas.width = img.width * ratio;
+                        canvas.height = img.height * ratio;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const compressed = canvas.toDataURL('image/jpeg', 0.7);
+                        localStorage.setItem('tempestBgImage', compressed);
+                        bgLayer.style.backgroundImage = `url(${compressed})`;
+                    };
+                    img.src = base64;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        if (bgBlurRange) {
+            bgBlurRange.addEventListener('input', (e) => {
+                const val = e.target.value;
+                bgBlurValue.textContent = val;
+                bgLayer.style.filter = `blur(${val}px)`;
+                localStorage.setItem('tempestBgBlur', val);
+            });
+        }
+
+        if (bgRemoveBtn) {
+            bgRemoveBtn.addEventListener('click', () => {
+                localStorage.removeItem('tempestBgImage');
+                bgLayer.style.backgroundImage = '';
+                bgLayer.style.filter = 'blur(0px)';
+                bgBlurRange.value = '0';
+                bgBlurValue.textContent = '0';
+                localStorage.setItem('tempestBgBlur', '0');
+            });
+        }
+
+        if (bgResetBtn) {
+            bgResetBtn.addEventListener('click', () => {
+                localStorage.removeItem('tempestBgImage');
+                localStorage.removeItem('tempestBgBlur');
+                bgLayer.style.backgroundImage = '';
+                bgLayer.style.filter = 'blur(0px)';
+                bgBlurRange.value = '0';
+                bgBlurValue.textContent = '0';
+            });
+        }
+
+        // ========== 状态管理 ==========
         let currentAlbumId = null, currentView = 'home';
         const navLinks = document.querySelectorAll('.nav-menu a');
         const homeView = document.getElementById('homeView');
+        const mapView = document.getElementById('mapView');
         const photosContainer = document.getElementById('photosContainer');
         const aboutView = document.getElementById('aboutView');
         const linksView = document.getElementById('linksView');
@@ -473,9 +874,7 @@
         const filterBtns = document.querySelectorAll('.filter-btn[data-type]');
         const announceBtn = document.getElementById('announceBtn');
 
-        if (announceBtn) {
-            announceBtn.addEventListener('click', () => showAnnouncement());
-        }
+        if (announceBtn) announceBtn.addEventListener('click', () => showAnnouncement());
 
         function showAnnouncement() {
             const existing = document.querySelector('.modal-overlay');
@@ -528,9 +927,13 @@
         }
 
         function switchView(viewName, albumId = null) {
-            homeView.style.display = 'none'; photosContainer.style.display = 'none';
-            aboutView.style.display = 'none'; linksView.style.display = 'none';
-            settingsView.style.display = 'none'; noResult.style.display = 'none';
+            homeView.style.display = 'none';
+            mapView.style.display = 'none';
+            photosContainer.style.display = 'none';
+            aboutView.style.display = 'none';
+            linksView.style.display = 'none';
+            settingsView.style.display = 'none';
+            noResult.style.display = 'none';
 
             if (viewName === 'home' || viewName === 'album') {
                 searchSection.style.display = 'flex';
@@ -540,15 +943,26 @@
                 filterSection.style.display = 'none';
             }
 
-            if (viewName === 'home') { homeView.style.display = 'block'; renderAlbums(currentKeyword); }
-            else if (viewName === 'about') { aboutView.style.display = 'block'; }
-            else if (viewName === 'links') { linksView.style.display = 'block'; }
-            else if (viewName === 'settings') { settingsView.style.display = 'block'; }
-            else if (viewName === 'album') {
+            if (viewName === 'home') {
+                homeView.style.display = 'block';
+                renderAlbums(currentKeyword);
+            } else if (viewName === 'map') {
+                mapView.style.display = 'block';
+                initMap();
+            } else if (viewName === 'about') {
+                aboutView.style.display = 'block';
+            } else if (viewName === 'links') {
+                linksView.style.display = 'block';
+            } else if (viewName === 'settings') {
+                settingsView.style.display = 'block';
+            } else if (viewName === 'album') {
                 photosContainer.style.display = 'block';
                 if (albumId) {
                     const album = albums.find(a => a.id === albumId);
-                    if (album) { currentAlbumId = albumId; renderPhotos(album, currentKeyword); }
+                    if (album) {
+                        currentAlbumId = albumId;
+                        renderPhotos(album, currentKeyword);
+                    }
                 }
             }
             currentView = viewName;
@@ -567,6 +981,7 @@
         window.addEventListener('hashchange', () => {
             const hash = location.hash.slice(1);
             if (hash === 'about') switchView('about');
+            else if (hash === 'map') switchView('map');
             else if (hash === 'links') switchView('links');
             else if (hash === 'settings') switchView('settings');
             else if (hash.startsWith('album/')) switchView('album', hash.replace('album/', ''));
@@ -574,6 +989,105 @@
         });
 
         function openAlbum(albumId) { location.hash = 'album/' + albumId; }
+
+        // ========== 地图初始化（天地图，缩放按钮左下） ==========
+        function initMap() {
+            if (!mapInitialized && typeof L !== 'undefined') {
+                map = L.map('map', {
+                    center: [30.0, 115.0],
+                    zoom: 5,
+                    zoomControl: false  // 禁用默认缩放控件，手动添加并放到左下角
+                });
+
+                L.tileLayer(`https://t{s}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${TIANDITU_KEY}`, {
+                    subdomains: ['0','1','2','3','4','5','6','7'],
+                    attribution: '© 天地图',
+                    maxZoom: 18
+                }).addTo(map);
+
+                L.tileLayer(`https://t{s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${TIANDITU_KEY}`, {
+                    subdomains: ['0','1','2','3','4','5','6','7'],
+                    attribution: '© 天地图',
+                    maxZoom: 18
+                }).addTo(map);
+
+                // 将缩放控件放在左下角
+                L.control.zoom({
+                    position: 'bottomleft'
+                }).addTo(map);
+
+                mapInitialized = true;
+                addCityMarkers();
+            } else if (mapInitialized) {
+                setTimeout(() => map.invalidateSize(), 100);
+            }
+        }
+
+        // ========== 城市标记与弹窗 ==========
+        function addCityMarkers() {
+            const cityPhotos = {};
+            albums.forEach(album => {
+                album.photos.forEach(photo => {
+                    if (photo.location && photo.location.trim() !== '') {
+                        const loc = photo.location.trim();
+                        if (!cityPhotos[loc]) cityPhotos[loc] = [];
+                        cityPhotos[loc].push({
+                            ...photo,
+                            albumId: album.id,
+                            albumTitle: album.title
+                        });
+                    }
+                });
+            });
+
+            Object.keys(cityPhotos).forEach(city => {
+                const coords = cityCoords[city];
+                if (!coords) return;
+                const photos = cityPhotos[city];
+
+                const firstPhoto = photos[0].src;
+                const icon = L.divIcon({
+                    className: 'custom-marker',
+                    html: `<div class="marker-square"><img src="${firstPhoto}" alt="${city}"></div>`,
+                    iconSize: [42, 42],
+                    iconAnchor: [21, 21],
+                    popupAnchor: [0, -24]
+                });
+
+                let photosHTML = '';
+                if (photos.length <= 3) {
+                    photos.forEach(photo => {
+                        photosHTML += `<img src="${photo.src}" alt="${photo.title}" onclick="window.showPreview('${photo.src}')">`;
+                    });
+                } else {
+                    for (let i = 0; i < 2; i++) {
+                        photosHTML += `<img src="${photos[i].src}" alt="${photos[i].title}" onclick="window.showPreview('${photos[i].src}')">`;
+                    }
+                    photosHTML += `<div class="photo-stack" onclick="expandStack(this)">`;
+                    for (let i = 2; i < photos.length; i++) {
+                        photosHTML += `<img src="${photos[i].src}" alt="${photos[i].title}" onclick="event.stopPropagation(); window.showPreview('${photos[i].src}')">`;
+                    }
+                    photosHTML += `</div>`;
+                }
+
+                const popupHTML = `
+                    <div class="map-popup">
+                        <div class="popup-title">📍 ${city} · ${photos.length}张照片</div>
+                        <div class="photo-grid">${photosHTML}</div>
+                        <a class="popup-btn" href="#album/${photos[0].albumId}">前往该相册 <span class="arrow">→</span></a>
+                    </div>`;
+
+                L.marker(coords, { icon: icon }).addTo(map)
+                    .bindPopup(popupHTML, { maxWidth: 400, minWidth: 0 });
+            });
+        }
+
+        window.expandStack = function(stackElement) {
+            stackElement.classList.add('expanded');
+            stackElement.onclick = null;
+        };
+
+        window.showPreview = showPreview;
 
         function renderAlbums(filterKeyword = '') {
             const container = document.getElementById('albumsContainer');
@@ -679,6 +1193,7 @@
 
         const initHash = location.hash.slice(1);
         if (initHash === 'about') switchView('about');
+        else if (initHash === 'map') switchView('map');
         else if (initHash === 'links') switchView('links');
         else if (initHash === 'settings') switchView('settings');
         else if (initHash.startsWith('album/')) switchView('album', initHash.replace('album/', ''));
