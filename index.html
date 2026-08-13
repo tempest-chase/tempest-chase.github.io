@@ -286,7 +286,7 @@
             color: #666;
         }
         .bg-setting input[type="file"] {
-            display: none; /* 隐藏原生文件输入，不显示文件名 */
+            display: none;
         }
 
         .album-intro {
@@ -863,8 +863,9 @@
                 <span class="modal-close">&times;</span>
                 <div class="announce-content">
                     <h2 style="margin-bottom: 16px; font-size: 1.4rem;">📢 网站公告</h2>
-                    <p>Tempest Chase V2（公测版）正式发布，网站目前所规划功能与版面设计已全部上线。</p>
+                    <p>Tempest Chase V1（先行版）正式发布，网站目前所规划功能与版面设计已全部上线。</p>
                     <p>但相册合集照片目前缺口较大，且版权问题未得到完全落实，因此当前网站版本实用性较低。</p>
+                    <p>目前网站已试运营V2部分功能，敬请期待</p>
                     <p style="margin-top: 16px; font-size: 0.9rem; color: #888;">（点击遮罩或右上角关闭按钮退出）</p>
                 </div>
             `;
@@ -968,14 +969,16 @@
 
         function openAlbum(albumId) { location.hash = 'album/' + albumId; }
 
-        // ========== 地图初始化（天地图） ==========
+        // ========== 地图初始化（天地图，缩放控件右下角） ==========
         function initMap() {
             if (!mapInitialized && typeof L !== 'undefined') {
                 map = L.map('map', {
                     center: [30.0, 115.0],
                     zoom: 5,
-                    zoomControl: true
+                    zoomControl: false
                 });
+
+                L.control.zoom({ position: 'bottomright' }).addTo(map);
 
                 L.tileLayer(`https://t{s}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${TIANDITU_KEY}`, {
                     subdomains: ['0','1','2','3','4','5','6','7'],
@@ -996,7 +999,7 @@
             }
         }
 
-        // ========== 城市标记与弹窗 ==========
+        // ========== 城市标记与弹窗（标题无 emoji） ==========
         function addCityMarkers() {
             const cityPhotos = {};
             albums.forEach(album => {
@@ -1045,7 +1048,7 @@
 
                 const popupHTML = `
                     <div class="map-popup">
-                        <div class="popup-title">📍 ${city} · ${photos.length}张照片</div>
+                        <div class="popup-title">${city} · ${photos.length}张照片</div>
                         <div class="photo-grid">${photosHTML}</div>
                         <a class="popup-btn" href="#album/${photos[0].albumId}">前往该相册 <span class="arrow">→</span></a>
                     </div>`;
