@@ -18,7 +18,6 @@
             position: relative;
         }
 
-        /* ========= 自定义背景层 ========= */
         #bgLayer {
             position: fixed;
             top: 0;
@@ -35,48 +34,18 @@
             pointer-events: none;
         }
 
-        /* ========= 黑夜模式 ========= */
-        body.dark-mode {
-            background-color: #1a1a2e;
-            color: #ccc;
-        }
-        body.dark-mode .site-header {
-            background: rgba(22, 33, 62, 0.3);
-            border-bottom-color: #2a2a4a;
-            backdrop-filter: blur(10px);
-        }
+        body.dark-mode { background-color: #1a1a2e; color: #ccc; }
+        body.dark-mode .site-header { background: rgba(22, 33, 62, 0.3); border-bottom-color: #2a2a4a; backdrop-filter: blur(10px); }
         body.dark-mode .site-title { color: #eee; }
         body.dark-mode .nav-menu a { color: #aaa; }
-        body.dark-mode .nav-menu a.active {
-            color: #fff;
-            border-bottom-color: #fff;
-        }
-        body.dark-mode .search-box-wrapper {
-            background: #1e293b;
-            border-color: #334155;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
-        }
-        body.dark-mode .search-box-wrapper input {
-            background: transparent;
-            color: #ccc;
-        }
-        body.dark-mode .album-card, body.dark-mode .photo-card {
-            background: transparent;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.3);
-        }
+        body.dark-mode .nav-menu a.active { color: #fff; border-bottom-color: #fff; }
+        body.dark-mode .search-box-wrapper { background: #1e293b; border-color: #334155; }
+        body.dark-mode .search-box-wrapper input { background: transparent; color: #ccc; }
+        body.dark-mode .album-card, body.dark-mode .photo-card { background: transparent; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         body.dark-mode .album-title, body.dark-mode .photo-title { color: #ddd; }
-        body.dark-mode .album-desc, body.dark-mode .photo-desc,
-        body.dark-mode .meta-author, body.dark-mode .meta-comment, body.dark-mode .meta-location { color: #aaa; }
-        body.dark-mode .action-btn {
-            border-color: #555;
-            color: #aaa;
-        }
-        body.dark-mode .action-btn:hover {
-            border-color: #888;
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(255,255,255,0.1);
-            transform: translateY(-2px);
-        }
+        body.dark-mode .album-desc, body.dark-mode .photo-desc, body.dark-mode .meta-author, body.dark-mode .meta-comment, body.dark-mode .meta-location { color: #aaa; }
+        body.dark-mode .action-btn { border-color: #555; color: #aaa; }
+        body.dark-mode .action-btn:hover { border-color: #888; color: #fff; }
         body.dark-mode .album-intro { color: #ccc; }
         body.dark-mode .modal-overlay { background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
         body.dark-mode footer { color: #666; }
@@ -84,19 +53,9 @@
         body.dark-mode .page-content h2 { color: #eee; }
         body.dark-mode .filter-btn { color: #aaa; }
         body.dark-mode .filter-btn.active { color: #fff; }
-        body.dark-mode .popup-btn {
-            background: rgba(22, 33, 62, 0.3);
-            border-color: rgba(255,255,255,0.2);
-            color: #ddd;
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
-        }
-        body.dark-mode .popup-btn:hover {
-            background: rgba(22, 33, 62, 0.5);
-            border-color: #888;
-        }
+        body.dark-mode .popup-btn { background: rgba(22, 33, 62, 0.3); border-color: rgba(255,255,255,0.2); color: #ddd; backdrop-filter: blur(12px); }
+        body.dark-mode .popup-btn:hover { background: rgba(22, 33, 62, 0.5); border-color: #888; }
 
-        /* 顶部导航（毛玻璃 30%） */
         .site-header {
             background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(10px);
@@ -120,35 +79,45 @@
         .search-box-wrapper {
             display: inline-flex; align-items: center;
             border: 1px solid #e0e0e0; border-radius: 12px; background: #fafafa;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.03); width: 100%; max-width: 400px;
-            transition: all 0.2s;
+            width: 100%; max-width: 400px; transition: all 0.2s;
         }
-        .search-box-wrapper:focus-within {
-            border-color: #5a9; box-shadow: 0 0 0 3px rgba(85,170,153,0.1), inset 0 1px 3px rgba(0,0,0,0.05);
-        }
+        .search-box-wrapper:focus-within { border-color: #5a9; box-shadow: 0 0 0 3px rgba(85,170,153,0.1); }
         .search-box-wrapper input {
             flex: 1; padding: 10px 16px; border: none; outline: none;
             font-size: 0.95rem; font-family: inherit; background: transparent; color: #333;
         }
-        .search-btn {
-            background: none; border: none; padding: 0 14px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; color: #888; transition: color 0.2s;
-        }
-        .search-btn:hover { color: #5a9; }
+        .search-btn { background: none; border: none; padding: 0 14px; cursor: pointer; color: #888; }
         .search-btn svg { width: 18px; height: 18px; }
 
         .nav-menu {
-            display: flex; gap: 30px; list-style: none; padding-left: 0; align-items: center; flex: 0 0 auto;
+            display: flex; gap: 30px; list-style: none; padding-left: 0;
+            align-items: center; flex: 0 0 auto; margin-left: auto; margin-right: 30px;
         }
-        .nav-menu a {
-            text-decoration: none; color: #555; font-size: 0.95rem; cursor: pointer;
-            transition: color 0.2s; line-height: 40px; display: flex; align-items: center;
-            border-bottom: 2px solid transparent; padding-bottom: 0;
-        }
+        .nav-menu a { text-decoration: none; color: #555; font-size: 0.95rem; cursor: pointer; line-height: 40px; border-bottom: 2px solid transparent; }
         .nav-menu a:hover { color: #222; }
         .nav-menu a.active { font-weight: 600; color: #000; border-bottom-color: #000; }
 
-        /* 分类筛选按钮 */
+        .header-actions { display: flex; align-items: center; gap: 20px; flex: 0 0 auto; }
+        .theme-toggle-btn { background: none; border: none; cursor: pointer; width: 30px; height: 30px; color: inherit; padding: 0; }
+        .theme-toggle-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .user-avatar { position: relative; width: 30px; height: 30px; background: none; border: none; cursor: pointer; padding: 0; }
+        .user-avatar svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .user-dropdown {
+            display: none; position: absolute; top: 40px; right: 0;
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);
+            border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            min-width: 160px; padding: 8px 0; z-index: 1001;
+        }
+        .user-avatar:hover .user-dropdown, .user-avatar.open .user-dropdown { display: block; }
+        .dropdown-item {
+            display: block; width: 100%; padding: 10px 20px; text-align: left; background: none;
+            border: none; color: #333; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; font-family: inherit;
+        }
+        .dropdown-item:hover { background: rgba(0,0,0,0.05); }
+        body.dark-mode .user-dropdown { background: rgba(22, 33, 62, 0.9); }
+        body.dark-mode .dropdown-item { color: #ddd; }
+        body.dark-mode .dropdown-item:hover { background: rgba(255,255,255,0.1); }
+
         .filter-section { max-width: 1300px; margin: 30px auto 0; padding: 0 20px; display: flex; align-items: center; gap: 24px; }
         .filter-btn {
             background: none; border: none; padding: 4px 0; font-size: 1rem; font-weight: 500;
@@ -157,45 +126,34 @@
         .filter-btn:hover { color: #666; }
         .filter-btn.active { color: #000; font-weight: 700; }
 
-        /* 网格 */
-        .albums-container, .photos-grid {
+        .albums-container, .photos-grid, .favorites-grid, .photo-settings-grid {
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
             justify-content: center; max-width: 1300px; margin: 0 auto; padding: 20px;
         }
-        .photos-container { display: none; }
+        .photos-container, .favorites-container, .photo-settings-container { display: none; }
 
         .album-card, .photo-card {
-            background: transparent;
-            border-radius: 8px;
+            background: transparent; border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.08);
             overflow: hidden; width: 100%; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;
         }
-        .album-card:hover, .photo-card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,0.1), 0 2px 6px rgba(0,0,0,0.08); }
+        .album-card:hover, .photo-card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,0.1); }
         .album-card img, .photo-card img { width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.4s; }
         .album-card:hover img, .photo-card:hover img { transform: scale(1.03); }
 
         .album-info, .photo-info {
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            padding: 16px; background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             transition: background 0.3s;
         }
-        body.dark-mode .album-info, body.dark-mode .photo-info {
-            background: rgba(22, 33, 62, 0.3);
-        }
+        body.dark-mode .album-info, body.dark-mode .photo-info { background: rgba(22, 33, 62, 0.3); }
         .album-title, .photo-title { font-weight: 600; font-size: 1rem; color: #222; margin-bottom: 6px; }
         .album-desc, .photo-desc { font-size: 0.85rem; color: #666; line-height: 1.5; }
         .photo-desc { margin-bottom: 12px; }
 
         .photo-meta {
-            display: flex;
-            align-items: center;
-            font-size: 0.8rem;
-            color: #666;
-            margin-bottom: 12px;
-            white-space: nowrap;
-            overflow: hidden;
+            display: flex; align-items: center; font-size: 0.8rem; color: #666;
+            margin-bottom: 12px; white-space: nowrap; overflow: hidden;
         }
         .meta-author { text-align: left; }
         .meta-comment { flex: 1; text-align: center; }
@@ -207,10 +165,9 @@
             width: 36px; height: 36px; border-radius: 50%; background: transparent;
             border: 1px solid #ddd; cursor: pointer; transition: all 0.2s; color: #666;
         }
-        .action-btn:hover {
-            border-color: #aaa; color: #333; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-        }
+        .action-btn:hover { border-color: #aaa; color: #333; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
         .action-btn svg { width: 18px; height: 18px; }
+        .action-btn.favorited { color: #f5b301; border-color: #f5b301; }
 
         .no-result { text-align: center; padding: 60px 20px; color: #aaa; font-size: 1.2rem; display: none; }
         footer { text-align: center; padding: 40px 20px; color: #bbb; font-size: 0.85rem; }
@@ -223,71 +180,100 @@
         .page-content a { color: #5a9; text-decoration: none; }
         .page-content a:hover { text-decoration: underline; }
 
-        .setting-row { display: flex; align-items: center; justify-content: space-between; max-width: 400px; margin: 20px auto; }
-        .toggle-label { font-weight: 500; }
-        .toggle-btn {
-            position: relative; width: 50px; height: 26px; background: #ccc; border-radius: 30px;
-            cursor: pointer; transition: background 0.3s; border: none; padding: 0;
+        .account-form, .auth-form {
+            max-width: 400px; margin: 30px auto; padding: 24px; border-radius: 12px;
+            background: rgba(255,255,255,0.4); backdrop-filter: blur(8px);
         }
-        .toggle-btn::after {
-            content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px;
-            background: white; border-radius: 50%; transition: transform 0.3s;
+        body.dark-mode .account-form, body.dark-mode .auth-form { background: rgba(30, 42, 58, 0.5); }
+        .account-form label, .auth-form label { display: block; font-size: 0.9rem; margin-bottom: 4px; color: #555; }
+        body.dark-mode .account-form label, body.dark-mode .auth-form label { color: #aaa; }
+        .account-form input, .account-form select, .auth-form input {
+            width: 100%; padding: 10px 16px; margin-bottom: 16px; border: 1px solid #ddd; border-radius: 8px;
+            font-size: 0.95rem; background: rgba(255,255,255,0.7); color: #333; outline: none; font-family: inherit;
         }
-        body.dark-mode .toggle-btn { background: #5a9; }
-        body.dark-mode .toggle-btn::after { transform: translateX(24px); }
+        body.dark-mode .account-form input, body.dark-mode .account-form select, body.dark-mode .auth-form input {
+            background: rgba(30, 42, 58, 0.7); border-color: #555; color: #ccc;
+        }
+        .account-form .btn-row, .auth-form .btn-row { display: flex; gap: 12px; }
+        .account-form .btn-primary, .auth-form .btn-primary {
+            flex: 1; padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer;
+            background: #5a9; color: white; font-size: 0.95rem; font-family: inherit;
+        }
+        .account-form .btn-danger {
+            padding: 10px 16px; border: 1px solid #e88; border-radius: 8px; cursor: pointer;
+            background: transparent; color: #c33; font-size: 0.95rem; font-family: inherit;
+        }
+        body.dark-mode .account-form .btn-danger { color: #e88; border-color: #a55; }
 
-        /* 背景设置模块 */
+        .download-item {
+            display: flex; align-items: center; gap: 16px; padding: 12px; border-radius: 8px;
+            margin-bottom: 8px; background: rgba(255,255,255,0.4); backdrop-filter: blur(8px);
+        }
+        body.dark-mode .download-item { background: rgba(30, 42, 58, 0.5); }
+        .download-item img { width: 48px; height: 48px; border-radius: 6px; object-fit: cover; }
+        .download-item .download-info { flex: 1; }
+        .download-item .download-title { font-weight: 600; font-size: 0.9rem; color: #333; }
+        body.dark-mode .download-item .download-title { color: #ddd; }
+        .download-item .download-time { font-size: 0.75rem; color: #888; }
+
+        .empty-state { text-align: center; padding: 80px 20px; color: #aaa; font-size: 1.1rem; }
+
         .bg-setting {
-            max-width: 400px;
-            margin: 20px auto;
-            padding: 16px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.4);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(0,0,0,0.05);
-            text-align: center;
+            max-width: 400px; margin: 20px auto; padding: 16px; border-radius: 12px;
+            background: rgba(255,255,255,0.4); backdrop-filter: blur(8px);
+            border: 1px solid rgba(0,0,0,0.05); text-align: center;
         }
-        body.dark-mode .bg-setting {
-            background: rgba(30, 42, 58, 0.4);
-            border-color: rgba(255,255,255,0.1);
-        }
-        .bg-setting p { margin-bottom: 12px; font-size: 0.9rem; }
-        .bg-setting .btn-row {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 12px;
-        }
+        body.dark-mode .bg-setting { background: rgba(30, 42, 58, 0.4); border-color: rgba(255,255,255,0.1); }
+        .bg-setting .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
         .bg-setting .btn-sm {
-            padding: 6px 16px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            background: transparent;
-            cursor: pointer;
-            font-size: 0.8rem;
-            color: #555;
-            transition: all 0.2s;
-            font-family: inherit;
+            padding: 6px 16px; border: 1px solid #ddd; border-radius: 20px;
+            background: transparent; cursor: pointer; font-size: 0.8rem; color: #555; font-family: inherit;
         }
-        .bg-setting .btn-sm:hover { background: #f5f5f5; }
         body.dark-mode .bg-setting .btn-sm { color: #ddd; border-color: #555; }
-        body.dark-mode .bg-setting .btn-sm:hover { background: rgba(255,255,255,0.1); }
-        .bg-setting input[type="range"] {
-            width: 80%;
-            margin: 0 auto 12px;
-            display: block;
+        .bg-setting input[type="range"] { width: 80%; margin: 0 auto 12px; display: block; }
+        .bg-setting input[type="file"] { display: none; }
+
+        .upload-dropzone {
+            border: 2px dashed #aaa; border-radius: 12px; padding: 40px 20px;
+            text-align: center; background: rgba(255,255,255,0.4); backdrop-filter: blur(8px);
+            cursor: pointer; transition: border-color 0.2s, background 0.2s;
         }
-        .bg-setting label {
-            display: block;
-            margin-bottom: 12px;
-            font-size: 0.85rem;
-            color: #666;
+        .upload-dropzone.dragover { border-color: #5a9; background: rgba(85,170,153,0.1); }
+        .upload-dropzone p { margin-bottom: 16px; color: #666; }
+        body.dark-mode .upload-dropzone p { color: #aaa; }
+        .upload-file-list { margin-top: 20px; }
+        .upload-file-item {
+            display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+            background: rgba(255,255,255,0.4); backdrop-filter: blur(8px); border-radius: 8px; margin-bottom: 8px;
         }
-        .bg-setting input[type="file"] {
-            display: none;
+        body.dark-mode .upload-file-item { background: rgba(30,42,58,0.5); }
+        .upload-file-item .file-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.05); border-radius: 6px; }
+        .upload-file-item .file-name { flex: 1; font-size: 0.9rem; word-break: break-all; }
+        .upload-file-item .file-size { font-size: 0.75rem; color: #888; }
+        .upload-info-section {
+            margin-top: 24px; padding: 20px; background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(8px); border-radius: 12px;
         }
+        body.dark-mode .upload-info-section { background: rgba(30,42,58,0.5); }
+        .upload-info-section h3 { margin-bottom: 16px; text-align: center; }
+        .upload-info-section label { display: block; font-size: 0.9rem; margin-bottom: 4px; color: #555; }
+        body.dark-mode .upload-info-section label { color: #aaa; }
+        .upload-info-section input, .upload-info-section select {
+            width: 100%; padding: 10px 16px; margin-bottom: 16px; border: 1px solid #ddd; border-radius: 8px;
+            background: rgba(255,255,255,0.7); color: #333; font-family: inherit; font-size: 0.95rem; outline: none;
+        }
+        body.dark-mode .upload-info-section input, body.dark-mode .upload-info-section select {
+            background: rgba(30,42,58,0.7); border-color: #555; color: #ccc;
+        }
+        .upload-info-section .btn-row { display: flex; justify-content: flex-end; margin-top: 8px; }
+
+        .btn-sm {
+            padding: 6px 16px; border: 1px solid #ddd; border-radius: 20px;
+            background: transparent; cursor: pointer; font-size: 0.8rem; color: #555; font-family: inherit;
+        }
+        .btn-sm:hover { background: #f5f5f5; }
+        body.dark-mode .btn-sm { color: #ddd; border-color: #555; }
+        body.dark-mode .btn-sm:hover { background: rgba(255,255,255,0.1); }
 
         .album-intro {
             max-width: 1200px; margin: 40px auto 20px; padding: 20px 20px 10px;
@@ -325,171 +311,83 @@
         }
         body.dark-mode .announce-content { background: #1e2a3a; color: #ccc; }
 
-        /* 地图视图 */
         #mapView {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: 1;
-            margin: 0;
-            padding: 0;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1;
+            margin: 0; padding: 0;
         }
-        #mapView #map {
-            height: 100%;
-            width: 100%;
-            border-radius: 0;
-        }
+        #mapView #map { height: 100%; width: 100%; border-radius: 0; }
 
-        /* 标记样式 */
         .custom-marker { background: transparent; border: none; }
         .marker-square {
-            position: relative;
-            width: 42px;
-            height: 42px;
-            border-radius: 8px;
-            background: #ccc;
-            border: 2px solid #fff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            overflow: hidden;
-            transition: transform 0.2s;
-            padding: 0;
+            position: relative; width: 42px; height: 42px; border-radius: 8px;
+            background: #ccc; border: 2px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            overflow: hidden; transition: transform 0.2s; padding: 0;
         }
         .marker-square:hover { transform: scale(1.15); }
         .marker-square img {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            object-fit: cover;
-            object-position: center;
-            display: block;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; object-position: center; display: block;
             margin: 0; padding: 0; border: none;
         }
 
-        /* 地图弹窗毛玻璃 30% */
-        .leaflet-popup-content-wrapper,
-        .leaflet-popup-tip {
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+            background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
         }
-        body.dark-mode .leaflet-popup-content-wrapper,
-        body.dark-mode .leaflet-popup-tip {
-            background: rgba(22, 33, 62, 0.3);
-        }
-
-        .leaflet-popup-content {
-            padding: 10px 16px;
-            margin: 0;
-        }
+        body.dark-mode .leaflet-popup-content-wrapper, body.dark-mode .leaflet-popup-tip { background: rgba(22, 33, 62, 0.3); }
+        .leaflet-popup-content { padding: 10px 16px; margin: 0; }
         .map-popup { width: fit-content; min-width: 0; }
         .map-popup .popup-title {
-            font-weight: 700;
-            font-size: 0.95rem;
-            margin-bottom: 10px;
-            color: #333;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            padding-bottom: 6px;
+            font-weight: 700; font-size: 0.95rem; margin-bottom: 10px; color: #333;
+            border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 6px;
         }
         .map-popup .photo-grid {
-            display: flex;
-            flex-wrap: nowrap;
-            gap: 6px;
-            align-items: flex-start;
-            max-width: 400px;
-            width: 100%;
+            display: flex; flex-wrap: nowrap; gap: 6px; align-items: flex-start;
+            max-width: 400px; width: 100%;
         }
         .map-popup .photo-grid img {
-            width: 70px; height: 70px;
-            object-fit: cover;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            width: 70px; height: 70px; object-fit: cover; border-radius: 4px; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
             flex-shrink: 0;
         }
-        .map-popup .photo-grid img:hover {
-            transform: scale(1.08);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-        }
-        body.dark-mode .map-popup .popup-title {
-            color: #ddd;
-            border-bottom-color: rgba(255,255,255,0.1);
-        }
+        .map-popup .photo-grid img:hover { transform: scale(1.08); box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
+        body.dark-mode .map-popup .popup-title { color: #ddd; border-bottom-color: rgba(255,255,255,0.1); }
 
-        /* 堆叠照片 */
         .photo-stack {
-            position: relative;
-            width: 70px; height: 70px;
-            flex-shrink: 0;
-            cursor: pointer;
-            margin-right: 12px;
+            position: relative; width: 70px; height: 70px; flex-shrink: 0;
+            cursor: pointer; margin-right: 12px;
         }
         .photo-stack img {
-            position: absolute;
-            top: 0; left: 0;
-            width: 70px; height: 70px;
-            object-fit: cover;
-            border-radius: 4px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            position: absolute; top: 0; left: 0; width: 70px; height: 70px;
+            object-fit: cover; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .photo-stack img:nth-child(1) { z-index: 3; }
         .photo-stack img:nth-child(2) { transform: translate(6px, 0); z-index: 2; }
         .photo-stack img:nth-child(3) { transform: translate(12px, 0); z-index: 1; }
-        .photo-stack.expanded {
-            width: auto; height: auto;
-            display: flex; flex-wrap: wrap; gap: 6px;
-            margin-right: 0;
-        }
-        .photo-stack.expanded img {
-            position: relative;
-            transform: none !important;
-            margin: 0;
-        }
+        .photo-stack.expanded { width: auto; height: auto; display: flex; flex-wrap: wrap; gap: 6px; margin-right: 0; }
+        .photo-stack.expanded img { position: relative; transform: none !important; margin: 0; }
 
-        /* 弹窗按钮：毛玻璃 30% */
         .popup-btn {
-            display: block;
-            width: 100%;
-            margin-top: 12px;
-            padding: 8px 20px;
-            border: 1px solid rgba(200,200,200,0.4);
-            border-radius: 20px;
-            background: rgba(255,255,255,0.3);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
-            color: #333;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            text-align: center;
-            box-sizing: border-box;
-            transition: background 0.2s, border-color 0.2s, transform 0.2s;
+            display: block; width: 100%; margin-top: 12px; padding: 8px 20px;
+            border: 1px solid rgba(200,200,200,0.4); border-radius: 20px;
+            background: rgba(255,255,255,0.3); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+            color: #333; text-decoration: none; font-size: 0.85rem; font-weight: 500;
+            text-align: center; box-sizing: border-box; transition: background 0.2s, border-color 0.2s, transform 0.2s;
         }
-        .popup-btn:hover {
-            background: rgba(255,255,255,0.45);
-            border-color: #aaa;
-            transform: translateY(-1px);
-        }
-        .popup-btn .arrow {
-            margin-left: 6px;
-            font-size: 1em;
-        }
+        .popup-btn:hover { background: rgba(255,255,255,0.45); border-color: #aaa; transform: translateY(-1px); }
+        .popup-btn .arrow { margin-left: 6px; font-size: 1em; }
 
-        /* ========= 响应式 ========= */
         @media (max-width: 1200px) {
-            .albums-container, .photos-grid { grid-template-columns: repeat(3, 1fr); }
+            .albums-container, .photos-grid, .favorites-grid, .photo-settings-grid { grid-template-columns: repeat(3, 1fr); }
         }
         @media (max-width: 768px) {
             .site-header { flex-direction: column; align-items: flex-start; padding: 12px 16px; }
             .search-section { width: 100%; padding: 8px 0; order: 3; }
-            .nav-menu { margin-top: 10px; gap: 20px; width: 100%; justify-content: flex-start; }
+            .nav-menu { margin-top: 10px; gap: 20px; width: 100%; justify-content: flex-start; margin-left: 0; margin-right: 0; }
+            .header-actions { position: absolute; top: 12px; right: 16px; gap: 12px; }
             .filter-section { margin-top: 20px; padding: 0 16px; gap: 20px; }
-            .albums-container, .photos-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
+            .albums-container, .photos-grid, .favorites-grid, .photo-settings-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
             .photo-card img { height: auto; aspect-ratio: 4/3; }
             .photo-info { padding: 12px; }
             .photo-title { font-size: 0.9rem; }
@@ -501,14 +399,10 @@
             .photo-stack { width: 56px; height: 56px; margin-right: 10px; }
         }
 
-        /* 黑夜模式地图瓦片反转 */
-        body.dark-mode .leaflet-tile {
-            filter: invert(1) hue-rotate(180deg) brightness(0.7) contrast(0.9);
-        }
+        body.dark-mode .leaflet-tile { filter: invert(1) hue-rotate(180deg) brightness(0.7) contrast(0.9); }
     </style>
 </head>
 <body>
-    <!-- 背景层 -->
     <div id="bgLayer"></div>
 
     <header class="site-header">
@@ -520,9 +414,7 @@
             <div class="search-box-wrapper">
                 <input type="text" id="searchInput" placeholder="搜索相册或照片…">
                 <button class="search-btn" id="searchBtn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </button>
             </div>
         </div>
@@ -531,8 +423,13 @@
             <li><a data-page="map">地图</a></li>
             <li><a data-page="about">关于</a></li>
             <li><a data-page="links">友情链接</a></li>
-            <li><a data-page="settings">设置</a></li>
         </ul>
+        <div class="header-actions">
+            <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="切换主题"></button>
+            <div class="user-avatar" id="userAvatar">
+                <div class="user-dropdown" id="userDropdown"></div>
+            </div>
+        </div>
     </header>
 
     <div class="filter-section" id="filterSection">
@@ -546,12 +443,120 @@
         <div class="albums-container" id="albumsContainer"></div>
     </div>
 
-    <!-- 地图视图 -->
-    <div id="mapView" style="display:none;">
-        <div id="map"></div>
+    <div id="mapView" style="display:none;"><div id="map"></div></div>
+    <div class="photos-container" id="photosContainer"></div>
+
+    <div id="authView" style="display: none;">
+        <div class="page-content">
+            <h2>登录 / 注册</h2>
+            <div class="auth-form">
+                <label for="authName">昵称</label>
+                <input type="text" id="authName" placeholder="输入昵称">
+                <label for="authPhone">手机号</label>
+                <input type="text" id="authPhone" placeholder="输入手机号">
+                <label for="authPassword">密码</label>
+                <input type="password" id="authPassword" placeholder="输入密码">
+                <div class="btn-row">
+                    <button class="btn-primary" id="loginBtn">登录</button>
+                    <button class="btn-primary" id="registerBtn">注册</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="photos-container" id="photosContainer"></div>
+    <div id="accountView" style="display: none;">
+        <div class="page-content">
+            <h2>账号设置</h2>
+            <div class="account-form">
+                <label for="accountUsername">昵称</label>
+                <input type="text" id="accountUsername" placeholder="输入昵称">
+                <label for="accountPhone">电话号码</label>
+                <input type="text" id="accountPhone" placeholder="输入电话号码">
+                <label for="accountGender">性别</label>
+                <select id="accountGender">
+                    <option value="保密">保密</option>
+                    <option value="男">男</option>
+                    <option value="女">女</option>
+                </select>
+                <div class="btn-row">
+                    <button class="btn-primary" id="saveAccountBtn">保存修改</button>
+                    <button class="btn-danger" id="logoutBtn">退出登录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="downloadsView" style="display: none;">
+        <div class="page-content">
+            <h2>下载记录</h2>
+            <div id="downloadListContainer"></div>
+        </div>
+    </div>
+
+    <div id="favoritesView" style="display: none;">
+        <div class="page-content">
+            <h2>我的收藏</h2>
+            <div class="favorites-grid" id="favoritesGrid"></div>
+        </div>
+    </div>
+
+    <div id="uploadView" style="display: none;">
+        <div class="page-content" style="max-width: 700px;">
+            <h2>上传照片</h2>
+            <div class="upload-dropzone" id="uploadDropzone">
+                <p>拖拽文件或文件夹到此处，或点击下方按钮选择文件</p>
+                <button class="btn-sm" id="chooseFilesBtn">选择文件</button>
+                <input type="file" id="fileInput" multiple webkitdirectory style="display:none;">
+            </div>
+            <div class="upload-file-list" id="uploadFileList"></div>
+            <div class="upload-info-section" id="uploadInfoSection" style="display:none;">
+                <h3>填写照片信息</h3>
+                <label for="uploadAlbum">选择相册</label>
+                <select id="uploadAlbum"></select>
+                <label for="uploadTitlePrefix">填写照片编码</label>
+                <input type="text" id="uploadTitlePrefix" placeholder="例如：RAGASA-照片1">
+                <label for="uploadAuthor">拍摄者</label>
+                <input type="text" id="uploadAuthor" placeholder="例如：追风队-飞鹰">
+                <label for="uploadCategory">分类</label>
+                <select id="uploadCategory">
+                    <option value="风毁">风毁</option>
+                    <option value="实况">实况</option>
+                    <option value="实景">实景</option>
+                </select>
+                <label for="uploadLocation">地点</label>
+                <input type="text" id="uploadLocation" placeholder="例如：珠海">
+                <div class="btn-row">
+                    <button class="btn-sm" id="submitUploadBtn">上传</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="customBgView" style="display: none;">
+        <div class="page-content">
+            <h2>自定义背景</h2>
+            <div class="bg-setting">
+                <p>选择一张图片作为网站背景</p>
+                <div class="btn-row">
+                    <button class="btn-sm" id="bgSelectBtn">选择图片</button>
+                    <button class="btn-sm" id="bgRemoveBtn">移除背景</button>
+                    <button class="btn-sm" id="bgResetBtn">重置</button>
+                </div>
+                <input type="file" id="bgFileInput" accept="image/*">
+                <label>模糊程度：<span id="bgBlurValue">0</span>px</label>
+                <input type="range" id="bgBlurRange" min="0" max="30" value="0" step="1">
+                <p style="font-size: 0.75rem; color: #888;">上传图片后浏览器会保存在本地，不会上传到服务器</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="photoSettingsView" style="display: none;">
+        <div class="page-content" style="max-width: 1300px;">
+            <h2>照片设置</h2>
+            <div id="photoSettingsAlbumsContainer" class="albums-container"></div>
+            <div id="photoSettingsPhotosContainer" class="photo-settings-grid"></div>
+        </div>
+    </div>
 
     <div id="aboutView" style="display: none;">
         <div class="page-content">
@@ -559,10 +564,10 @@
             <p class="intro-text">这里是<strong>华南气象爱好者的追风小分队</strong>，记录团队追逐过的风暴。点击相册浏览照片，所有的图片与视频在非商用的前提下均可下载。</p>
             <h2>关于我们</h2>
             <p><strong>华南气象爱好者追风小分队</strong>成立于2025年，是一群热爱气象、追逐风暴的年轻人。我们穿梭于台风、暴雨、雷暴和雪原之间，用镜头记录大自然的狂暴与温柔。</p>
-            <p>团队成员来自珠三角各地，有气象专业的学生，也有业余的摄影爱好者。我们相信，每一次追风都是一次与自然的对话。</p>
+            <p>团队成员来自珠三角各地，有气象专业的学生，也有业余的摄影爱好者。</p>
             <p>如果你也热爱天气，欢迎加入我们！</p>
             <h2>友情提醒</h2>
-            <p><strong>追风行为系在经验丰富和科学保障的前提下进行的</strong>，请勿随意模仿，本站无宣扬追风行为意思，遇台风天或雷暴天需注意个人安全。</p>
+            <p><strong>追风行为系在经验丰富和科学保障的前提下进行的</strong>，请勿随意模仿。</p>
         </div>
     </div>
 
@@ -571,36 +576,10 @@
             <h2>友情链接</h2>
             <p><a href="http://www.nmc.cn/" target="_blank">中国气象局</a> — 官方天气预报与预警</p>
             <p><a href="https://tf.121.com.cn/index.html" target="_blank">深圳台风网</a> — 实时台风路径追踪</p>
-            <p><a href="https://space.bilibili.com/1095244956?spm_id_from=333.1007.0.0" target="_blank">哔哩哔哩</a> — 我们的视频频道</p>
+            <p><a href="https://space.bilibili.com/1095244956" target="_blank">哔哩哔哩</a> — 我们的视频频道</p>
             <p><a href="https://www.smca.fun/" target="_blank">团队天气栈</a> — 各式各样的预报与实况平台</p>
             <p><a href="https://yandoos.balabot.top/numerical" target="_blank">CirroPisces</a> — 数值预报查询平台</p>
             <p><a href="https://track.storm-chasers.cn/" target="_blank">追风平台</a> — 追击风暴的工具平台</p>
-        </div>
-    </div>
-
-    <div id="settingsView" style="display: none;">
-        <div class="page-content">
-            <h2>设置</h2>
-            <div class="setting-row">
-                <span class="toggle-label">黑夜模式</span>
-                <button class="toggle-btn" id="darkModeToggle"></button>
-            </div>
-            <p style="text-align: center; font-size: 0.9rem; color: #888;">切换后自动保存您的偏好</p>
-
-            <!-- 背景设置模块（按钮顺序：选择图片 | 重置 | 移除背景） -->
-            <div class="bg-setting">
-                <p>自定义背景</p>
-                <div class="btn-row">
-                    <button class="btn-sm" id="bgSelectBtn">选择图片</button>
-                    <button class="btn-sm" id="bgResetBtn">重置</button>
-                    <button class="btn-sm" id="bgRemoveBtn">移除背景</button>
-                </div>
-                <!-- 隐藏的原生文件输入 -->
-                <input type="file" id="bgFileInput" accept="image/*">
-                <label for="bgBlurRange">模糊程度：<span id="bgBlurValue">0</span>px</label>
-                <input type="range" id="bgBlurRange" min="0" max="30" value="0" step="1">
-                <p style="font-size: 0.75rem; color: #888; margin-top: 8px;">上传图片后浏览器会保存在本地，不会上传到服务器</p>
-            </div>
         </div>
     </div>
 
@@ -609,233 +588,572 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // ========== 天地图密钥 ==========
+        // ==================== 配置 ====================
+        const API_BASE = 'https://chase.moexin.cn'; // 请替换为你的后端地址
         const TIANDITU_KEY = '7af52769cf10860155e93786bb66db9d';
+        const ENABLE_AUTH = true;
 
-        // ========== 相册数据 ==========
-        const albums = [
-            {
-                id: 'mujigae',
-                title: '台风桦加沙',
-                description: '珠三角自2018年以来影响最强台风',
-                introDetail: '这，是我们追击的第一个超强台风！我们深入了"桦加沙"的狂暴外眼墙，直击13级以上的强阵风，完整记录下了珠海金湾在这场台风影响下的全过程！',
-                cover: 'ragasa/ragasaphoto1.jpg',
-                keywords: '桦加沙',
-                videoTitle: '桦加沙追风视频',
-                videoUrl: 'https://www.bilibili.com/video/BV1GZHnzDEQk/',
-                photos: [
-                    { src: 'ragasa/ragasaphoto1.jpg', title: 'RAGASA-照片1', author: '追风队-飞鹰', comment: '风毁', location: '珠海' },
-                    { src: 'ragasa/ragasaphoto2.jpg', title: 'RAGASA-照片2', author: '', comment: '', location: '' },
-                    { src: 'ragasa/ragasaphoto3.jpg', title: 'RAGASA-照片3', author: '', comment: '', location: '' },
-                    { src: 'ragasa/ragasaphoto4.jpg', title: 'RAGASA-照片4', author: '', comment: '', location: '' }
-                ]
-            },
-            {
-                id: 'matmo',
-                title: '台风麦德姆',
-                description: '团队首次进入成熟的台风眼区',
-                introDetail: '在"桦加沙"远去之后，西太的疯狂仍未停止，接下来赶到战场的便是强台风"麦德姆"。而我们的追风小队，再一次踏上了追风的征途，我们穿越了它的眼墙，直击它的风眼，同时在眼内看到了国内少有的风眼蓝天的场面，完整记录下了湛江在这场台风影响下的全过程！',
-                cover: 'matmo/matmophoto1.jpg',
-                keywords: '麦德姆',
-                videoTitle: '麦德姆追风视频',
-                videoUrl: 'https://www.bilibili.com/video/BV1Ea4ezCEwX/',
-                photos: [
-                    { src: 'matmo/matmophoto1.jpg', title: 'MATMO-照片1', author: '追风队-CL', comment: '实况', location: '湛江' },
-                    { src: 'matmo/matmophoto2.jpg', title: 'MATMO-照片2', author: '', comment: '', location: '' },
-                    { src: 'matmo/matmophoto3.jpg', title: 'MATMO-照片3', author: '', comment: '', location: '' },
-                    { src: 'matmo/matmophoto4.jpg', title: 'MATMO-照片4', author: '', comment: '', location: '' }
-                ]
-            },
-            {
-                id: 'bavi',
-                title: '台风巴威',
-                description: '20年代厄年远洋台风先驱',
-                introDetail: '2020-2025年，西北太平洋连续六年拉尼娜，自此，远洋超台几乎销声匿迹。而在超强厄尔尼诺到来的2026年，"巴威"横空出世，而它的诞生，也将突破这六年的常态，创造西北太平洋的新佳话......',
-                cover: 'bavi/baviphoto1.jpg',
-                keywords: '巴威',
-                videoTitle: '巴威地球风云系列视频',
-                videoUrl: 'https://www.bilibili.com/video/BV1n93463E3H/',
-                photos: [
-                    { src: 'bavi/baviphoto1.jpg', title: 'BAVI-照片1', author: '追风队-飞鹰', comment: '实况', location: '台州' },
-                    { src: 'bavi/baviphoto2.jpg', title: 'BAVI-照片2', author: '追风队-飞鹰', comment: '实况', location: '台州' },
-                    { src: 'bavi/baviphoto3.jpg', title: 'BAVI-照片3', author: '追风队-飞鹰', comment: '实况', location: '台州' },
-                    { src: 'bavi/baviphoto4.jpg', title: 'BAVI-照片4', author: '追风队-飞鹰', comment: '风毁', location: '台州' },
-                    { src: 'bavi/baviphoto5.jpg', title: 'BAVI-照片5', author: '追风队-飞鹰', comment: '风毁', location: '台州' },
-                    { src: 'bavi/baviphoto6.jpg', title: 'BAVI-照片6', author: '追风队-飞鹰', comment: '风毁', location: '台州' },
-                    { src: 'bavi/baviphoto7.jpg', title: 'BAVI-照片7', author: '追风队-飞鹰', comment: '风毁', location: '台州' },
-                    { src: 'bavi/baviphoto8.jpg', title: 'BAVI-照片8', author: '', comment: '', location: '' }
-                ]
-            },
-            {
-                id: 'noul',
-                title: '台风红霞',
-                description: '珠东地区自2003年以来影响最强台风',
-                introDetail: '通常，厄尔尼诺年的近岸盛行下沉支，台风在近岸难以有明显发展。但在今年，一个台风从菲东暖池中诞生后冲向广东，在近岸进行了一次如"天鸽"般的猛烈爆发',
-                cover: 'noul/noulphoto1.jpg',
-                keywords: '红霞',
-                videoTitle: '红霞追风视频',
-                videoUrl: 'https://www.bilibili.com/video/BV13Z3E6iE77/',
-                photos: [
-                    { src: 'noul/noulphoto1.jpg', title: 'NOUL-照片1', author: '追风队-落帆星海', comment: '风毁', location: '深汕' },
-                    { src: 'noul/noulphoto2.jpg', title: 'NOUL-照片2', author: '', comment: '', location: '' },
-                    { src: 'noul/noulphoto3.jpg', title: 'NOUL-照片3', author: '', comment: '', location: '' },
-                    { src: 'noul/noulphoto4.jpg', title: 'NOUL-照片4', author: '', comment: '', location: '' }
-                ]
-            },
-            {
-                id: 'thunderstorm',
-                title: '雷暴合集',
-                description: '用镜头捕捉天地间最原始的咆哮',
-                introDetail: '大自然最磅礴的呼吸——雷暴云团。它们是天空的雕塑家最狂放的杰作：夕阳将砧状云顶熔炼成通红的铁毡，云塔在暮色中无声坍塌又耸起，闪电如根须般在云腹中密布游走，刹那照亮大地的轮廓',
-                cover: 'storm/stormphoto1.jpg',
-                keywords: '强对流 雷暴',
-                videoTitle: '2026雷暴追击视频',
-                videoUrl: 'https://www.bilibili.com/video/BV1AeL36CEGn/',
-                photos: [
-                    { src: 'storm/stormphoto1.jpg', title: 'STORM-照片1', author: '追风队-燕东', comment: '实景', location: '深圳' },
-                    { src: 'storm/stormphoto2.jpg', title: 'STORM-照片2', author: '追风队-粤气爱', comment: '实景', location: '深圳' },
-                    { src: 'storm/stormphoto3.jpg', title: 'STORM-照片3', author: '追风队-TQM', comment: '实景', location: '深圳' },
-                    { src: 'storm/stormphoto4.jpg', title: 'STORM-照片4', author: '追风队-TQM', comment: '实景', location: '深圳' },
-                    { src: 'storm/stormphoto5.png', title: 'STORM-照片5', author: '追风队-南超', comment: '实景', location: '东莞' },
-                    { src: 'storm/stormphoto6.png', title: 'STORM-照片6', author: '追风队-南超', comment: '实景', location: '东莞' },
-                    { src: 'storm/stormphoto7.png', title: 'STORM-照片7', author: '追风队-南超', comment: '实景', location: '东莞' },
-                    { src: 'storm/stormphoto8.png', title: 'STORM-照片8', author: '', comment: '', location: '' }
-                ]
-            },
-            {
-                id: 'snow',
-                title: '雪原合集',
-                description: '记录那些被风雪覆盖的屋檐、树梢与足迹',
-                introDetail: '平日里喧嚣的街道被白色轻轻覆盖，熟悉的楼宇藏在蓬松的轮廓里，连时间都仿佛放慢了脚步。车轮碾过积雪的声音变得沉闷，行人的交谈被吸入柔软的雪被，整座城市像被按下了静音键——雪没收了所有急躁，只留下它自己的语言',
-                cover: 'snow/snowphoto1.jpg',
-                keywords: '降雪 雪',
-                videoTitle: '2026降雪追击视频',
-                videoUrl: 'https://www.bilibili.com/video/BV1rhkxBjExL/',
-                photos: [
-                    { src: 'snow/snowphoto1.jpg', title: 'SNOW-照片1', author: '追风队-飞鹰', comment: '实景', location: '烟台' },
-                    { src: 'snow/snowphoto2.jpg', title: 'SNOW-照片2', author: '追风队-飞鹰', comment: '实景', location: '烟台' },
-                    { src: 'snow/snowphoto3.jpg', title: 'SNOW-照片3', author: '追风队-飞鹰', comment: '实景', location: '烟台' },
-                    { src: 'snow/snowphoto4.jpg', title: 'SNOW-照片4', author: '追风队-飞鹰', comment: '实景', location: '烟台' },
-                    { src: 'snow/snowphoto5.jpg', title: 'SNOW-照片5', author: '追风队-飞鹰', comment: '实景', location: '烟台' },
-                    { src: 'snow/snowphoto6.jpg', title: 'SNOW-照片6', author: '追风队-飞鹰', comment: '实景', location: '烟台' },
-                    { src: 'snow/snowphoto7.jpg', title: 'SNOW-照片7', author: '', comment: '', location: '' },
-                    { src: 'snow/snowphoto8.jpg', title: 'SNOW-照片8', author: '', comment: '', location: '' }
-                ]
-            }
-        ];
-
-        // 城市坐标映射
-        const cityCoords = {
-            '珠海': [22.270978, 113.576677],
-            '湛江': [21.270702, 110.359377],
-            '台州': [28.65638, 121.42076],
-            '深汕': [22.8105, 115.1840],
-            '深圳': [22.543099, 114.057868],
-            '东莞': [23.0207, 113.7518],
-            '烟台': [37.4638, 121.4479]
-        };
-
+        // ==================== 全局状态 ====================
+        let albums = [];
+        let allPhotos = []; // 缓存所有照片，避免重复请求
+        let favorites = JSON.parse(localStorage.getItem('tempestFavorites')) || [];
+        let downloads = JSON.parse(localStorage.getItem('tempestDownloads')) || [];
+        let userProfile = JSON.parse(localStorage.getItem('tempestUserProfile')) || {};
+        let currentUser = null;
+        let uploadedFiles = [];
         let currentType = 'all';
         let currentKeyword = '';
         let mapInitialized = false;
         let map;
+        let currentAlbumForSettings = null;
 
-        // ========== 黑夜模式 ==========
-        const darkModeToggle = document.getElementById('darkModeToggle');
+        // ==================== API 请求封装 ====================
+        async function apiFetch(url, options = {}) {
+            const config = {
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                },
+                ...options
+            };
+            if (options.body && options.body instanceof FormData) {
+                delete config.headers['Content-Type'];
+            }
+            const res = await fetch(`${API_BASE}${url}`, config);
+            if (res.status === 204) return null;
+            if (!res.ok) {
+                let errorData;
+                try { errorData = await res.json(); } catch(e) { errorData = null; }
+                throw new Error(errorData?.detail?.msg || errorData?.detail || '请求失败');
+            }
+            return await res.json();
+        }
+
+        async function registerUser(name, phone, password) {
+            return apiFetch('/api/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({ name, phone, password })
+            });
+        }
+        async function loginUser(phone, password) {
+            return apiFetch('/api/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ phone, password })
+            });
+        }
+        async function logoutUser() {
+            return apiFetch('/api/auth/logout', { method: 'POST' });
+        }
+        async function fetchCurrentUser() {
+            return apiFetch('/api/auth/me');
+        }
+        async function fetchAlbums() {
+            return apiFetch('/api/albums');
+        }
+        async function createAlbum(albumData) {
+            return apiFetch('/api/albums', {
+                method: 'POST',
+                body: JSON.stringify(albumData)
+            });
+        }
+        async function fetchPhotos(albumId = null) {
+            let url = '/api/photos?limit=100';
+            if (albumId) url += `&album_id=${encodeURIComponent(albumId)}`;
+            return apiFetch(url);
+        }
+        async function uploadPhoto(formData) {
+            return apiFetch('/api/photos', {
+                method: 'POST',
+                body: formData
+            });
+        }
+        async function deletePhoto(photoId) {
+            return apiFetch(`/api/photos/${photoId}`, { method: 'DELETE' });
+        }
+        async function deleteAlbum(albumId) {
+            return apiFetch(`/api/albums/${albumId}`, { method: 'DELETE' });
+        }
+        async function updateUserUploadApproval(userId, approved) {
+            return apiFetch(`/api/auth/users/${userId}/upload-approval`, {
+                method: 'PATCH',
+                body: JSON.stringify({ upload_approved: approved })
+            });
+        }
+
+        // ==================== 主题切换 ====================
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        function updateThemeIcon() {
+            const isDark = document.body.classList.contains('dark-mode');
+            themeToggleBtn.innerHTML = isDark ?
+                '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/></svg>' :
+                '<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+        }
         function applyDarkMode(isDark) {
             if (isDark) document.body.classList.add('dark-mode');
             else document.body.classList.remove('dark-mode');
             localStorage.setItem('tempestDarkMode', isDark ? '1' : '0');
+            updateThemeIcon();
         }
         if (localStorage.getItem('tempestDarkMode') === '1') applyDarkMode(true);
         else applyDarkMode(false);
-        if (darkModeToggle) {
-            darkModeToggle.addEventListener('click', () => applyDarkMode(!document.body.classList.contains('dark-mode')));
-        }
+        themeToggleBtn.addEventListener('click', () => applyDarkMode(!document.body.classList.contains('dark-mode')));
 
-        // ========== 背景设置模块 ==========
-        const bgLayer = document.getElementById('bgLayer');
-        const bgFileInput = document.getElementById('bgFileInput');
-        const bgBlurRange = document.getElementById('bgBlurRange');
-        const bgBlurValue = document.getElementById('bgBlurValue');
-        const bgRemoveBtn = document.getElementById('bgRemoveBtn');
-        const bgResetBtn = document.getElementById('bgResetBtn');
-        const bgSelectBtn = document.getElementById('bgSelectBtn');
-
-        if (bgSelectBtn && bgFileInput) {
-            bgSelectBtn.addEventListener('click', () => bgFileInput.click());
-        }
-
-        function loadBgSettings() {
-            const savedBg = localStorage.getItem('tempestBgImage');
-            const savedBlur = localStorage.getItem('tempestBgBlur') || '0';
-            if (savedBg) {
-                bgLayer.style.backgroundImage = `url(${savedBg})`;
+        // ==================== 用户界面 ====================
+        function renderUserUI() {
+            const avatarContainer = document.getElementById('userAvatar');
+            const isLoggedIn = ENABLE_AUTH && currentUser;
+            if (isLoggedIn) {
+                let extraMenu = '';
+                if (currentUser.is_admin) {
+                    extraMenu = '<button class="dropdown-item" data-page="photoSettings">照片设置</button>';
+                }
+                avatarContainer.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                        <line x1="9" y1="9" x2="9.01" y2="9" />
+                        <line x1="15" y1="9" x2="15.01" y2="9" />
+                    </svg>
+                    <div class="user-dropdown" id="userDropdown">
+                        <button class="dropdown-item" data-page="account">账号设置</button>
+                        <button class="dropdown-item" data-page="downloads">下载记录</button>
+                        <button class="dropdown-item" data-page="favorites">我的收藏</button>
+                        <button class="dropdown-item" data-page="upload">上传</button>
+                        <button class="dropdown-item" data-page="customBg">自定义背景</button>
+                        ${extraMenu}
+                    </div>
+                `;
+            } else {
+                avatarContainer.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M8 15s1.5 -2 4 -2 4 2 4 2" />
+                        <line x1="9" y1="9" x2="9.01" y2="9" />
+                        <line x1="15" y1="9" x2="15.01" y2="9" />
+                    </svg>
+                    <div class="user-dropdown" id="userDropdown">
+                        <button class="dropdown-item" data-page="auth">登录/注册</button>
+                        <button class="dropdown-item" data-page="customBg">自定义背景</button>
+                    </div>
+                `;
             }
-            bgLayer.style.filter = `blur(${savedBlur}px)`;
-            bgBlurRange.value = savedBlur;
-            bgBlurValue.textContent = savedBlur;
-        }
-        loadBgSettings();
 
-        if (bgFileInput) {
-            bgFileInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const base64 = event.target.result;
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const maxW = 1920;
-                        const ratio = Math.min(1, maxW / img.width);
-                        canvas.width = img.width * ratio;
-                        canvas.height = img.height * ratio;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        const compressed = canvas.toDataURL('image/jpeg', 0.7);
-                        localStorage.setItem('tempestBgImage', compressed);
-                        bgLayer.style.backgroundImage = `url(${compressed})`;
-                    };
-                    img.src = base64;
-                };
-                reader.readAsDataURL(file);
+            const newDropdown = document.getElementById('userDropdown');
+            if (newDropdown) {
+                newDropdown.querySelectorAll('.dropdown-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const page = item.getAttribute('data-page');
+                        location.hash = page;
+                        avatarContainer.classList.remove('open');
+                    });
+                });
+            }
+        }
+        const userAvatar = document.getElementById('userAvatar');
+        userAvatar.addEventListener('click', (e) => { e.stopPropagation(); userAvatar.classList.toggle('open'); });
+        document.addEventListener('click', () => userAvatar.classList.remove('open'));
+
+        // ==================== 登录/注册 ====================
+        const authView = document.getElementById('authView');
+        const authName = document.getElementById('authName');
+        const authPhone = document.getElementById('authPhone');
+        const authPassword = document.getElementById('authPassword');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+
+        loginBtn.addEventListener('click', async () => {
+            const phone = authPhone.value.trim();
+            const password = authPassword.value.trim();
+            if (!phone || !password) { alert('请输入手机号和密码'); return; }
+            try {
+                const user = await loginUser(phone, password);
+                currentUser = user;
+                userProfile = { name: user.name, phone: user.phone, gender: '保密' };
+                localStorage.setItem('tempestUserProfile', JSON.stringify(userProfile));
+                renderUserUI();
+                location.hash = 'home';
+                alert('登录成功');
+            } catch(e) {
+                alert(e.message);
+            }
+        });
+        registerBtn.addEventListener('click', async () => {
+            const name = authName.value.trim();
+            const phone = authPhone.value.trim();
+            const password = authPassword.value.trim();
+            if (!name || !phone || !password) { alert('请完整填写注册信息'); return; }
+            try {
+                const user = await registerUser(name, phone, password);
+                currentUser = user;
+                userProfile = { name: user.name, phone: user.phone, gender: '保密' };
+                localStorage.setItem('tempestUserProfile', JSON.stringify(userProfile));
+                renderUserUI();
+                location.hash = 'home';
+                alert('注册成功，已自动登录');
+            } catch(e) {
+                alert(e.message);
+            }
+        });
+
+        // ==================== 账号设置 ====================
+        const accountUsername = document.getElementById('accountUsername');
+        const accountPhone = document.getElementById('accountPhone');
+        const accountGender = document.getElementById('accountGender');
+        const saveAccountBtn = document.getElementById('saveAccountBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        function loadAccountForm() {
+            accountUsername.value = userProfile.name || '';
+            accountPhone.value = userProfile.phone || '';
+            accountGender.value = userProfile.gender || '保密';
+        }
+        saveAccountBtn.addEventListener('click', async () => {
+            // 后端暂不支持普通用户修改资料，此处仅更新本地展示，可扩展
+            userProfile.name = accountUsername.value.trim() || '追风者';
+            userProfile.phone = accountPhone.value.trim();
+            userProfile.gender = accountGender.value;
+            localStorage.setItem('tempestUserProfile', JSON.stringify(userProfile));
+            alert('本地账号设置已保存（需后端扩展）');
+        });
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await logoutUser();
+                currentUser = null;
+                localStorage.removeItem('tempestUserProfile');
+                renderUserUI();
+                location.hash = 'home';
+                alert('已退出登录');
+            } catch(e) {
+                // 即使接口失败也清除本地
+                currentUser = null;
+                renderUserUI();
+                location.hash = 'home';
+            }
+        });
+
+        // ==================== 下载记录 ====================
+        function recordDownload(src, title) {
+            const record = { src, title, time: new Date().toLocaleString('zh-CN') };
+            downloads.unshift(record);
+            if (downloads.length > 100) downloads = downloads.slice(0, 100);
+            localStorage.setItem('tempestDownloads', JSON.stringify(downloads));
+        }
+        function renderDownloads() {
+            const container = document.getElementById('downloadListContainer');
+            if (!container) return;
+            if (downloads.length === 0) {
+                container.innerHTML = '<div class="empty-state">还没有下载记录哦</div>';
+                return;
+            }
+            container.innerHTML = downloads.map(d => `
+                <div class="download-item">
+                    <img src="${d.src}" alt="${d.title}">
+                    <div class="download-info">
+                        <div class="download-title">${d.title}</div>
+                        <div class="download-time">${d.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ==================== 收藏功能 ====================
+        function isFavorited(src) { return favorites.some(f => f.src === src); }
+        function toggleFavorite(src, btn) {
+            const index = favorites.findIndex(f => f.src === src);
+            if (index > -1) {
+                favorites.splice(index, 1);
+                btn.classList.remove('favorited');
+            } else {
+                let photoInfo = { src, title: '', author: '', comment: '', location: '' };
+                for (const album of albums) {
+                    const found = album.photos?.find(p => p.url === src);
+                    if (found) {
+                        photoInfo = { src: found.url, title: found.title, author: found.author || '', comment: found.comment || '', location: found.location || '' };
+                        break;
+                    }
+                }
+                favorites.push(photoInfo);
+                btn.classList.add('favorited');
+            }
+            localStorage.setItem('tempestFavorites', JSON.stringify(favorites));
+        }
+        function renderFavorites() {
+            const grid = document.getElementById('favoritesGrid');
+            if (!grid) return;
+            if (favorites.length === 0) {
+                grid.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;">还没有收藏任何照片哦</div>';
+                return;
+            }
+            grid.innerHTML = favorites.map(photo => `
+                <div class="photo-card">
+                    <img src="${photo.src}" alt="${photo.title}" onclick="showPreview('${photo.src}')">
+                    <div class="photo-info">
+                        <div class="photo-title">${photo.title}</div>
+                        <div class="photo-desc">${photo.author || ''}${photo.location ? ' · ' + photo.location : ''}</div>
+                        <div class="photo-actions">
+                            <a class="action-btn" href="${photo.src}" download title="下载原图" onclick="recordDownload('${photo.src}', '${photo.title}')">${getDownloadIcon()}</a>
+                            <button class="action-btn" onclick="event.stopPropagation(); showPreview('${photo.src}')" title="预览照片">${getEyeIcon()}</button>
+                            <button class="action-btn favorited" onclick="event.stopPropagation(); toggleFavorite('${photo.src}', this)" title="取消收藏">${getStarIcon(true)}</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ==================== 上传模块 ====================
+        const uploadDropzone = document.getElementById('uploadDropzone');
+        const fileInput = document.getElementById('fileInput');
+        const chooseFilesBtn = document.getElementById('chooseFilesBtn');
+        const uploadFileList = document.getElementById('uploadFileList');
+        const uploadInfoSection = document.getElementById('uploadInfoSection');
+        const submitUploadBtn = document.getElementById('submitUploadBtn');
+        const uploadAlbumSelect = document.getElementById('uploadAlbum');
+        const uploadTitlePrefix = document.getElementById('uploadTitlePrefix');
+        const uploadAuthor = document.getElementById('uploadAuthor');
+        const uploadCategory = document.getElementById('uploadCategory');
+        const uploadLocation = document.getElementById('uploadLocation');
+
+        function populateAlbumSelect() {
+            if (!uploadAlbumSelect) return;
+            let options = albums.map(album => `<option value="${album.id}">${album.title}</option>`).join('');
+            if (currentUser && currentUser.is_admin) {
+                options += `<option value="__create_new__">+ 创建新相册</option>`;
+            }
+            uploadAlbumSelect.innerHTML = options;
+        }
+
+        function showCreateAlbumModal() {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="announce-content" style="max-width: 400px;">
+                    <h3 style="margin-bottom: 16px;">创建新相册</h3>
+                    <label for="newAlbumId">相册ID（英文）</label>
+                    <input type="text" id="newAlbumId" style="width:100%; margin-bottom: 12px; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                    <label for="newAlbumTitle">相册标题</label>
+                    <input type="text" id="newAlbumTitle" style="width:100%; margin-bottom: 12px; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                    <label for="newAlbumDesc">描述</label>
+                    <input type="text" id="newAlbumDesc" style="width:100%; margin-bottom: 12px; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn-sm" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                        <button class="btn-sm" id="confirmCreateAlbumBtn">确认创建</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            overlay.querySelector('#confirmCreateAlbumBtn').addEventListener('click', async () => {
+                const id = overlay.querySelector('#newAlbumId').value.trim();
+                const title = overlay.querySelector('#newAlbumTitle').value.trim();
+                const desc = overlay.querySelector('#newAlbumDesc').value.trim();
+                if (!id || !title) { alert('请输入相册ID和标题'); return; }
+                try {
+                    const album = await createAlbum({ id, title, description: desc || null });
+                    await loadAlbums();
+                    populateAlbumSelect();
+                    overlay.remove();
+                    alert('相册创建成功');
+                } catch(e) {
+                    alert(e.message);
+                }
             });
         }
 
-        if (bgBlurRange) {
-            bgBlurRange.addEventListener('input', (e) => {
-                const val = e.target.value;
-                bgBlurValue.textContent = val;
-                bgLayer.style.filter = `blur(${val}px)`;
-                localStorage.setItem('tempestBgBlur', val);
+        uploadAlbumSelect?.addEventListener('change', () => {
+            if (uploadAlbumSelect.value === '__create_new__') {
+                showCreateAlbumModal();
+                uploadAlbumSelect.value = '';
+            }
+        });
+
+        function handleFiles(files) {
+            uploadedFiles = Array.from(files);
+            renderUploadFileList();
+            uploadInfoSection.style.display = uploadedFiles.length > 0 ? 'block' : 'none';
+        }
+        function renderUploadFileList() {
+            if (!uploadFileList) return;
+            uploadFileList.innerHTML = uploadedFiles.map((file) => {
+                const sizeKB = (file.size / 1024).toFixed(1);
+                return `
+                    <div class="upload-file-item">
+                        <div class="file-icon">📄</div>
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${sizeKB} KB</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        chooseFilesBtn?.addEventListener('click', () => fileInput.click());
+        fileInput?.addEventListener('change', (e) => handleFiles(e.target.files));
+        uploadDropzone?.addEventListener('dragover', (e) => { e.preventDefault(); uploadDropzone.classList.add('dragover'); });
+        uploadDropzone?.addEventListener('dragleave', () => uploadDropzone.classList.remove('dragover'));
+        uploadDropzone?.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            uploadDropzone.classList.remove('dragover');
+            const files = await getFilesFromDataTransfer(e.dataTransfer);
+            handleFiles(files);
+        });
+
+        async function getFilesFromDataTransfer(dataTransfer) {
+            const items = dataTransfer.items;
+            if (items && items.length > 0) {
+                const entries = [];
+                for (let i = 0; i < items.length; i++) {
+                    const entry = items[i].webkitGetAsEntry();
+                    if (entry) entries.push(entry);
+                }
+                const files = [];
+                for (const entry of entries) await traverseFileTree(entry, files);
+                return files;
+            } else return Array.from(dataTransfer.files);
+        }
+        function traverseFileTree(entry, files) {
+            return new Promise((resolve) => {
+                if (entry.isFile) {
+                    entry.file((file) => { files.push(file); resolve(); });
+                } else if (entry.isDirectory) {
+                    const dirReader = entry.createReader();
+                    dirReader.readEntries(async (entries) => {
+                        for (const e of entries) await traverseFileTree(e, files);
+                        resolve();
+                    });
+                } else resolve();
             });
         }
+        submitUploadBtn?.addEventListener('click', async () => {
+            const titlePrefixValue = uploadTitlePrefix.value.trim();
+            const author = uploadAuthor.value.trim();
+            const category = uploadCategory.value;
+            const location = uploadLocation.value.trim();
+            const albumId = uploadAlbumSelect.value;
+            if (!titlePrefixValue) { alert('请输入照片编码'); return; }
+            if (!albumId) { alert('请选择相册'); return; }
+            if (uploadedFiles.length === 0) { alert('请先选择文件'); return; }
 
-        if (bgRemoveBtn) {
-            bgRemoveBtn.addEventListener('click', () => {
-                localStorage.removeItem('tempestBgImage');
-                bgLayer.style.backgroundImage = '';
-                bgLayer.style.filter = 'blur(0px)';
-                bgBlurRange.value = '0';
-                bgBlurValue.textContent = '0';
-                localStorage.setItem('tempestBgBlur', '0');
-            });
+            try {
+                for (let i = 0; i < uploadedFiles.length; i++) {
+                    const formData = new FormData();
+                    formData.append('file', uploadedFiles[i]);
+                    formData.append('album_id', albumId);
+                    formData.append('title', `${titlePrefixValue}-${i + 1}`);
+                    formData.append('comment', category);
+                    if (location) formData.append('location', location);
+                    await uploadPhoto(formData);
+                }
+                alert('上传成功');
+                await loadAlbums();
+                location.hash = 'home';
+            } catch(e) {
+                alert('上传失败: ' + e.message);
+            }
+        });
+
+        // ==================== 照片设置（管理员） ====================
+        const photoSettingsView = document.getElementById('photoSettingsView');
+        const photoSettingsAlbumsContainer = document.getElementById('photoSettingsAlbumsContainer');
+        const photoSettingsPhotosContainer = document.getElementById('photoSettingsPhotosContainer');
+
+        function renderPhotoSettingsAlbums() {
+            if (!photoSettingsAlbumsContainer) return;
+            photoSettingsAlbumsContainer.innerHTML = albums.map(album => `
+                <div class="album-card" onclick="openPhotoSettingsAlbum('${album.id}')">
+                    <img src="${album.cover?.url || 'placeholder.jpg'}" alt="${album.title}">
+                    <div class="album-info">
+                        <div class="album-title">${album.title}</div>
+                        <div class="album-desc">${album.description || ''}</div>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        if (bgResetBtn) {
-            bgResetBtn.addEventListener('click', () => {
-                localStorage.removeItem('tempestBgImage');
-                localStorage.removeItem('tempestBgBlur');
-                bgLayer.style.backgroundImage = '';
-                bgLayer.style.filter = 'blur(0px)';
-                bgBlurRange.value = '0';
-                bgBlurValue.textContent = '0';
-            });
+        window.openPhotoSettingsAlbum = async function(albumId) {
+            currentAlbumForSettings = albumId;
+            const album = albums.find(a => a.id === albumId);
+            if (!album) return;
+            photoSettingsAlbumsContainer.style.display = 'none';
+            photoSettingsPhotosContainer.style.display = 'grid';
+            try {
+                const photosData = await fetchPhotos(albumId);
+                const photos = Array.isArray(photosData) ? photosData : (photosData.data || []);
+                renderPhotoSettingsPhotos(photos);
+            } catch(e) {
+                alert(e.message);
+                photoSettingsPhotosContainer.innerHTML = '<div class="empty-state">加载失败</div>';
+            }
+        };
+
+        function renderPhotoSettingsPhotos(photos) {
+            if (!photoSettingsPhotosContainer) return;
+            if (photos.length === 0) {
+                photoSettingsPhotosContainer.innerHTML = '<div class="empty-state">该相册暂无照片</div>';
+                return;
+            }
+            photoSettingsPhotosContainer.innerHTML = photos.map(photo => `
+                <div class="photo-card">
+                    <img src="${photo.url}" alt="${photo.title}">
+                    <div class="photo-info">
+                        <div class="photo-title">${photo.title}</div>
+                        <div class="photo-actions" style="justify-content: flex-end;">
+                            <button class="action-btn" onclick="deletePhotoById('${photo.id}')" title="删除照片">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // ========== 状态管理 ==========
+        window.deletePhotoById = async function(photoId) {
+            if (!confirm('确认删除这张照片？')) return;
+            try {
+                await deletePhoto(photoId);
+                alert('照片已删除');
+                if (currentAlbumForSettings) {
+                    const photosData = await fetchPhotos(currentAlbumForSettings);
+                    const photos = Array.isArray(photosData) ? photosData : (photosData.data || []);
+                    renderPhotoSettingsPhotos(photos);
+                }
+                await loadAlbums();
+            } catch(e) {
+                alert('删除失败: ' + e.message);
+            }
+        };
+
+        // ==================== 数据加载（已修正兼容格式） ====================
+        async function loadAlbums() {
+            try {
+                const albumList = await fetchAlbums();
+                // 兼容后端返回：若为数组直接使用，若为对象且含 data 数组则使用 data
+                albums = Array.isArray(albumList) ? albumList : (albumList.data || []);
+                
+                // 兼容 cover 字段：可能为 cover 对象、cover_url 字符串等
+                albums.forEach(album => {
+                    album.cover = album.cover || { url: album.cover_url || album.coverUrl || '' };
+                    album.photos = [];
+                });
+
+                // 加载所有照片（兼容数组或 {data: []}）
+                const photosData = await fetchPhotos();
+                allPhotos = Array.isArray(photosData) ? photosData : (photosData.data || []);
+                
+                // 将照片分配至相册
+                albums.forEach(album => {
+                    album.photos = allPhotos.filter(p => p.album_id === album.id);
+                });
+
+                renderAlbums(currentKeyword);
+                if (currentView === 'map') initMap();
+            } catch(e) {
+                console.error('加载相册失败:', e);
+                albums = [];
+                renderAlbums(currentKeyword);
+                noResult.style.display = 'block';
+                noResult.textContent = '😕 无法连接服务器，请稍后重试';
+            }
+        }
+
+        // ==================== 路由和视图切换 ====================
         let currentAlbumId = null, currentView = 'home';
         const navLinks = document.querySelectorAll('.nav-menu a');
         const homeView = document.getElementById('homeView');
@@ -843,7 +1161,11 @@
         const photosContainer = document.getElementById('photosContainer');
         const aboutView = document.getElementById('aboutView');
         const linksView = document.getElementById('linksView');
-        const settingsView = document.getElementById('settingsView');
+        const accountView = document.getElementById('accountView');
+        const downloadsView = document.getElementById('downloadsView');
+        const favoritesView = document.getElementById('favoritesView');
+        const uploadView = document.getElementById('uploadView');
+        const customBgView = document.getElementById('customBgView');
         const searchSection = document.getElementById('searchSection');
         const filterSection = document.getElementById('filterSection');
         const noResult = document.getElementById('noResult');
@@ -853,7 +1175,6 @@
         const announceBtn = document.getElementById('announceBtn');
 
         if (announceBtn) announceBtn.addEventListener('click', () => showAnnouncement());
-
         function showAnnouncement() {
             const existing = document.querySelector('.modal-overlay');
             if (existing) existing.remove();
@@ -862,10 +1183,8 @@
             overlay.innerHTML = `
                 <span class="modal-close">&times;</span>
                 <div class="announce-content">
-                    <h2 style="margin-bottom: 16px; font-size: 1.4rem;">📢 网站公告</h2>
-                    <p>Tempest Chase V1（先行版）正式发布，网站目前所规划功能与版面设计已全部上线。</p>
-                    <p>但相册合集照片目前缺口较大，且版权问题未得到完全落实，因此当前网站版本实用性较低。</p>
-                    <p>目前网站已试运营V2部分功能，敬请期待</p>
+                    <h2>📢 网站公告</h2>
+                    <p>Tempest Chase V2（公测版）正式发布，网站目前所规划功能与版面设计已全部上线。</p>
                     <p style="margin-top: 16px; font-size: 0.9rem; color: #888;">（点击遮罩或右上角关闭按钮退出）</p>
                 </div>
             `;
@@ -877,71 +1196,60 @@
             btn.addEventListener('click', () => {
                 filterBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                announceBtn.classList.remove('active');
                 currentType = btn.dataset.type;
                 if (currentView === 'home') renderAlbums(currentKeyword);
-                else if (currentView === 'album') {
-                    const album = albums.find(a => a.id === currentAlbumId);
-                    if (album) renderPhotos(album, currentKeyword);
-                }
             });
         });
 
         function performSearch() {
             currentKeyword = searchInput.value;
             if (currentView === 'home') renderAlbums(currentKeyword);
-            else if (currentView === 'album') {
-                const album = albums.find(a => a.id === currentAlbumId);
-                if (album) renderPhotos(album, currentKeyword);
-            }
         }
         searchBtn.addEventListener('click', performSearch);
         searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') performSearch(); });
         searchInput.addEventListener('input', performSearch);
 
-        function getFileType(filename) {
-            if (/video/i.test(filename)) return 'video';
-            if (/photo/i.test(filename)) return 'photo';
-            return 'photo';
-        }
-
         function switchView(viewName, albumId = null) {
-            homeView.style.display = 'none';
-            mapView.style.display = 'none';
-            photosContainer.style.display = 'none';
-            aboutView.style.display = 'none';
-            linksView.style.display = 'none';
-            settingsView.style.display = 'none';
+            homeView.style.display = 'none'; mapView.style.display = 'none';
+            photosContainer.style.display = 'none'; aboutView.style.display = 'none';
+            linksView.style.display = 'none'; accountView.style.display = 'none';
+            downloadsView.style.display = 'none'; favoritesView.style.display = 'none';
+            uploadView.style.display = 'none'; customBgView.style.display = 'none';
+            authView.style.display = 'none'; photoSettingsView.style.display = 'none';
             noResult.style.display = 'none';
 
             if (viewName === 'home' || viewName === 'album') {
-                searchSection.style.display = 'flex';
-                filterSection.style.display = 'flex';
+                searchSection.style.display = 'flex'; filterSection.style.display = 'flex';
             } else {
-                searchSection.style.display = 'none';
-                filterSection.style.display = 'none';
+                searchSection.style.display = 'none'; filterSection.style.display = 'none';
             }
 
-            if (viewName === 'home') {
-                homeView.style.display = 'block';
-                renderAlbums(currentKeyword);
-            } else if (viewName === 'map') {
-                mapView.style.display = 'block';
-                initMap();
-            } else if (viewName === 'about') {
-                aboutView.style.display = 'block';
-            } else if (viewName === 'links') {
-                linksView.style.display = 'block';
-            } else if (viewName === 'settings') {
-                settingsView.style.display = 'block';
-            } else if (viewName === 'album') {
+            if (viewName === 'home') { homeView.style.display = 'block'; renderAlbums(currentKeyword); }
+            else if (viewName === 'map') { mapView.style.display = 'block'; initMap(); }
+            else if (viewName === 'about') { aboutView.style.display = 'block'; }
+            else if (viewName === 'links') { linksView.style.display = 'block'; }
+            else if (viewName === 'auth') { authView.style.display = 'block'; }
+            else if (viewName === 'account') { accountView.style.display = 'block'; loadAccountForm(); }
+            else if (viewName === 'downloads') { downloadsView.style.display = 'block'; renderDownloads(); }
+            else if (viewName === 'favorites') { favoritesView.style.display = 'block'; renderFavorites(); }
+            else if (viewName === 'upload') { uploadView.style.display = 'block'; populateAlbumSelect(); }
+            else if (viewName === 'customBg') { customBgView.style.display = 'block'; }
+            else if (viewName === 'photoSettings') {
+                if (currentUser?.is_admin) {
+                    photoSettingsView.style.display = 'block';
+                    photoSettingsAlbumsContainer.style.display = 'grid';
+                    photoSettingsPhotosContainer.style.display = 'none';
+                    renderPhotoSettingsAlbums();
+                } else {
+                    location.hash = 'home';
+                    alert('无访问权限');
+                }
+            }
+            else if (viewName === 'album') {
                 photosContainer.style.display = 'block';
                 if (albumId) {
                     const album = albums.find(a => a.id === albumId);
-                    if (album) {
-                        currentAlbumId = albumId;
-                        renderPhotos(album, currentKeyword);
-                    }
+                    if (album) { currentAlbumId = albumId; renderPhotos(album, currentKeyword); }
                 }
             }
             currentView = viewName;
@@ -956,113 +1264,79 @@
         }
 
         navLinks.forEach(link => link.addEventListener('click', () => location.hash = link.getAttribute('data-page')));
-
         window.addEventListener('hashchange', () => {
             const hash = location.hash.slice(1);
             if (hash === 'about') switchView('about');
             else if (hash === 'map') switchView('map');
             else if (hash === 'links') switchView('links');
-            else if (hash === 'settings') switchView('settings');
+            else if (hash === 'auth') switchView('auth');
+            else if (hash === 'account') switchView('account');
+            else if (hash === 'downloads') switchView('downloads');
+            else if (hash === 'favorites') switchView('favorites');
+            else if (hash === 'upload') switchView('upload');
+            else if (hash === 'customBg') switchView('customBg');
+            else if (hash === 'photoSettings') switchView('photoSettings');
             else if (hash.startsWith('album/')) switchView('album', hash.replace('album/', ''));
             else switchView('home');
         });
 
         function openAlbum(albumId) { location.hash = 'album/' + albumId; }
 
-        // ========== 地图初始化（天地图，缩放控件右下角） ==========
         function initMap() {
             if (!mapInitialized && typeof L !== 'undefined') {
-                map = L.map('map', {
-                    center: [30.0, 115.0],
-                    zoom: 5,
-                    zoomControl: false
-                });
-
+                map = L.map('map', { center: [30.0, 115.0], zoom: 5, zoomControl: false });
                 L.control.zoom({ position: 'bottomright' }).addTo(map);
-
                 L.tileLayer(`https://t{s}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${TIANDITU_KEY}`, {
-                    subdomains: ['0','1','2','3','4','5','6','7'],
-                    attribution: '© 天地图',
-                    maxZoom: 18
+                    subdomains: ['0','1','2','3','4','5','6','7'], maxZoom: 18
                 }).addTo(map);
-
                 L.tileLayer(`https://t{s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${TIANDITU_KEY}`, {
-                    subdomains: ['0','1','2','3','4','5','6','7'],
-                    attribution: '© 天地图',
-                    maxZoom: 18
+                    subdomains: ['0','1','2','3','4','5','6','7'], maxZoom: 18
                 }).addTo(map);
-
                 mapInitialized = true;
                 addCityMarkers();
-            } else if (mapInitialized) {
-                setTimeout(() => map.invalidateSize(), 100);
-            }
+            } else if (mapInitialized) { setTimeout(() => map.invalidateSize(), 100); }
         }
 
-        // ========== 城市标记与弹窗（标题无 emoji） ==========
         function addCityMarkers() {
             const cityPhotos = {};
             albums.forEach(album => {
-                album.photos.forEach(photo => {
+                (album.photos || []).forEach(photo => {
                     if (photo.location && photo.location.trim() !== '') {
                         const loc = photo.location.trim();
                         if (!cityPhotos[loc]) cityPhotos[loc] = [];
-                        cityPhotos[loc].push({
-                            ...photo,
-                            albumId: album.id,
-                            albumTitle: album.title
-                        });
+                        cityPhotos[loc].push({ ...photo, albumId: album.id, albumTitle: album.title });
                     }
                 });
             });
-
             Object.keys(cityPhotos).forEach(city => {
                 const coords = cityCoords[city];
                 if (!coords) return;
                 const photos = cityPhotos[city];
-
-                const firstPhoto = photos[0].src;
+                const firstPhoto = photos[0].url;
                 const icon = L.divIcon({
                     className: 'custom-marker',
                     html: `<div class="marker-square"><img src="${firstPhoto}" alt="${city}"></div>`,
-                    iconSize: [42, 42],
-                    iconAnchor: [21, 21],
-                    popupAnchor: [0, -24]
+                    iconSize: [42, 42], iconAnchor: [21, 21], popupAnchor: [0, -24]
                 });
-
                 let photosHTML = '';
                 if (photos.length <= 3) {
-                    photos.forEach(photo => {
-                        photosHTML += `<img src="${photo.src}" alt="${photo.title}" onclick="window.showPreview('${photo.src}')">`;
-                    });
+                    photos.forEach(photo => { photosHTML += `<img src="${photo.url}" onclick="window.showPreview('${photo.url}')">`; });
                 } else {
-                    for (let i = 0; i < 2; i++) {
-                        photosHTML += `<img src="${photos[i].src}" alt="${photos[i].title}" onclick="window.showPreview('${photos[i].src}')">`;
-                    }
+                    for (let i = 0; i < 2; i++) { photosHTML += `<img src="${photos[i].url}" onclick="window.showPreview('${photos[i].url}')">`; }
                     photosHTML += `<div class="photo-stack" onclick="expandStack(this)">`;
-                    for (let i = 2; i < photos.length; i++) {
-                        photosHTML += `<img src="${photos[i].src}" alt="${photos[i].title}" onclick="event.stopPropagation(); window.showPreview('${photos[i].src}')">`;
-                    }
+                    for (let i = 2; i < photos.length; i++) { photosHTML += `<img src="${photos[i].url}" onclick="event.stopPropagation(); window.showPreview('${photos[i].url}')">`; }
                     photosHTML += `</div>`;
                 }
-
                 const popupHTML = `
                     <div class="map-popup">
                         <div class="popup-title">${city} · ${photos.length}张照片</div>
                         <div class="photo-grid">${photosHTML}</div>
-                        <a class="popup-btn" href="#album/${photos[0].albumId}">前往该相册 <span class="arrow">→</span></a>
+                        <a class="popup-btn" href="#album/${photos[0].albumId}">前往该相册 <span>→</span></a>
                     </div>`;
-
-                L.marker(coords, { icon: icon }).addTo(map)
-                    .bindPopup(popupHTML, { maxWidth: 400, minWidth: 0 });
+                L.marker(coords, { icon: icon }).addTo(map).bindPopup(popupHTML, { maxWidth: 400 });
             });
         }
-
-        window.expandStack = function(stackElement) {
-            stackElement.classList.add('expanded');
-            stackElement.onclick = null;
-        };
-
+        window.expandStack = function(el) { el.classList.add('expanded'); el.onclick = null; };
         window.showPreview = showPreview;
 
         function renderAlbums(filterKeyword = '') {
@@ -1071,20 +1345,76 @@
             const keyword = filterKeyword.toLowerCase().trim();
             let hasVisible = false;
             albums.forEach(album => {
+                const photos = album.photos || [];
                 if (currentType !== 'all') {
-                    const hasType = album.photos.some(p => getFileType(p.src) === currentType);
+                    const hasType = photos.some(p => getFileType(p.filename || p.url) === currentType);
                     if (!hasType) return;
                 }
-                if (keyword && !album.keywords.toLowerCase().includes(keyword) && !album.title.toLowerCase().includes(keyword)) return;
+                if (keyword && !(album.title.toLowerCase().includes(keyword) || (album.description || '').toLowerCase().includes(keyword))) return;
                 hasVisible = true;
+                const coverUrl = album.cover?.url || '';
                 const card = document.createElement('div');
                 card.className = 'album-card';
-                card.innerHTML = `<img src="${album.cover}" alt="${album.title}"><div class="album-info"><div class="album-title">${album.title}</div><div class="album-desc">${album.description}</div></div>`;
+                card.innerHTML = `<img src="${coverUrl}" alt="${album.title}"><div class="album-info"><div class="album-title">${album.title}</div><div class="album-desc">${album.description || ''}</div></div>`;
                 card.addEventListener('click', () => openAlbum(album.id));
                 container.appendChild(card);
             });
             noResult.style.display = hasVisible ? 'none' : 'block';
-            if (!hasVisible) noResult.textContent = '😕 没有找到匹配的相册，换个关键词试试吧。';
+            if (!hasVisible) noResult.textContent = '😕 没有找到匹配的相册';
+        }
+
+        function getFileType(filename) {
+            if (/video/i.test(filename)) return 'video';
+            if (/photo/i.test(filename)) return 'photo';
+            return 'photo';
+        }
+
+        function renderPhotos(album, filterKeyword = '') {
+            const container = document.getElementById('photosContainer');
+            container.innerHTML = '';
+            const introDiv = document.createElement('div');
+            introDiv.className = 'album-intro';
+            introDiv.innerHTML = `<span class="intro-bracket">「</span>${album.description || album.title}<span class="intro-bracket">」</span>`;
+            container.appendChild(introDiv);
+
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'photos-grid';
+            const photos = album.photos || [];
+            let hasVisible = false;
+            photos.forEach(photo => {
+                if (currentType !== 'all' && getFileType(photo.filename || photo.url) !== currentType) return;
+                const keyword = filterKeyword.toLowerCase().trim();
+                const combined = `${photo.title} ${photo.author || ''} ${photo.comment || ''} ${photo.location || ''}`.toLowerCase();
+                if (keyword && !combined.includes(keyword)) return;
+                hasVisible = true;
+                const favorited = isFavorited(photo.url);
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.innerHTML = `
+                    <img src="${photo.url}" alt="${photo.title}" onclick="showPreview('${photo.url}')">
+                    <div class="photo-info">
+                        <div class="photo-title">${photo.title}</div>
+                        <div class="photo-meta">
+                            <span class="meta-author">${photo.author || ''}</span>
+                            <span class="meta-comment">${photo.comment || ''}</span>
+                            <span class="meta-location">${photo.location || ''}</span>
+                        </div>
+                        <div class="photo-actions">
+                            <a class="action-btn" href="${photo.url}" download title="下载原图" onclick="recordDownload('${photo.url}', '${photo.title}')">${getDownloadIcon()}</a>
+                            <button class="action-btn" onclick="event.stopPropagation(); showPreview('${photo.url}')" title="预览照片">${getEyeIcon()}</button>
+                            <button class="action-btn ${favorited ? 'favorited' : ''}" onclick="event.stopPropagation(); toggleFavorite('${photo.url}', this)" title="收藏">${getStarIcon(favorited)}</button>
+                        </div>
+                    </div>
+                `;
+                gridDiv.appendChild(card);
+            });
+            container.appendChild(gridDiv);
+            if (!hasVisible) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-state';
+                empty.textContent = '该相册暂无照片';
+                container.appendChild(empty);
+            }
         }
 
         function getDownloadIcon() {
@@ -1092,6 +1422,9 @@
         }
         function getEyeIcon() {
             return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+        }
+        function getStarIcon(favorited) {
+            return `<svg viewBox="0 0 24 24" fill="${favorited ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
         }
 
         function showPreview(src) {
@@ -1104,76 +1437,34 @@
             document.body.appendChild(overlay);
         }
 
-        function renderPhotos(album, filterKeyword = '') {
-            const container = document.getElementById('photosContainer');
-            container.innerHTML = '';
-            const introText = album.introDetail || album.description;
-            const introDiv = document.createElement('div');
-            introDiv.className = 'album-intro';
-            introDiv.innerHTML = `<span class="intro-bracket">「</span>${introText}<span class="intro-bracket">」</span>`;
-            container.appendChild(introDiv);
-
-            if (album.videoTitle && album.videoUrl) {
-                const linkWrapper = document.createElement('div');
-                linkWrapper.className = 'video-link-wrapper';
-                linkWrapper.innerHTML = `<a class="video-btn" href="${album.videoUrl}" target="_blank">${getBiliTvIcon()} ${album.videoTitle}</a>`;
-                container.appendChild(linkWrapper);
-            }
-
-            const gridDiv = document.createElement('div');
-            gridDiv.className = 'photos-grid';
-            const keyword = filterKeyword.toLowerCase().trim();
-            let hasVisible = false;
-            album.photos.forEach(photo => {
-                if (currentType !== 'all' && getFileType(photo.src) !== currentType) return;
-                const combined = (photo.title + ' ' + (photo.author||'') + ' ' + (photo.comment||'') + ' ' + (photo.location||'')).toLowerCase();
-                if (keyword && !combined.includes(keyword)) return;
-                hasVisible = true;
-
-                const hasMeta = photo.author !== undefined || photo.comment !== undefined || photo.location !== undefined;
-                let metaHTML = '';
-                if (hasMeta) {
-                    metaHTML = `
-                        <div class="photo-meta">
-                            <span class="meta-author">${photo.author || ''}</span>
-                            <span class="meta-comment">${photo.comment || ''}</span>
-                            <span class="meta-location">${photo.location || ''}</span>
-                        </div>`;
-                } else if (photo.desc) {
-                    metaHTML = `<div class="photo-desc">${photo.desc}</div>`;
+        // ==================== 初始化 ====================
+        async function initApp() {
+            try {
+                currentUser = await fetchCurrentUser();
+                if (currentUser) {
+                    userProfile = { name: currentUser.name, phone: currentUser.phone, gender: '保密' };
+                    localStorage.setItem('tempestUserProfile', JSON.stringify(userProfile));
                 }
-
-                const card = document.createElement('div');
-                card.className = 'photo-card';
-                card.innerHTML = `
-                    <img src="${photo.src}" alt="${photo.title}" onclick="showPreview('${photo.src}')">
-                    <div class="photo-info">
-                        <div class="photo-title">${photo.title}</div>
-                        ${metaHTML}
-                        <div class="photo-actions">
-                            <a class="action-btn" href="${photo.src}" download title="下载原图">${getDownloadIcon()}</a>
-                            <button class="action-btn" onclick="event.stopPropagation(); showPreview('${photo.src}')" title="预览照片">${getEyeIcon()}</button>
-                        </div>
-                    </div>
-                `;
-                gridDiv.appendChild(card);
-            });
-            container.appendChild(gridDiv);
-            noResult.style.display = (!hasVisible && keyword !== '') ? 'block' : 'none';
-            if (!hasVisible && keyword !== '') noResult.textContent = '😕 没有匹配的照片，换个关键词试试吧。';
+            } catch(e) {
+                currentUser = null;
+            }
+            renderUserUI();
+            await loadAlbums();
+            const initHash = location.hash.slice(1);
+            if (initHash === 'about') switchView('about');
+            else if (initHash === 'map') switchView('map');
+            else if (initHash === 'links') switchView('links');
+            else if (initHash === 'auth') switchView('auth');
+            else if (initHash === 'account') switchView('account');
+            else if (initHash === 'downloads') switchView('downloads');
+            else if (initHash === 'favorites') switchView('favorites');
+            else if (initHash === 'upload') switchView('upload');
+            else if (initHash === 'customBg') switchView('customBg');
+            else if (initHash === 'photoSettings') switchView('photoSettings');
+            else if (initHash.startsWith('album/')) switchView('album', initHash.replace('album/', ''));
+            else switchView('home');
         }
-
-        function getBiliTvIcon() {
-            return `<svg class="bili-tv-icon" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="4" width="20" height="15" rx="2" fill="none" stroke="white" stroke-width="2"/><polygon points="10,8 16,12 10,16" fill="white"/><line x1="5" y1="20" x2="19" y2="20" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="7" y1="22" x2="17" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`;
-        }
-
-        const initHash = location.hash.slice(1);
-        if (initHash === 'about') switchView('about');
-        else if (initHash === 'map') switchView('map');
-        else if (initHash === 'links') switchView('links');
-        else if (initHash === 'settings') switchView('settings');
-        else if (initHash.startsWith('album/')) switchView('album', initHash.replace('album/', ''));
-        else switchView('home');
+        initApp();
     </script>
 </body>
 </html>
