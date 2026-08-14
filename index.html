@@ -7,7 +7,7 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        /* ===== 原有样式保留 ===== */
+        /* ===== 样式部分（保持不变，略有补充） ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
@@ -1483,7 +1483,8 @@
                         <div class="album-info">
                             <div class="album-title">${escapeHTML(album.title)}</div>
                             <div class="album-desc">${escapeHTML(album.description || '')}</div>
-                            <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                            <div style="display:flex; justify-content:space-between; margin-top:8px; gap:8px;">
+                                <button class="btn-sm" onclick="setCover('${album.id}')">设置封面</button>
                                 <button class="btn-sm" onclick="deleteAlbum('${album.id}')">删除</button>
                             </div>
                         </div>
@@ -1548,11 +1549,57 @@
             }
         }
 
+        // 设置封面
+        window.setCover = async function(albumId) {
+            try {
+                const result = await api.getPhotos(albumId, 0, 100);
+                const photos = result.data || [];
+                if (photos.length === 0) {
+                    alert('该相册暂无照片，无法设置封面');
+                    return;
+                }
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                const photosHTML = photos.map(photo => `
+                    <div class="photo-card" style="cursor:pointer;" onclick="selectCover('${photo.id}', '${albumId}')">
+                        <img src="${escapeHTML(photo.url)}" alt="${escapeHTML(photo.title)}">
+                        <div class="photo-info">
+                            <div class="photo-title">${escapeHTML(photo.title)}</div>
+                        </div>
+                    </div>
+                `).join('');
+                overlay.innerHTML = `
+                    <span class="modal-close">&times;</span>
+                    <div class="announce-content" style="max-width: 90%; max-height: 80%; overflow-y: auto; background: white; color: #333;">
+                        <h2 style="margin-bottom:16px;">选择封面照片</h2>
+                        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap:12px;">
+                            ${photosHTML}
+                        </div>
+                    </div>
+                `;
+                overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+                document.body.appendChild(overlay);
+            } catch (err) {
+                alert('加载照片失败：' + err.message);
+            }
+        };
+
+        window.selectCover = async function(photoId, albumId) {
+            try {
+                await api.updateAlbumCover(albumId, photoId);
+                document.querySelector('.modal-overlay')?.remove();
+                alert('封面设置成功');
+                renderAdminAlbums();
+                await loadAlbums(); // 刷新首页数据
+            } catch (err) {
+                alert('设置封面失败：' + err.message);
+            }
+        };
+
         window.deleteAlbum = async function(albumId) {
             if (!confirm('确定删除该相册吗？此操作会删除相册及其中所有照片？')) return;
             try {
                 await api.deleteAlbum(albumId);
-                // 从本地 albums 移除
                 albums = albums.filter(a => a.id !== albumId);
                 backendAlbumIds.delete(albumId);
                 renderAdminAlbums();
