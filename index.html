@@ -7,7 +7,7 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        /* ===== 样式部分（保持不变，略有补充） ===== */
+        /* ===== 样式部分 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
@@ -94,14 +94,34 @@
             display: flex; gap: 30px; list-style: none; padding-left: 0;
             align-items: center; flex: 0 0 auto; margin-left: auto; margin-right: 30px;
         }
-        .nav-menu a { text-decoration: none; color: #555; font-size: 0.95rem; cursor: pointer; line-height: 40px; border-bottom: 2px solid transparent; }
+        .nav-menu a {
+            text-decoration: none;
+            color: #555;
+            font-size: 0.95rem;
+            cursor: pointer;
+            line-height: 40px;
+            border-bottom: 2px solid transparent;
+            padding-bottom: 8px; /* 增大字符与下划线之间的间隙 */
+            transition: color 0.2s, border-color 0.2s;
+        }
         .nav-menu a:hover { color: #222; }
         .nav-menu a.active { font-weight: 600; color: #000; border-bottom-color: #000; }
 
         .header-actions { display: flex; align-items: center; gap: 20px; flex: 0 0 auto; }
-        .theme-toggle-btn { background: none; border: none; cursor: pointer; width: 30px; height: 30px; color: inherit; padding: 0; }
+        .theme-toggle-btn, .user-avatar {
+            display: inline-flex;               /* 新增：flex 布局 */
+            align-items: center;               /* 垂直居中 */
+            justify-content: center;           /* 水平居中 */
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            line-height: 1;                    /* 避免继承行高影响 */
+        }
         .theme-toggle-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; }
-        .user-avatar { position: relative; width: 30px; height: 30px; background: none; border: none; cursor: pointer; padding: 0; }
+        .user-avatar { position: relative; }
         .user-avatar svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; }
         .user-dropdown {
             display: none; position: absolute; top: 40px; right: 0;
@@ -522,7 +542,9 @@
                 <label for="accountName">姓名</label>
                 <input type="text" id="accountName" placeholder="输入姓名">
                 <label for="accountPhone">电话号码</label>
-                <input type="text" id="accountPhone" placeholder="输入电话号码" disabled>
+                <input type="text" id="accountPhone" placeholder="输入电话号码">
+                <label for="accountPassword">新密码（留空则不修改）</label>
+                <input type="password" id="accountPassword" placeholder="输入新密码">
                 <div class="btn-row">
                     <button class="btn-primary" id="saveAccountBtn">保存修改</button>
                     <button class="btn-danger" id="logoutBtn">退出登录</button>
@@ -780,6 +802,13 @@
             me() {
                 return this.request('/api/auth/me');
             },
+            // 修改当前用户资料（需后端支持 PATCH /api/auth/me）
+            updateCurrentUser(data) {
+                return this.request('/api/auth/me', {
+                    method: 'PATCH',
+                    body: JSON.stringify(data)
+                });
+            },
 
             // 相册
             getAlbums() {
@@ -883,6 +912,7 @@
         const accountView = document.getElementById('accountView');
         const accountName = document.getElementById('accountName');
         const accountPhone = document.getElementById('accountPhone');
+        const accountPassword = document.getElementById('accountPassword');
         const saveAccountBtn = document.getElementById('saveAccountBtn');
         const logoutBtn = document.getElementById('logoutBtn');
         const downloadsView = document.getElementById('downloadsView');
@@ -1079,19 +1109,35 @@
             if (currentUser) {
                 accountName.value = currentUser.name || '';
                 accountPhone.value = currentUser.phone || '';
+                accountPassword.value = '';
             }
         }
         saveAccountBtn.addEventListener('click', async () => {
             if (!currentUser) return;
             const newName = accountName.value.trim();
+            const newPhone = accountPhone.value.trim();
+            const newPassword = accountPassword.value.trim();
             if (!newName) { alert('姓名不能为空'); return; }
+            if (newPhone && !/^\+?[0-9]{6,20}$/.test(newPhone)) {
+                alert('手机号格式不正确');
+                return;
+            }
+            const updateData = {};
+            if (newName !== currentUser.name) updateData.name = newName;
+            if (newPhone !== currentUser.phone) updateData.phone = newPhone;
+            if (newPassword) updateData.password = newPassword;
+            if (Object.keys(updateData).length === 0) {
+                alert('没有需要修改的内容');
+                return;
+            }
             try {
-                // 注：OpenAPI 未提供普通用户更新姓名的接口，这里暂时仅本地更新（可后续扩展）
-                currentUser.name = newName;
-                localStorage.setItem('tempestUser', JSON.stringify(currentUser));
-                alert('姓名已更新（仅本地）');
+                const updatedUser = await api.updateCurrentUser(updateData);
+                currentUser = updatedUser;
+                localStorage.setItem('tempestUser', JSON.stringify(updatedUser));
+                accountPassword.value = '';
+                alert('账号信息已更新');
             } catch (err) {
-                alert(err.message);
+                alert('更新失败：' + err.message);
             }
         });
 
