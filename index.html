@@ -337,7 +337,10 @@
         body.dark-mode .batch-settings .batch-row input {
             background: rgba(30,42,58,0.7); border-color: #555; color: #ccc;
         }
-        .batch-settings .btn-sm { flex-shrink: 0; }
+        .batch-settings .btn-sm {
+            flex-shrink: 0;
+            height: 38px;
+        }
 
         .btn-sm {
             padding: 6px 16px; border: 1px solid #ddd; border-radius: 20px;
@@ -632,7 +635,7 @@
                 <div class="batch-settings">
                     <label style="margin-bottom:8px;">批量设置（可选）</label>
                     <div class="batch-row">
-                        <input type="text" id="batchTitlePrefix" placeholder="标题前缀，如 RAGASA">
+                        <input type="text" id="batchTitlePrefix" placeholder="标题前缀，如 RAGASA-照片">
                         <input type="text" id="batchCategory" placeholder="分类，如 风毁">
                         <input type="text" id="batchLocation" placeholder="地点，如 珠海">
                         <button class="btn-sm" id="applyBatchBtn">应用到全部</button>
