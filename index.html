@@ -7,7 +7,7 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        /* ===== 样式部分 ===== */
+        /* ===== 全局基础 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
@@ -101,7 +101,7 @@
             cursor: pointer;
             line-height: 40px;
             border-bottom: 2px solid transparent;
-            padding-bottom: 8px; /* 增大字符与下划线之间的间隙 */
+            padding-bottom: 8px;
             transition: color 0.2s, border-color 0.2s;
         }
         .nav-menu a:hover { color: #222; }
@@ -109,17 +109,19 @@
 
         .header-actions { display: flex; align-items: center; gap: 20px; flex: 0 0 auto; }
         .theme-toggle-btn, .user-avatar {
-            display: inline-flex;               /* 新增：flex 布局 */
-            align-items: center;               /* 垂直居中 */
-            justify-content: center;           /* 水平居中 */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             background: none;
             border: none;
             cursor: pointer;
             width: 30px;
             height: 30px;
             padding: 0;
-            line-height: 1;                    /* 避免继承行高影响 */
+            line-height: 1;
         }
+        .theme-toggle-btn { color: #555; }
+        body.dark-mode .theme-toggle-btn { color: #fff; }
         .theme-toggle-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; }
         .user-avatar { position: relative; }
         .user-avatar svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; }
@@ -146,6 +148,23 @@
         }
         .filter-btn:hover { color: #666; }
         .filter-btn.active { color: #000; font-weight: 700; }
+
+        .sync-albums-btn {
+            background: none;
+            border: none;
+            padding: 4px 0;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.2s, font-weight 0.2s;
+            font-family: inherit;
+            line-height: 1.5;
+            border-radius: 0;
+        }
+        .sync-albums-btn:hover { color: #666; }
+        body.dark-mode .sync-albums-btn { color: #aaa; }
+        body.dark-mode .sync-albums-btn:hover { color: #ccc; }
 
         .albums-container, .photos-grid, .favorites-grid, .photo-settings-grid {
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
@@ -400,17 +419,10 @@
         .popup-btn:hover { background: rgba(255,255,255,0.45); border-color: #aaa; transform: translateY(-1px); }
         .popup-btn .arrow { margin-left: 6px; font-size: 1em; }
 
-        .sync-albums-btn {
-            background: #5a9; color: white; border: none; border-radius: 20px;
-            padding: 6px 16px; font-size: 0.8rem; cursor: pointer; margin-left: auto;
-        }
-        .sync-albums-btn:hover { opacity: 0.9; }
-        body.dark-mode .sync-albums-btn { background: #4a8; }
-
-        /* 管理员中心样式 */
+        /* 管理员中心选项卡 */
         .admin-tabs {
             display: flex;
-            gap: 12px;
+            gap: 24px;
             margin-bottom: 20px;
             border-bottom: 1px solid rgba(0,0,0,0.1);
             padding-bottom: 8px;
@@ -418,18 +430,21 @@
         .admin-tab {
             background: none;
             border: none;
-            padding: 8px 16px;
-            font-size: 0.9rem;
-            font-weight: 600;
+            padding: 4px 0;
+            font-size: 1rem;
+            font-weight: 500;
             color: #999;
             cursor: pointer;
-            border-radius: 8px;
-            transition: background 0.2s, color 0.2s;
+            transition: color 0.2s, font-weight 0.2s;
+            font-family: inherit;
+            line-height: 1.5;
+            border-radius: 0;
         }
-        .admin-tab:hover { background: rgba(0,0,0,0.05); color: #333; }
-        .admin-tab.active { background: #5a9; color: white; }
-        body.dark-mode .admin-tab:hover { background: rgba(255,255,255,0.1); color: #ddd; }
-        body.dark-mode .admin-tab.active { background: #4a8; }
+        .admin-tab:hover { color: #666; }
+        .admin-tab.active { color: #000; font-weight: 700; }
+        body.dark-mode .admin-tab { color: #aaa; }
+        body.dark-mode .admin-tab:hover { color: #ccc; }
+        body.dark-mode .admin-tab.active { color: #fff; font-weight: 700; }
 
         .admin-panel { min-height: 200px; }
         .panel-header {
@@ -585,8 +600,8 @@
                 <select id="uploadAlbum">
                     <!-- 相册选项由 JS 动态填充 -->
                 </select>
-                <label for="uploadTitlePrefix">照片标题前缀</label>
-                <input type="text" id="uploadTitlePrefix" placeholder="例如：RAGASA">
+                <label for="uploadTitlePrefix">填写照片编码</label>
+                <input type="text" id="uploadTitlePrefix" placeholder="例如：RAGASA-照片1">
                 <label for="uploadCategory">分类（comment）</label>
                 <select id="uploadCategory">
                     <option value="风毁">风毁</option>
@@ -681,10 +696,10 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         // ===== 全局配置 =====
-        const API_BASE = '';  // 留空表示同源，后端路径为 /api/...
+        const API_BASE = '';
         const TIANDITU_KEY = '7af52769cf10860155e93786bb66db9d';
 
-        // ===== 默认相册数据（用于前端展示和同步） =====
+        // ===== 默认相册数据 =====
         const defaultAlbums = [
             {
                 id: 'mujigae',
@@ -748,7 +763,7 @@
             }
         ];
 
-        // ===== 工具函数：XSS 防护 =====
+        // ===== 工具函数 =====
         function escapeHTML(str) {
             if (!str) return '';
             const div = document.createElement('div');
@@ -783,7 +798,6 @@
                 return response.json();
             },
 
-            // 认证
             register(phone, password, name) {
                 return this.request('/api/auth/register', {
                     method: 'POST',
@@ -802,7 +816,6 @@
             me() {
                 return this.request('/api/auth/me');
             },
-            // 修改当前用户资料（需后端支持 PATCH /api/auth/me）
             updateCurrentUser(data) {
                 return this.request('/api/auth/me', {
                     method: 'PATCH',
@@ -810,7 +823,6 @@
                 });
             },
 
-            // 相册
             getAlbums() {
                 return this.request('/api/albums');
             },
@@ -830,7 +842,6 @@
                 return this.request(`/api/albums/${albumId}/cover`, { method: 'PATCH', body: JSON.stringify({ photo_id: photoId }) });
             },
 
-            // 照片
             getPhotos(albumId = null, skip = 0, limit = 100) {
                 let query = `?skip=${skip}&limit=${limit}`;
                 if (albumId) query += `&album_id=${encodeURIComponent(albumId)}`;
@@ -852,7 +863,6 @@
                 return this.request(`/api/photos/${photoId}`, { method: 'DELETE' });
             },
 
-            // 用户管理
             getUsers(pendingApproval = null) {
                 let query = '';
                 if (pendingApproval !== null) query = `?pending_upload_approval=${pendingApproval}`;
@@ -873,8 +883,8 @@
         };
 
         // ===== 全局状态 =====
-        let albums = [];           // 合并后的相册列表
-        let backendAlbumIds = new Set(); // 后端已存在的相册ID
+        let albums = [];
+        let backendAlbumIds = new Set();
         let currentUser = null;
         let favorites = JSON.parse(localStorage.getItem('tempestFavorites')) || [];
         let downloads = JSON.parse(localStorage.getItem('tempestDownloads')) || [];
@@ -886,7 +896,7 @@
         let mapInitialized = false;
         let map;
         let uploadedFiles = [];
-        let adminCurrentTab = 'albums'; // 管理员中心当前 tab
+        let adminCurrentTab = 'albums';
 
         const cityCoords = {
             '珠海': [22.270978, 113.576677],
@@ -932,7 +942,6 @@
         const uploadLocation = document.getElementById('uploadLocation');
         const customBgView = document.getElementById('customBgView');
 
-        // 管理员中心 DOM
         const adminCenterView = document.getElementById('adminCenterView');
         const adminTabs = document.querySelectorAll('.admin-tab');
         const adminAlbumsPanel = document.getElementById('adminAlbumsPanel');
@@ -1562,7 +1571,8 @@
                                 <span>${escapeHTML(photo.author || '')}</span>
                                 <span>${escapeHTML(photo.location || '')}</span>
                             </div>
-                            <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                            <div style="display:flex; justify-content:space-between; margin-top:8px; gap:8px;">
+                                <button class="btn-sm" onclick="editPhoto('${photo.id}')">二次修改</button>
                                 <button class="btn-sm" onclick="deletePhoto('${photo.id}')">删除</button>
                             </div>
                         </div>
@@ -1636,9 +1646,51 @@
                 document.querySelector('.modal-overlay')?.remove();
                 alert('封面设置成功');
                 renderAdminAlbums();
-                await loadAlbums(); // 刷新首页数据
+                await loadAlbums();
             } catch (err) {
                 alert('设置封面失败：' + err.message);
+            }
+        };
+
+        // 二次修改照片
+        window.editPhoto = async function(photoId) {
+            try {
+                // 获取照片详情
+                const photo = await api.getPhoto(photoId);
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                overlay.innerHTML = `
+                    <div class="announce-content" style="max-width: 400px;">
+                        <h3 style="margin-bottom:16px;">修改照片信息</h3>
+                        <label for="editPhotoTitle">标题</label>
+                        <input type="text" id="editPhotoTitle" value="${escapeHTML(photo.title)}" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px;">
+                        <label for="editPhotoComment">评论</label>
+                        <input type="text" id="editPhotoComment" value="${escapeHTML(photo.comment || '')}" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px;">
+                        <label for="editPhotoLocation">地点</label>
+                        <input type="text" id="editPhotoLocation" value="${escapeHTML(photo.location || '')}" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px;">
+                        <div style="display:flex; gap:10px; justify-content:flex-end;">
+                            <button class="btn-sm" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                            <button class="btn-sm" id="confirmEditPhotoBtn">保存修改</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+                overlay.querySelector('#confirmEditPhotoBtn').addEventListener('click', async () => {
+                    const title = overlay.querySelector('#editPhotoTitle').value.trim();
+                    const comment = overlay.querySelector('#editPhotoComment').value.trim();
+                    const location = overlay.querySelector('#editPhotoLocation').value.trim();
+                    if (!title) { alert('标题不能为空'); return; }
+                    try {
+                        await api.updatePhoto(photoId, { title, comment, location });
+                        overlay.remove();
+                        alert('照片信息已更新');
+                        renderAdminPhotos(); // 刷新列表
+                    } catch (err) {
+                        alert('更新失败：' + err.message);
+                    }
+                });
+            } catch (err) {
+                alert('加载照片信息失败：' + err.message);
             }
         };
 
@@ -1790,7 +1842,6 @@
                 case 'adminCenter':
                     if (!currentUser?.is_admin) { location.hash = 'home'; alert('无访问权限'); break; }
                     adminCenterView.style.display = 'block';
-                    // 默认显示相册 tab
                     adminTabs.forEach(t => t.classList.remove('active'));
                     adminTabs[0].classList.add('active');
                     switchAdminTab('albums');
@@ -1905,7 +1956,7 @@
                 <span class="modal-close">&times;</span>
                 <div class="announce-content">
                     <h2>📢 网站公告</h2>
-                    <p>Tempest Chase V2（公测版）正式发布，网站目前所规划功能与版面设计已全部上线。</p>
+                    <p>Tempest Chase V2（PRO-满血版）正式发布，网站目前所规划功能与版面设计已全部上线。</p>
                     <p style="margin-top: 16px; font-size: 0.9rem; color: #888;">（点击遮罩或右上角关闭按钮退出）</p>
                 </div>
             `;
