@@ -7,6 +7,7 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
+        /* ===== 样式部分保持不变，略作补充 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
@@ -233,6 +234,7 @@
         .bg-setting input[type="range"] { width: 80%; margin: 0 auto 12px; display: block; }
         .bg-setting input[type="file"] { display: none; }
 
+        /* 上传 */
         .upload-dropzone {
             border: 2px dashed #aaa; border-radius: 12px; padding: 40px 20px;
             text-align: center; background: rgba(255,255,255,0.4); backdrop-filter: blur(8px);
@@ -427,7 +429,9 @@
         <div class="header-actions">
             <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="切换主题"></button>
             <div class="user-avatar" id="userAvatar">
-                <div class="user-dropdown" id="userDropdown"></div>
+                <div class="user-dropdown" id="userDropdown">
+                    <!-- 下拉菜单由 JS 动态生成 -->
+                </div>
             </div>
         </div>
     </header>
@@ -441,43 +445,43 @@
 
     <div id="homeView">
         <div class="albums-container" id="albumsContainer"></div>
+        <div id="loadingIndicator" class="empty-state" style="display:none;">加载中...</div>
     </div>
 
     <div id="mapView" style="display:none;"><div id="map"></div></div>
     <div class="photos-container" id="photosContainer"></div>
 
+    <!-- 登录/注册 -->
     <div id="authView" style="display: none;">
         <div class="page-content">
             <h2>登录 / 注册</h2>
             <div class="auth-form">
-                <label for="authName">昵称</label>
-                <input type="text" id="authName" placeholder="输入昵称">
                 <label for="authPhone">手机号</label>
                 <input type="text" id="authPhone" placeholder="输入手机号">
                 <label for="authPassword">密码</label>
                 <input type="password" id="authPassword" placeholder="输入密码">
+                <div id="registerNameField" style="display:none;">
+                    <label for="authName">姓名</label>
+                    <input type="text" id="authName" placeholder="输入姓名">
+                </div>
                 <div class="btn-row">
                     <button class="btn-primary" id="loginBtn">登录</button>
                     <button class="btn-primary" id="registerBtn">注册</button>
                 </div>
+                <p style="text-align:center; margin-top:10px;"><a href="#" id="toggleAuthMode">切换到注册</a></p>
             </div>
         </div>
     </div>
 
+    <!-- 账号设置 -->
     <div id="accountView" style="display: none;">
         <div class="page-content">
             <h2>账号设置</h2>
             <div class="account-form">
-                <label for="accountUsername">昵称</label>
-                <input type="text" id="accountUsername" placeholder="输入昵称">
+                <label for="accountName">姓名</label>
+                <input type="text" id="accountName" placeholder="输入姓名">
                 <label for="accountPhone">电话号码</label>
-                <input type="text" id="accountPhone" placeholder="输入电话号码">
-                <label for="accountGender">性别</label>
-                <select id="accountGender">
-                    <option value="保密">保密</option>
-                    <option value="男">男</option>
-                    <option value="女">女</option>
-                </select>
+                <input type="text" id="accountPhone" placeholder="输入电话号码" disabled>
                 <div class="btn-row">
                     <button class="btn-primary" id="saveAccountBtn">保存修改</button>
                     <button class="btn-danger" id="logoutBtn">退出登录</button>
@@ -486,6 +490,7 @@
         </div>
     </div>
 
+    <!-- 下载记录 -->
     <div id="downloadsView" style="display: none;">
         <div class="page-content">
             <h2>下载记录</h2>
@@ -493,6 +498,7 @@
         </div>
     </div>
 
+    <!-- 我的收藏 -->
     <div id="favoritesView" style="display: none;">
         <div class="page-content">
             <h2>我的收藏</h2>
@@ -500,6 +506,7 @@
         </div>
     </div>
 
+    <!-- 上传 -->
     <div id="uploadView" style="display: none;">
         <div class="page-content" style="max-width: 700px;">
             <h2>上传照片</h2>
@@ -512,12 +519,12 @@
             <div class="upload-info-section" id="uploadInfoSection" style="display:none;">
                 <h3>填写照片信息</h3>
                 <label for="uploadAlbum">选择相册</label>
-                <select id="uploadAlbum"></select>
-                <label for="uploadTitlePrefix">填写照片编码</label>
-                <input type="text" id="uploadTitlePrefix" placeholder="例如：RAGASA-照片1">
-                <label for="uploadAuthor">拍摄者</label>
-                <input type="text" id="uploadAuthor" placeholder="例如：追风队-飞鹰">
-                <label for="uploadCategory">分类</label>
+                <select id="uploadAlbum">
+                    <!-- 相册选项由 JS 动态填充 -->
+                </select>
+                <label for="uploadTitlePrefix">照片标题前缀</label>
+                <input type="text" id="uploadTitlePrefix" placeholder="例如：RAGASA">
+                <label for="uploadCategory">分类（comment）</label>
                 <select id="uploadCategory">
                     <option value="风毁">风毁</option>
                     <option value="实况">实况</option>
@@ -532,6 +539,7 @@
         </div>
     </div>
 
+    <!-- 自定义背景 -->
     <div id="customBgView" style="display: none;">
         <div class="page-content">
             <h2>自定义背景</h2>
@@ -550,11 +558,20 @@
         </div>
     </div>
 
+    <!-- 照片设置（管理员） -->
     <div id="photoSettingsView" style="display: none;">
         <div class="page-content" style="max-width: 1300px;">
             <h2>照片设置</h2>
             <div id="photoSettingsAlbumsContainer" class="albums-container"></div>
             <div id="photoSettingsPhotosContainer" class="photo-settings-grid"></div>
+        </div>
+    </div>
+
+    <!-- 用户管理（管理员） -->
+    <div id="userManagementView" style="display: none;">
+        <div class="page-content" style="max-width: 800px;">
+            <h2>用户管理</h2>
+            <div id="userManagementContainer"></div>
         </div>
     </div>
 
@@ -588,101 +605,212 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // ==================== 配置 ====================
-        const API_BASE = 'https://chase.moexin.cn'; // 请替换为你的后端地址
+        // ===== 全局配置 =====
+        const API_BASE = 'https://chase.moexin.cn';  // 留空表示同源，后端路径为 /api/...
         const TIANDITU_KEY = '7af52769cf10860155e93786bb66db9d';
-        const ENABLE_AUTH = true;
 
-        // ==================== 全局状态 ====================
+        // ===== 工具函数 =====
+        function escapeHTML(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ===== API 模块 =====
+        const api = {
+            async request(url, options = {}) {
+                const defaultHeaders = { 'Content-Type': 'application/json' };
+                const headers = { ...defaultHeaders, ...(options.headers || {}) };
+                const config = { ...options, headers, credentials: 'include' }; // 携带 cookie
+                const response = await fetch(`${API_BASE}${url}`, config);
+                if (!response.ok) {
+                    let errorMsg = `请求失败 (${response.status})`;
+                    try {
+                        const errorData = await response.json();
+                        if (errorData.detail) {
+                            if (Array.isArray(errorData.detail)) {
+                                errorMsg = errorData.detail.map(e => e.msg).join(', ');
+                            } else {
+                                errorMsg = errorData.detail;
+                            }
+                        }
+                    } catch (e) {}
+                    throw new Error(errorMsg);
+                }
+                if (response.status === 204) return null;
+                return response.json();
+            },
+
+            // 认证
+            async register(phone, password, name) {
+                return this.request('/api/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({ phone, password, name })
+                });
+            },
+            async login(phone, password) {
+                return this.request('/api/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ phone, password })
+                });
+            },
+            async logout() {
+                return this.request('/api/auth/logout', { method: 'POST' });
+            },
+            async me() {
+                return this.request('/api/auth/me');
+            },
+
+            // 相册
+            async getAlbums() {
+                return this.request('/api/albums');
+            },
+            async getAlbum(albumId) {
+                return this.request(`/api/albums/${albumId}`);
+            },
+            async createAlbum(data) {
+                return this.request('/api/albums', { method: 'POST', body: JSON.stringify(data) });
+            },
+            async updateAlbum(albumId, data) {
+                return this.request(`/api/albums/${albumId}`, { method: 'PATCH', body: JSON.stringify(data) });
+            },
+            async deleteAlbum(albumId) {
+                return this.request(`/api/albums/${albumId}`, { method: 'DELETE' });
+            },
+            async updateAlbumCover(albumId, photoId) {
+                return this.request(`/api/albums/${albumId}/cover`, { method: 'PATCH', body: JSON.stringify({ photo_id: photoId }) });
+            },
+
+            // 照片
+            async getPhotos(albumId = null, skip = 0, limit = 100) {
+                let query = `?skip=${skip}&limit=${limit}`;
+                if (albumId) query += `&album_id=${encodeURIComponent(albumId)}`;
+                return this.request(`/api/photos${query}`);
+            },
+            async getPhoto(photoId) {
+                return this.request(`/api/photos/${photoId}`);
+            },
+            async uploadPhoto(formData) {
+                // 注意：上传时不能设置 Content-Type，让浏览器自动添加 boundary
+                const headers = { ...(formData.getHeaders ? formData.getHeaders() : {}) };
+                return this.request('/api/photos', {
+                    method: 'POST',
+                    body: formData,
+                    headers: headers
+                });
+            },
+            async updatePhoto(photoId, data) {
+                return this.request(`/api/photos/${photoId}`, { method: 'PATCH', body: JSON.stringify(data) });
+            },
+            async deletePhoto(photoId) {
+                return this.request(`/api/photos/${photoId}`, { method: 'DELETE' });
+            },
+
+            // 用户管理（管理员）
+            async getUsers(pendingApproval = null) {
+                let query = '';
+                if (pendingApproval !== null) query = `?pending_upload_approval=${pendingApproval}`;
+                return this.request(`/api/auth/users${query}`);
+            },
+            async updateUserApproval(userId, approved) {
+                return this.request(`/api/auth/users/${userId}/upload-approval`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ upload_approved: approved })
+                });
+            },
+            async updateUser(userId, data) {
+                return this.request(`/api/auth/users/${userId}`, { method: 'PATCH', body: JSON.stringify(data) });
+            },
+            async deleteUser(userId) {
+                return this.request(`/api/auth/users/${userId}`, { method: 'DELETE' });
+            },
+
+            // 健康检查
+            async healthCheck() {
+                return this.request('/api/utils/health-check/');
+            }
+        };
+
+        // ===== 全局状态 =====
         let albums = [];
-        let allPhotos = []; // 缓存所有照片，避免重复请求
+        let currentUser = null; // UserPublic 对象
         let favorites = JSON.parse(localStorage.getItem('tempestFavorites')) || [];
         let downloads = JSON.parse(localStorage.getItem('tempestDownloads')) || [];
-        let userProfile = JSON.parse(localStorage.getItem('tempestUserProfile')) || {};
-        let currentUser = null;
-        let uploadedFiles = [];
+        let userProfile = { name: '', phone: '' }; // 本地缓存，可能不同步
+
         let currentType = 'all';
         let currentKeyword = '';
+        let currentAlbumId = null;
+        let currentView = 'home';
         let mapInitialized = false;
         let map;
         let currentAlbumForSettings = null;
+        let uploadedFiles = [];
 
-        // ==================== API 请求封装 ====================
-        async function apiFetch(url, options = {}) {
-            const config = {
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                },
-                ...options
-            };
-            if (options.body && options.body instanceof FormData) {
-                delete config.headers['Content-Type'];
-            }
-            const res = await fetch(`${API_BASE}${url}`, config);
-            if (res.status === 204) return null;
-            if (!res.ok) {
-                let errorData;
-                try { errorData = await res.json(); } catch(e) { errorData = null; }
-                throw new Error(errorData?.detail?.msg || errorData?.detail || '请求失败');
-            }
-            return await res.json();
-        }
+        const cityCoords = {
+            '珠海': [22.270978, 113.576677],
+            '湛江': [21.270702, 110.359377],
+            '台州': [28.65638, 121.42076],
+            '深汕': [22.8105, 115.1840],
+            '深圳': [22.543099, 114.057868],
+            '东莞': [23.0207, 113.7518],
+            '烟台': [37.4638, 121.4479]
+        };
 
-        async function registerUser(name, phone, password) {
-            return apiFetch('/api/auth/register', {
-                method: 'POST',
-                body: JSON.stringify({ name, phone, password })
-            });
-        }
-        async function loginUser(phone, password) {
-            return apiFetch('/api/auth/login', {
-                method: 'POST',
-                body: JSON.stringify({ phone, password })
-            });
-        }
-        async function logoutUser() {
-            return apiFetch('/api/auth/logout', { method: 'POST' });
-        }
-        async function fetchCurrentUser() {
-            return apiFetch('/api/auth/me');
-        }
-        async function fetchAlbums() {
-            return apiFetch('/api/albums');
-        }
-        async function createAlbum(albumData) {
-            return apiFetch('/api/albums', {
-                method: 'POST',
-                body: JSON.stringify(albumData)
-            });
-        }
-        async function fetchPhotos(albumId = null) {
-            let url = '/api/photos?limit=100';
-            if (albumId) url += `&album_id=${encodeURIComponent(albumId)}`;
-            return apiFetch(url);
-        }
-        async function uploadPhoto(formData) {
-            return apiFetch('/api/photos', {
-                method: 'POST',
-                body: formData
-            });
-        }
-        async function deletePhoto(photoId) {
-            return apiFetch(`/api/photos/${photoId}`, { method: 'DELETE' });
-        }
-        async function deleteAlbum(albumId) {
-            return apiFetch(`/api/albums/${albumId}`, { method: 'DELETE' });
-        }
-        async function updateUserUploadApproval(userId, approved) {
-            return apiFetch(`/api/auth/users/${userId}/upload-approval`, {
-                method: 'PATCH',
-                body: JSON.stringify({ upload_approved: approved })
-            });
-        }
-
-        // ==================== 主题切换 ====================
+        // ===== DOM 元素 =====
         const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const userAvatar = document.getElementById('userAvatar');
+        const authView = document.getElementById('authView');
+        const authPhone = document.getElementById('authPhone');
+        const authPassword = document.getElementById('authPassword');
+        const authName = document.getElementById('authName');
+        const registerNameField = document.getElementById('registerNameField');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const toggleAuthMode = document.getElementById('toggleAuthMode');
+        const accountView = document.getElementById('accountView');
+        const accountName = document.getElementById('accountName');
+        const accountPhone = document.getElementById('accountPhone');
+        const saveAccountBtn = document.getElementById('saveAccountBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const downloadsView = document.getElementById('downloadsView');
+        const downloadListContainer = document.getElementById('downloadListContainer');
+        const favoritesView = document.getElementById('favoritesView');
+        const favoritesGrid = document.getElementById('favoritesGrid');
+        const uploadView = document.getElementById('uploadView');
+        const uploadDropzone = document.getElementById('uploadDropzone');
+        const fileInput = document.getElementById('fileInput');
+        const chooseFilesBtn = document.getElementById('chooseFilesBtn');
+        const uploadFileList = document.getElementById('uploadFileList');
+        const uploadInfoSection = document.getElementById('uploadInfoSection');
+        const submitUploadBtn = document.getElementById('submitUploadBtn');
+        const uploadAlbumSelect = document.getElementById('uploadAlbum');
+        const uploadTitlePrefix = document.getElementById('uploadTitlePrefix');
+        const uploadCategory = document.getElementById('uploadCategory');
+        const uploadLocation = document.getElementById('uploadLocation');
+        const customBgView = document.getElementById('customBgView');
+        const photoSettingsView = document.getElementById('photoSettingsView');
+        const photoSettingsAlbumsContainer = document.getElementById('photoSettingsAlbumsContainer');
+        const photoSettingsPhotosContainer = document.getElementById('photoSettingsPhotosContainer');
+        const userManagementView = document.getElementById('userManagementView');
+        const userManagementContainer = document.getElementById('userManagementContainer');
+
+        const homeView = document.getElementById('homeView');
+        const mapView = document.getElementById('mapView');
+        const photosContainer = document.getElementById('photosContainer');
+        const aboutView = document.getElementById('aboutView');
+        const linksView = document.getElementById('linksView');
+        const searchSection = document.getElementById('searchSection');
+        const filterSection = document.getElementById('filterSection');
+        const noResult = document.getElementById('noResult');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const filterBtns = document.querySelectorAll('.filter-btn[data-type]');
+        const announceBtn = document.getElementById('announceBtn');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+
+        // ===== 主题切换 =====
         function updateThemeIcon() {
             const isDark = document.body.classList.contains('dark-mode');
             themeToggleBtn.innerHTML = isDark ?
@@ -699,14 +827,14 @@
         else applyDarkMode(false);
         themeToggleBtn.addEventListener('click', () => applyDarkMode(!document.body.classList.contains('dark-mode')));
 
-        // ==================== 用户界面 ====================
+        // ===== 用户 UI =====
         function renderUserUI() {
             const avatarContainer = document.getElementById('userAvatar');
-            const isLoggedIn = ENABLE_AUTH && currentUser;
-            if (isLoggedIn) {
+            if (currentUser) {
                 let extraMenu = '';
                 if (currentUser.is_admin) {
-                    extraMenu = '<button class="dropdown-item" data-page="photoSettings">照片设置</button>';
+                    extraMenu += '<button class="dropdown-item" data-page="photoSettings">照片设置</button>';
+                    extraMenu += '<button class="dropdown-item" data-page="userManagement">用户管理</button>';
                 }
                 avatarContainer.innerHTML = `
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -738,7 +866,6 @@
                     </div>
                 `;
             }
-
             const newDropdown = document.getElementById('userDropdown');
             if (newDropdown) {
                 newDropdown.querySelectorAll('.dropdown-item').forEach(item => {
@@ -746,231 +873,188 @@
                         e.stopPropagation();
                         const page = item.getAttribute('data-page');
                         location.hash = page;
-                        avatarContainer.classList.remove('open');
+                        userAvatar.classList.remove('open');
                     });
                 });
             }
         }
-        const userAvatar = document.getElementById('userAvatar');
         userAvatar.addEventListener('click', (e) => { e.stopPropagation(); userAvatar.classList.toggle('open'); });
         document.addEventListener('click', () => userAvatar.classList.remove('open'));
 
-        // ==================== 登录/注册 ====================
-        const authView = document.getElementById('authView');
-        const authName = document.getElementById('authName');
-        const authPhone = document.getElementById('authPhone');
-        const authPassword = document.getElementById('authPassword');
-        const loginBtn = document.getElementById('loginBtn');
-        const registerBtn = document.getElementById('registerBtn');
+        // ===== 认证 =====
+        let isRegisterMode = false;
+        function setAuthMode(register) {
+            isRegisterMode = register;
+            registerNameField.style.display = register ? 'block' : 'none';
+            toggleAuthMode.textContent = register ? '切换到登录' : '切换到注册';
+            if (!register) {
+                authName.value = '';
+            }
+        }
+        toggleAuthMode.addEventListener('click', (e) => {
+            e.preventDefault();
+            setAuthMode(!isRegisterMode);
+        });
+
+        async function checkAuth() {
+            try {
+                const user = await api.me();
+                currentUser = user;
+                localStorage.setItem('tempestUser', JSON.stringify(user));
+                userProfile = { name: user.name, phone: user.phone };
+                renderUserUI();
+            } catch (err) {
+                // 未登录或会话失效
+                currentUser = null;
+                localStorage.removeItem('tempestUser');
+                renderUserUI();
+            }
+        }
 
         loginBtn.addEventListener('click', async () => {
             const phone = authPhone.value.trim();
             const password = authPassword.value.trim();
             if (!phone || !password) { alert('请输入手机号和密码'); return; }
             try {
-                const user = await loginUser(phone, password);
+                const user = await api.login(phone, password);
                 currentUser = user;
-                userProfile = { name: user.name, phone: user.phone, gender: '保密' };
-                localStorage.setItem('tempestUserProfile', JSON.stringify(userProfile));
+                localStorage.setItem('tempestUser', JSON.stringify(user));
+                userProfile = { name: user.name, phone: user.phone };
                 renderUserUI();
                 location.hash = 'home';
                 alert('登录成功');
-            } catch(e) {
-                alert(e.message);
+            } catch (err) {
+                alert(err.message || '登录失败');
             }
         });
+
         registerBtn.addEventListener('click', async () => {
-            const name = authName.value.trim();
             const phone = authPhone.value.trim();
             const password = authPassword.value.trim();
-            if (!name || !phone || !password) { alert('请完整填写注册信息'); return; }
+            const name = authName.value.trim();
+            if (!phone || !password || !name) { alert('请填写手机号、密码和姓名'); return; }
             try {
-                const user = await registerUser(name, phone, password);
+                const user = await api.register(phone, password, name);
                 currentUser = user;
-                userProfile = { name: user.name, phone: user.phone, gender: '保密' };
-                localStorage.setItem('tempestUserProfile', JSON.stringify(userProfile));
+                localStorage.setItem('tempestUser', JSON.stringify(user));
+                userProfile = { name: user.name, phone: user.phone };
                 renderUserUI();
                 location.hash = 'home';
                 alert('注册成功，已自动登录');
-            } catch(e) {
-                alert(e.message);
+            } catch (err) {
+                alert(err.message || '注册失败');
             }
         });
 
-        // ==================== 账号设置 ====================
-        const accountUsername = document.getElementById('accountUsername');
-        const accountPhone = document.getElementById('accountPhone');
-        const accountGender = document.getElementById('accountGender');
-        const saveAccountBtn = document.getElementById('saveAccountBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        function loadAccountForm() {
-            accountUsername.value = userProfile.name || '';
-            accountPhone.value = userProfile.phone || '';
-            accountGender.value = userProfile.gender || '保密';
-        }
-        saveAccountBtn.addEventListener('click', async () => {
-            // 后端暂不支持普通用户修改资料，此处仅更新本地展示，可扩展
-            userProfile.name = accountUsername.value.trim() || '追风者';
-            userProfile.phone = accountPhone.value.trim();
-            userProfile.gender = accountGender.value;
-            localStorage.setItem('tempestUserProfile', JSON.stringify(userProfile));
-            alert('本地账号设置已保存（需后端扩展）');
-        });
         logoutBtn.addEventListener('click', async () => {
             try {
-                await logoutUser();
-                currentUser = null;
-                localStorage.removeItem('tempestUserProfile');
-                renderUserUI();
-                location.hash = 'home';
-                alert('已退出登录');
-            } catch(e) {
-                // 即使接口失败也清除本地
-                currentUser = null;
-                renderUserUI();
-                location.hash = 'home';
+                await api.logout();
+            } catch (e) {}
+            currentUser = null;
+            localStorage.removeItem('tempestUser');
+            renderUserUI();
+            location.hash = 'home';
+            alert('已退出登录');
+        });
+
+        // ===== 账号设置 =====
+        function loadAccountForm() {
+            if (currentUser) {
+                accountName.value = currentUser.name || '';
+                accountPhone.value = currentUser.phone || '';
+            }
+        }
+        saveAccountBtn.addEventListener('click', async () => {
+            if (!currentUser) return;
+            const newName = accountName.value.trim();
+            if (!newName) { alert('姓名不能为空'); return; }
+            try {
+                // 注意：API 只提供管理员更新用户的接口，普通用户修改姓名可能需要其他方式，这里暂时只更新本地
+                // 实际上后端可能不允许普通用户修改 name，我们需要调用 /api/auth/me 相关的更新接口？但 OpenAPI 中没有提供普通用户更新。
+                // 这里仅做本地修改提示，实际需要后端支持。
+                currentUser.name = newName;
+                localStorage.setItem('tempestUser', JSON.stringify(currentUser));
+                userProfile.name = newName;
+                alert('姓名已更新（仅本地）');
+            } catch (err) {
+                alert(err.message);
             }
         });
 
-        // ==================== 下载记录 ====================
+        // ===== 下载记录 =====
         function recordDownload(src, title) {
-            const record = { src, title, time: new Date().toLocaleString('zh-CN') };
+            const record = { src: src, title: title, time: new Date().toLocaleString('zh-CN') };
             downloads.unshift(record);
             if (downloads.length > 100) downloads = downloads.slice(0, 100);
             localStorage.setItem('tempestDownloads', JSON.stringify(downloads));
         }
         function renderDownloads() {
-            const container = document.getElementById('downloadListContainer');
-            if (!container) return;
             if (downloads.length === 0) {
-                container.innerHTML = '<div class="empty-state">还没有下载记录哦</div>';
+                downloadListContainer.innerHTML = '<div class="empty-state">还没有下载记录哦</div>';
                 return;
             }
-            container.innerHTML = downloads.map(d => `
+            downloadListContainer.innerHTML = downloads.map(d => `
                 <div class="download-item">
-                    <img src="${d.src}" alt="${d.title}">
+                    <img src="${escapeHTML(d.src)}" alt="${escapeHTML(d.title)}">
                     <div class="download-info">
-                        <div class="download-title">${d.title}</div>
-                        <div class="download-time">${d.time}</div>
+                        <div class="download-title">${escapeHTML(d.title)}</div>
+                        <div class="download-time">${escapeHTML(d.time)}</div>
                     </div>
                 </div>
             `).join('');
         }
 
-        // ==================== 收藏功能 ====================
+        // ===== 收藏功能 =====
         function isFavorited(src) { return favorites.some(f => f.src === src); }
-        function toggleFavorite(src, btn) {
+        function toggleFavorite(src, btn, photoInfo = null) {
             const index = favorites.findIndex(f => f.src === src);
             if (index > -1) {
                 favorites.splice(index, 1);
-                btn.classList.remove('favorited');
+                if (btn) btn.classList.remove('favorited');
             } else {
-                let photoInfo = { src, title: '', author: '', comment: '', location: '' };
-                for (const album of albums) {
-                    const found = album.photos?.find(p => p.url === src);
-                    if (found) {
-                        photoInfo = { src: found.url, title: found.title, author: found.author || '', comment: found.comment || '', location: found.location || '' };
-                        break;
-                    }
-                }
-                favorites.push(photoInfo);
-                btn.classList.add('favorited');
+                let info = photoInfo || { src: src, title: '', author: '', comment: '', location: '' };
+                favorites.push(info);
+                if (btn) btn.classList.add('favorited');
             }
             localStorage.setItem('tempestFavorites', JSON.stringify(favorites));
         }
+        function getStarIcon(favorited) {
+            return `<svg viewBox="0 0 24 24" fill="${favorited ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+        }
         function renderFavorites() {
-            const grid = document.getElementById('favoritesGrid');
-            if (!grid) return;
             if (favorites.length === 0) {
-                grid.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;">还没有收藏任何照片哦</div>';
+                favoritesGrid.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;">还没有收藏任何照片哦</div>';
                 return;
             }
-            grid.innerHTML = favorites.map(photo => `
+            favoritesGrid.innerHTML = favorites.map(photo => `
                 <div class="photo-card">
-                    <img src="${photo.src}" alt="${photo.title}" onclick="showPreview('${photo.src}')">
+                    <img src="${escapeHTML(photo.src)}" alt="${escapeHTML(photo.title)}" onclick="showPreview('${escapeHTML(photo.src)}')">
                     <div class="photo-info">
-                        <div class="photo-title">${photo.title}</div>
-                        <div class="photo-desc">${photo.author || ''}${photo.location ? ' · ' + photo.location : ''}</div>
+                        <div class="photo-title">${escapeHTML(photo.title)}</div>
+                        <div class="photo-desc">${escapeHTML(photo.author || '')}${photo.location ? ' · ' + escapeHTML(photo.location) : ''}</div>
                         <div class="photo-actions">
-                            <a class="action-btn" href="${photo.src}" download title="下载原图" onclick="recordDownload('${photo.src}', '${photo.title}')">${getDownloadIcon()}</a>
-                            <button class="action-btn" onclick="event.stopPropagation(); showPreview('${photo.src}')" title="预览照片">${getEyeIcon()}</button>
-                            <button class="action-btn favorited" onclick="event.stopPropagation(); toggleFavorite('${photo.src}', this)" title="取消收藏">${getStarIcon(true)}</button>
+                            <a class="action-btn" href="${escapeHTML(photo.src)}" download title="下载原图" onclick="recordDownload('${escapeHTML(photo.src)}', '${escapeHTML(photo.title)}')">${getDownloadIcon()}</a>
+                            <button class="action-btn" onclick="event.stopPropagation(); showPreview('${escapeHTML(photo.src)}')" title="预览照片">${getEyeIcon()}</button>
+                            <button class="action-btn favorited" onclick="event.stopPropagation(); toggleFavorite('${escapeHTML(photo.src)}', this)" title="取消收藏">${getStarIcon(true)}</button>
                         </div>
                     </div>
                 </div>
             `).join('');
         }
 
-        // ==================== 上传模块 ====================
-        const uploadDropzone = document.getElementById('uploadDropzone');
-        const fileInput = document.getElementById('fileInput');
-        const chooseFilesBtn = document.getElementById('chooseFilesBtn');
-        const uploadFileList = document.getElementById('uploadFileList');
-        const uploadInfoSection = document.getElementById('uploadInfoSection');
-        const submitUploadBtn = document.getElementById('submitUploadBtn');
-        const uploadAlbumSelect = document.getElementById('uploadAlbum');
-        const uploadTitlePrefix = document.getElementById('uploadTitlePrefix');
-        const uploadAuthor = document.getElementById('uploadAuthor');
-        const uploadCategory = document.getElementById('uploadCategory');
-        const uploadLocation = document.getElementById('uploadLocation');
-
+        // ===== 上传模块 =====
         function populateAlbumSelect() {
             if (!uploadAlbumSelect) return;
-            let options = albums.map(album => `<option value="${album.id}">${album.title}</option>`).join('');
-            if (currentUser && currentUser.is_admin) {
-                options += `<option value="__create_new__">+ 创建新相册</option>`;
-            }
+            let options = albums.map(album => `<option value="${album.id}">${escapeHTML(album.title)}</option>`).join('');
             uploadAlbumSelect.innerHTML = options;
         }
-
-        function showCreateAlbumModal() {
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay';
-            overlay.innerHTML = `
-                <div class="announce-content" style="max-width: 400px;">
-                    <h3 style="margin-bottom: 16px;">创建新相册</h3>
-                    <label for="newAlbumId">相册ID（英文）</label>
-                    <input type="text" id="newAlbumId" style="width:100%; margin-bottom: 12px; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
-                    <label for="newAlbumTitle">相册标题</label>
-                    <input type="text" id="newAlbumTitle" style="width:100%; margin-bottom: 12px; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
-                    <label for="newAlbumDesc">描述</label>
-                    <input type="text" id="newAlbumDesc" style="width:100%; margin-bottom: 12px; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
-                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                        <button class="btn-sm" onclick="this.closest('.modal-overlay').remove()">取消</button>
-                        <button class="btn-sm" id="confirmCreateAlbumBtn">确认创建</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(overlay);
-            overlay.querySelector('#confirmCreateAlbumBtn').addEventListener('click', async () => {
-                const id = overlay.querySelector('#newAlbumId').value.trim();
-                const title = overlay.querySelector('#newAlbumTitle').value.trim();
-                const desc = overlay.querySelector('#newAlbumDesc').value.trim();
-                if (!id || !title) { alert('请输入相册ID和标题'); return; }
-                try {
-                    const album = await createAlbum({ id, title, description: desc || null });
-                    await loadAlbums();
-                    populateAlbumSelect();
-                    overlay.remove();
-                    alert('相册创建成功');
-                } catch(e) {
-                    alert(e.message);
-                }
-            });
-        }
-
-        uploadAlbumSelect?.addEventListener('change', () => {
-            if (uploadAlbumSelect.value === '__create_new__') {
-                showCreateAlbumModal();
-                uploadAlbumSelect.value = '';
-            }
-        });
 
         function handleFiles(files) {
             uploadedFiles = Array.from(files);
             renderUploadFileList();
             uploadInfoSection.style.display = uploadedFiles.length > 0 ? 'block' : 'none';
         }
+
         function renderUploadFileList() {
             if (!uploadFileList) return;
             uploadFileList.innerHTML = uploadedFiles.map((file) => {
@@ -978,17 +1062,18 @@
                 return `
                     <div class="upload-file-item">
                         <div class="file-icon">📄</div>
-                        <div class="file-name">${file.name}</div>
+                        <div class="file-name">${escapeHTML(file.name)}</div>
                         <div class="file-size">${sizeKB} KB</div>
                     </div>
                 `;
             }).join('');
         }
-        chooseFilesBtn?.addEventListener('click', () => fileInput.click());
-        fileInput?.addEventListener('change', (e) => handleFiles(e.target.files));
-        uploadDropzone?.addEventListener('dragover', (e) => { e.preventDefault(); uploadDropzone.classList.add('dragover'); });
-        uploadDropzone?.addEventListener('dragleave', () => uploadDropzone.classList.remove('dragover'));
-        uploadDropzone?.addEventListener('drop', async (e) => {
+
+        chooseFilesBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+        uploadDropzone.addEventListener('dragover', (e) => { e.preventDefault(); uploadDropzone.classList.add('dragover'); });
+        uploadDropzone.addEventListener('dragleave', () => uploadDropzone.classList.remove('dragover'));
+        uploadDropzone.addEventListener('drop', async (e) => {
             e.preventDefault();
             uploadDropzone.classList.remove('dragover');
             const files = await getFilesFromDataTransfer(e.dataTransfer);
@@ -1004,9 +1089,13 @@
                     if (entry) entries.push(entry);
                 }
                 const files = [];
-                for (const entry of entries) await traverseFileTree(entry, files);
+                for (const entry of entries) {
+                    await traverseFileTree(entry, files);
+                }
                 return files;
-            } else return Array.from(dataTransfer.files);
+            } else {
+                return Array.from(dataTransfer.files);
+            }
         }
         function traverseFileTree(entry, files) {
             return new Promise((resolve) => {
@@ -1021,81 +1110,86 @@
                 } else resolve();
             });
         }
-        submitUploadBtn?.addEventListener('click', async () => {
-            const titlePrefixValue = uploadTitlePrefix.value.trim();
-            const author = uploadAuthor.value.trim();
+
+        submitUploadBtn.addEventListener('click', async () => {
+            if (!currentUser) {
+                alert('请先登录');
+                location.hash = 'auth';
+                return;
+            }
+            const titlePrefix = uploadTitlePrefix.value.trim();
             const category = uploadCategory.value;
             const location = uploadLocation.value.trim();
             const albumId = uploadAlbumSelect.value;
-            if (!titlePrefixValue) { alert('请输入照片编码'); return; }
+            if (!titlePrefix) { alert('请输入照片标题前缀'); return; }
             if (!albumId) { alert('请选择相册'); return; }
             if (uploadedFiles.length === 0) { alert('请先选择文件'); return; }
 
+            submitUploadBtn.disabled = true;
+            submitUploadBtn.textContent = '上传中...';
             try {
-                for (let i = 0; i < uploadedFiles.length; i++) {
+                for (const file of uploadedFiles) {
                     const formData = new FormData();
-                    formData.append('file', uploadedFiles[i]);
+                    formData.append('file', file);
                     formData.append('album_id', albumId);
-                    formData.append('title', `${titlePrefixValue}-${i + 1}`);
+                    formData.append('title', `${titlePrefix}-${uploadedFiles.indexOf(file) + 1}`);
                     formData.append('comment', category);
-                    if (location) formData.append('location', location);
-                    await uploadPhoto(formData);
+                    formData.append('location', location);
+                    await api.uploadPhoto(formData);
                 }
-                alert('上传成功');
-                await loadAlbums();
-                location.hash = 'home';
-            } catch(e) {
-                alert('上传失败: ' + e.message);
+                alert('上传成功！');
+                // 清空
+                uploadedFiles = [];
+                renderUploadFileList();
+                uploadInfoSection.style.display = 'none';
+                // 刷新相册照片
+                if (currentAlbumId === albumId) {
+                    const album = albums.find(a => a.id === albumId);
+                    if (album) loadPhotos(album);
+                }
+            } catch (err) {
+                alert('上传失败：' + err.message);
+            } finally {
+                submitUploadBtn.disabled = false;
+                submitUploadBtn.textContent = '上传';
             }
         });
 
-        // ==================== 照片设置（管理员） ====================
-        const photoSettingsView = document.getElementById('photoSettingsView');
-        const photoSettingsAlbumsContainer = document.getElementById('photoSettingsAlbumsContainer');
-        const photoSettingsPhotosContainer = document.getElementById('photoSettingsPhotosContainer');
-
+        // ===== 照片设置（管理员） =====
         function renderPhotoSettingsAlbums() {
-            if (!photoSettingsAlbumsContainer) return;
             photoSettingsAlbumsContainer.innerHTML = albums.map(album => `
                 <div class="album-card" onclick="openPhotoSettingsAlbum('${album.id}')">
-                    <img src="${album.cover?.url || 'placeholder.jpg'}" alt="${album.title}">
+                    <img src="${escapeHTML(album.cover?.url || 'placeholder.jpg')}" alt="${escapeHTML(album.title)}">
                     <div class="album-info">
-                        <div class="album-title">${album.title}</div>
-                        <div class="album-desc">${album.description || ''}</div>
+                        <div class="album-title">${escapeHTML(album.title)}</div>
+                        <div class="album-desc">${escapeHTML(album.description || '')}</div>
                     </div>
                 </div>
             `).join('');
         }
 
-        window.openPhotoSettingsAlbum = async function(albumId) {
+        function openPhotoSettingsAlbum(albumId) {
             currentAlbumForSettings = albumId;
             const album = albums.find(a => a.id === albumId);
             if (!album) return;
             photoSettingsAlbumsContainer.style.display = 'none';
             photoSettingsPhotosContainer.style.display = 'grid';
-            try {
-                const photosData = await fetchPhotos(albumId);
-                const photos = Array.isArray(photosData) ? photosData : (photosData.data || []);
-                renderPhotoSettingsPhotos(photos);
-            } catch(e) {
-                alert(e.message);
-                photoSettingsPhotosContainer.innerHTML = '<div class="empty-state">加载失败</div>';
-            }
-        };
+            // 加载照片
+            loadPhotos(album).then(() => renderPhotoSettingsPhotos(album));
+        }
 
-        function renderPhotoSettingsPhotos(photos) {
-            if (!photoSettingsPhotosContainer) return;
-            if (photos.length === 0) {
+        function renderPhotoSettingsPhotos(album) {
+            if (!album.photos || album.photos.length === 0) {
                 photoSettingsPhotosContainer.innerHTML = '<div class="empty-state">该相册暂无照片</div>';
                 return;
             }
-            photoSettingsPhotosContainer.innerHTML = photos.map(photo => `
+            photoSettingsPhotosContainer.innerHTML = album.photos.map(photo => `
                 <div class="photo-card">
-                    <img src="${photo.url}" alt="${photo.title}">
+                    <img src="${escapeHTML(photo.url)}" alt="${escapeHTML(photo.title)}">
                     <div class="photo-info">
-                        <div class="photo-title">${photo.title}</div>
+                        <div class="photo-title">${escapeHTML(photo.title)}</div>
                         <div class="photo-actions" style="justify-content: flex-end;">
-                            <button class="action-btn" onclick="deletePhotoById('${photo.id}')" title="删除照片">
+                            <button class="action-btn" onclick="deletePhoto('${photo.id}')" title="删除照片">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                             </button>
                         </div>
@@ -1104,80 +1198,370 @@
             `).join('');
         }
 
-        window.deletePhotoById = async function(photoId) {
-            if (!confirm('确认删除这张照片？')) return;
+        window.deletePhoto = async function(photoId) {
+            if (!confirm('确定删除这张照片吗？')) return;
             try {
-                await deletePhoto(photoId);
-                alert('照片已删除');
+                await api.deletePhoto(photoId);
+                // 从当前相册移除
                 if (currentAlbumForSettings) {
-                    const photosData = await fetchPhotos(currentAlbumForSettings);
-                    const photos = Array.isArray(photosData) ? photosData : (photosData.data || []);
-                    renderPhotoSettingsPhotos(photos);
+                    const album = albums.find(a => a.id === currentAlbumForSettings);
+                    if (album && album.photos) {
+                        album.photos = album.photos.filter(p => p.id !== photoId);
+                        renderPhotoSettingsPhotos(album);
+                    }
                 }
-                await loadAlbums();
-            } catch(e) {
-                alert('删除失败: ' + e.message);
+                alert('照片已删除');
+            } catch (err) {
+                alert('删除失败：' + err.message);
             }
         };
+        window.openPhotoSettingsAlbum = openPhotoSettingsAlbum;
 
-        // ==================== 数据加载（已修正兼容格式） ====================
-        async function loadAlbums() {
+        // ===== 用户管理（管理员） =====
+        async function renderUserManagement() {
             try {
-                const albumList = await fetchAlbums();
-                // 兼容后端返回：若为数组直接使用，若为对象且含 data 数组则使用 data
-                albums = Array.isArray(albumList) ? albumList : (albumList.data || []);
-                
-                // 兼容 cover 字段：可能为 cover 对象、cover_url 字符串等
-                albums.forEach(album => {
-                    album.cover = album.cover || { url: album.cover_url || album.coverUrl || '' };
-                    album.photos = [];
-                });
-
-                // 加载所有照片（兼容数组或 {data: []}）
-                const photosData = await fetchPhotos();
-                allPhotos = Array.isArray(photosData) ? photosData : (photosData.data || []);
-                
-                // 将照片分配至相册
-                albums.forEach(album => {
-                    album.photos = allPhotos.filter(p => p.album_id === album.id);
-                });
-
-                renderAlbums(currentKeyword);
-                if (currentView === 'map') initMap();
-            } catch(e) {
-                console.error('加载相册失败:', e);
-                albums = [];
-                renderAlbums(currentKeyword);
-                noResult.style.display = 'block';
-                noResult.textContent = '😕 无法连接服务器，请稍后重试';
+                const users = await api.getUsers();
+                userManagementContainer.innerHTML = users.map(user => `
+                    <div class="download-item" style="margin-bottom:10px;">
+                        <div class="download-info">
+                            <div class="download-title">${escapeHTML(user.name)} (${escapeHTML(user.phone)})</div>
+                            <div class="download-time">管理员: ${user.is_admin ? '是' : '否'} | 上传审批: ${user.upload_approved ? '通过' : '未通过'}</div>
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn-sm" onclick="toggleApproval('${user.id}', ${!user.upload_approved})">${user.upload_approved ? '撤销审批' : '通过审批'}</button>
+                            <button class="btn-sm" onclick="toggleAdmin('${user.id}', ${!user.is_admin})">${user.is_admin ? '撤销管理员' : '设为管理员'}</button>
+                            <button class="btn-sm" onclick="deleteUser('${user.id}')">删除</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                userManagementContainer.innerHTML = `<div class="empty-state">加载失败：${escapeHTML(err.message)}</div>`;
             }
         }
 
-        // ==================== 路由和视图切换 ====================
-        let currentAlbumId = null, currentView = 'home';
-        const navLinks = document.querySelectorAll('.nav-menu a');
-        const homeView = document.getElementById('homeView');
-        const mapView = document.getElementById('mapView');
-        const photosContainer = document.getElementById('photosContainer');
-        const aboutView = document.getElementById('aboutView');
-        const linksView = document.getElementById('linksView');
-        const accountView = document.getElementById('accountView');
-        const downloadsView = document.getElementById('downloadsView');
-        const favoritesView = document.getElementById('favoritesView');
-        const uploadView = document.getElementById('uploadView');
-        const customBgView = document.getElementById('customBgView');
-        const searchSection = document.getElementById('searchSection');
-        const filterSection = document.getElementById('filterSection');
-        const noResult = document.getElementById('noResult');
-        const searchInput = document.getElementById('searchInput');
-        const searchBtn = document.getElementById('searchBtn');
-        const filterBtns = document.querySelectorAll('.filter-btn[data-type]');
-        const announceBtn = document.getElementById('announceBtn');
+        window.toggleApproval = async function(userId, approved) {
+            try {
+                await api.updateUserApproval(userId, approved);
+                renderUserManagement();
+            } catch (err) { alert(err.message); }
+        };
+        window.toggleAdmin = async function(userId, isAdmin) {
+            try {
+                await api.updateUser(userId, { is_admin: isAdmin });
+                renderUserManagement();
+            } catch (err) { alert(err.message); }
+        };
+        window.deleteUser = async function(userId) {
+            if (!confirm('确定删除该用户吗？')) return;
+            try {
+                await api.deleteUser(userId);
+                renderUserManagement();
+            } catch (err) { alert(err.message); }
+        };
 
-        if (announceBtn) announceBtn.addEventListener('click', () => showAnnouncement());
-        function showAnnouncement() {
+        // ===== 状态管理与路由 =====
+        const navLinks = document.querySelectorAll('.nav-menu a');
+
+        function switchView(viewName, albumId = null) {
+            homeView.style.display = 'none'; mapView.style.display = 'none';
+            photosContainer.style.display = 'none'; aboutView.style.display = 'none';
+            linksView.style.display = 'none'; accountView.style.display = 'none';
+            downloadsView.style.display = 'none'; favoritesView.style.display = 'none';
+            uploadView.style.display = 'none'; customBgView.style.display = 'none';
+            authView.style.display = 'none'; photoSettingsView.style.display = 'none';
+            userManagementView.style.display = 'none';
+            noResult.style.display = 'none';
+            loadingIndicator.style.display = 'none';
+
+            if (viewName === 'home' || viewName === 'album') {
+                searchSection.style.display = 'flex'; filterSection.style.display = 'flex';
+            } else {
+                searchSection.style.display = 'none'; filterSection.style.display = 'none';
+            }
+
+            switch (viewName) {
+                case 'home':
+                    homeView.style.display = 'block';
+                    renderAlbums(currentKeyword);
+                    break;
+                case 'map':
+                    mapView.style.display = 'block';
+                    initMap();
+                    break;
+                case 'about':
+                    aboutView.style.display = 'block';
+                    break;
+                case 'links':
+                    linksView.style.display = 'block';
+                    break;
+                case 'auth':
+                    authView.style.display = 'block';
+                    break;
+                case 'account':
+                    if (!currentUser) { location.hash = 'auth'; break; }
+                    accountView.style.display = 'block';
+                    loadAccountForm();
+                    break;
+                case 'downloads':
+                    downloadsView.style.display = 'block';
+                    renderDownloads();
+                    break;
+                case 'favorites':
+                    favoritesView.style.display = 'block';
+                    renderFavorites();
+                    break;
+                case 'upload':
+                    if (!currentUser) { location.hash = 'auth'; break; }
+                    uploadView.style.display = 'block';
+                    populateAlbumSelect();
+                    break;
+                case 'customBg':
+                    customBgView.style.display = 'block';
+                    break;
+                case 'photoSettings':
+                    if (!currentUser?.is_admin) { location.hash = 'home'; alert('无访问权限'); break; }
+                    photoSettingsView.style.display = 'block';
+                    photoSettingsAlbumsContainer.style.display = 'grid';
+                    photoSettingsPhotosContainer.style.display = 'none';
+                    renderPhotoSettingsAlbums();
+                    break;
+                case 'userManagement':
+                    if (!currentUser?.is_admin) { location.hash = 'home'; alert('无访问权限'); break; }
+                    userManagementView.style.display = 'block';
+                    renderUserManagement();
+                    break;
+                case 'album':
+                    if (albumId) {
+                        photosContainer.style.display = 'block';
+                        const album = albums.find(a => a.id === albumId);
+                        if (album) {
+                            currentAlbumId = albumId;
+                            loadPhotos(album);
+                        }
+                    }
+                    break;
+                default:
+                    homeView.style.display = 'block';
+                    renderAlbums(currentKeyword);
+            }
+            currentView = viewName === 'album' ? 'home' : viewName;
+            updateNavActive(currentView);
+        }
+
+        function updateNavActive(page) {
+            navLinks.forEach(link => {
+                if (link.getAttribute('data-page') === page) link.classList.add('active');
+                else link.classList.remove('active');
+            });
+        }
+
+        navLinks.forEach(link => link.addEventListener('click', () => location.hash = link.getAttribute('data-page')));
+        window.addEventListener('hashchange', () => {
+            const hash = location.hash.slice(1);
+            if (hash.startsWith('album/')) switchView('album', hash.replace('album/', ''));
+            else switchView(hash || 'home');
+        });
+
+        function openAlbum(albumId) { location.hash = 'album/' + albumId; }
+
+        // ===== 地图 =====
+        function initMap() {
+            if (!mapInitialized && typeof L !== 'undefined') {
+                map = L.map('map', { center: [30.0, 115.0], zoom: 5, zoomControl: false });
+                L.control.zoom({ position: 'bottomright' }).addTo(map);
+                L.tileLayer(`https://t{s}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${TIANDITU_KEY}`, {
+                    subdomains: ['0','1','2','3','4','5','6','7'], maxZoom: 18
+                }).addTo(map);
+                L.tileLayer(`https://t{s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${TIANDITU_KEY}`, {
+                    subdomains: ['0','1','2','3','4','5','6','7'], maxZoom: 18
+                }).addTo(map);
+                mapInitialized = true;
+                loadMapMarkers();
+            } else if (mapInitialized) {
+                setTimeout(() => map.invalidateSize(), 100);
+            }
+        }
+
+        async function loadMapMarkers() {
+            try {
+                // 获取前100张照片（可能不够，后续可加分页）
+                const result = await api.getPhotos(null, 0, 100);
+                const photos = result.data || [];
+                const cityPhotos = {};
+                photos.forEach(photo => {
+                    if (photo.location && photo.location.trim() !== '') {
+                        const loc = photo.location.trim();
+                        if (!cityPhotos[loc]) cityPhotos[loc] = [];
+                        cityPhotos[loc].push(photo);
+                    }
+                });
+                // 清除旧标记
+                if (map._markers) map._markers.forEach(m => map.removeLayer(m));
+                map._markers = [];
+                Object.keys(cityPhotos).forEach(city => {
+                    const coords = cityCoords[city];
+                    if (!coords) return;
+                    const photosInCity = cityPhotos[city];
+                    const firstPhoto = photosInCity[0];
+                    const icon = L.divIcon({
+                        className: 'custom-marker',
+                        html: `<div class="marker-square"><img src="${escapeHTML(firstPhoto.url)}" alt="${escapeHTML(city)}"></div>`,
+                        iconSize: [42, 42], iconAnchor: [21, 21], popupAnchor: [0, -24]
+                    });
+                    let photosHTML = '';
+                    if (photosInCity.length <= 3) {
+                        photosInCity.forEach(photo => { photosHTML += `<img src="${escapeHTML(photo.url)}" onclick="window.showPreview('${escapeHTML(photo.url)}')">`; });
+                    } else {
+                        for (let i = 0; i < 2; i++) { photosHTML += `<img src="${escapeHTML(photosInCity[i].url)}" onclick="window.showPreview('${escapeHTML(photosInCity[i].url)}')">`; }
+                        photosHTML += `<div class="photo-stack" onclick="expandStack(this)">`;
+                        for (let i = 2; i < photosInCity.length; i++) { photosHTML += `<img src="${escapeHTML(photosInCity[i].url)}" onclick="event.stopPropagation(); window.showPreview('${escapeHTML(photosInCity[i].url)}')">`; }
+                        photosHTML += `</div>`;
+                    }
+                    const popupHTML = `
+                        <div class="map-popup">
+                            <div class="popup-title">${escapeHTML(city)} · ${photosInCity.length}张照片</div>
+                            <div class="photo-grid">${photosHTML}</div>
+                            <a class="popup-btn" href="#album/${photosInCity[0].album_id}">前往该相册 <span>→</span></a>
+                        </div>`;
+                    const marker = L.marker(coords, { icon: icon }).addTo(map).bindPopup(popupHTML, { maxWidth: 400 });
+                    map._markers.push(marker);
+                });
+            } catch (err) {
+                console.error('加载地图标记失败', err);
+            }
+        }
+        window.expandStack = function(el) { el.classList.add('expanded'); el.onclick = null; };
+        window.showPreview = showPreview;
+
+        // ===== 渲染相册 =====
+        async function loadAlbums() {
+            if (albums.length > 0) return;
+            loadingIndicator.style.display = 'block';
+            try {
+                albums = await api.getAlbums();
+                renderAlbums(currentKeyword);
+            } catch (err) {
+                alert('加载相册失败：' + err.message);
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        async function loadPhotos(album) {
+            if (album.photos && album.photos.length > 0) {
+                renderPhotos(album, currentKeyword);
+                return;
+            }
+            loadingIndicator.style.display = 'block';
+            try {
+                const result = await api.getPhotos(album.id, 0, 100); // 最多100张
+                album.photos = result.data || [];
+                renderPhotos(album, currentKeyword);
+            } catch (err) {
+                alert('加载照片失败：' + err.message);
+                console.error(err);
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        function renderAlbums(filterKeyword = '') {
+            const container = document.getElementById('albumsContainer');
+            container.innerHTML = '';
+            const keyword = filterKeyword.toLowerCase().trim();
+            let hasVisible = false;
+            albums.forEach(album => {
+                const albumText = (album.title + ' ' + (album.description || '')).toLowerCase();
+                if (keyword && !albumText.includes(keyword)) return;
+                // 类型过滤：相册没有类型信息，默认显示全部
+                if (currentType !== 'all') {
+                    // 如果没有照片数据，直接跳过？暂时先显示
+                }
+                hasVisible = true;
+                const card = document.createElement('div');
+                card.className = 'album-card';
+                const coverUrl = album.cover?.url || album.cover || 'placeholder.jpg';
+                card.innerHTML = `<img src="${escapeHTML(coverUrl)}" alt="${escapeHTML(album.title)}"><div class="album-info"><div class="album-title">${escapeHTML(album.title)}</div><div class="album-desc">${escapeHTML(album.description || '')}</div></div>`;
+                card.addEventListener('click', () => openAlbum(album.id));
+                container.appendChild(card);
+            });
+            noResult.style.display = hasVisible ? 'none' : 'block';
+        }
+
+        function renderPhotos(album, filterKeyword = '') {
+            const container = document.getElementById('photosContainer');
+            container.innerHTML = '';
+            const introDiv = document.createElement('div');
+            introDiv.className = 'album-intro';
+            introDiv.innerHTML = `<span class="intro-bracket">「</span>${escapeHTML(album.description || '')}<span class="intro-bracket">」</span>`;
+            container.appendChild(introDiv);
+
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'photos-grid';
+            const keyword = filterKeyword.toLowerCase().trim();
+            let hasVisible = false;
+            const photos = album.photos || [];
+            if (photos.length === 0) {
+                gridDiv.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;">该相册暂无照片</div>';
+                container.appendChild(gridDiv);
+                return;
+            }
+            photos.forEach(photo => {
+                if (currentType !== 'all' && getFileType(photo.url) !== currentType) return;
+                const combined = (photo.title + ' ' + (photo.author || '') + ' ' + (photo.comment || '') + ' ' + (photo.location || '')).toLowerCase();
+                if (keyword && !combined.includes(keyword)) return;
+                hasVisible = true;
+                const favorited = isFavorited(photo.url);
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.innerHTML = `
+                    <img src="${escapeHTML(photo.url)}" alt="${escapeHTML(photo.title)}" onclick="showPreview('${escapeHTML(photo.url)}')">
+                    <div class="photo-info">
+                        <div class="photo-title">${escapeHTML(photo.title)}</div>
+                        <div class="photo-meta">
+                            <span class="meta-author">${escapeHTML(photo.author || '')}</span>
+                            <span class="meta-comment">${escapeHTML(photo.comment || '')}</span>
+                            <span class="meta-location">${escapeHTML(photo.location || '')}</span>
+                        </div>
+                        <div class="photo-actions">
+                            <a class="action-btn" href="${escapeHTML(photo.url)}" download title="下载原图" onclick="recordDownload('${escapeHTML(photo.url)}', '${escapeHTML(photo.title)}')">${getDownloadIcon()}</a>
+                            <button class="action-btn" onclick="event.stopPropagation(); showPreview('${escapeHTML(photo.url)}')" title="预览照片">${getEyeIcon()}</button>
+                            <button class="action-btn ${favorited ? 'favorited' : ''}" onclick="event.stopPropagation(); toggleFavorite('${escapeHTML(photo.url)}', this, { src: '${escapeHTML(photo.url)}', title: '${escapeHTML(photo.title)}', author: '${escapeHTML(photo.author || '')}', comment: '${escapeHTML(photo.comment || '')}', location: '${escapeHTML(photo.location || '')}' })" title="收藏">${getStarIcon(favorited)}</button>
+                        </div>
+                    </div>
+                `;
+                gridDiv.appendChild(card);
+            });
+            container.appendChild(gridDiv);
+            noResult.style.display = (!hasVisible && keyword !== '') ? 'block' : 'none';
+        }
+
+        function getFileType(url) {
+            // 根据扩展名判断，简单实现
+            if (/\.(mp4|webm|mov|avi|mkv|flv)$/i.test(url)) return 'video';
+            return 'photo';
+        }
+
+        function getDownloadIcon() {
+            return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+        }
+        function getEyeIcon() {
+            return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+        }
+
+        function showPreview(src) {
             const existing = document.querySelector('.modal-overlay');
             if (existing) existing.remove();
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `<span class="modal-close">&times;</span><img src="${escapeHTML(src)}" onclick="event.stopPropagation()">`;
+            overlay.addEventListener('click', () => overlay.remove());
+            document.body.appendChild(overlay);
+        }
+
+        // ===== 公告 =====
+        announceBtn.addEventListener('click', () => showAnnouncement());
+        function showAnnouncement() {
             const overlay = document.createElement('div');
             overlay.className = 'modal-overlay';
             overlay.innerHTML = `
@@ -1192,277 +1576,113 @@
             document.body.appendChild(overlay);
         }
 
+        // ===== 搜索与过滤 =====
         filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 filterBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 currentType = btn.dataset.type;
                 if (currentView === 'home') renderAlbums(currentKeyword);
+                else if (currentAlbumId) {
+                    const album = albums.find(a => a.id === currentAlbumId);
+                    if (album) renderPhotos(album, currentKeyword);
+                }
             });
         });
 
         function performSearch() {
             currentKeyword = searchInput.value;
             if (currentView === 'home') renderAlbums(currentKeyword);
+            else if (currentAlbumId) {
+                const album = albums.find(a => a.id === currentAlbumId);
+                if (album) renderPhotos(album, currentKeyword);
+            }
         }
         searchBtn.addEventListener('click', performSearch);
         searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') performSearch(); });
         searchInput.addEventListener('input', performSearch);
 
-        function switchView(viewName, albumId = null) {
-            homeView.style.display = 'none'; mapView.style.display = 'none';
-            photosContainer.style.display = 'none'; aboutView.style.display = 'none';
-            linksView.style.display = 'none'; accountView.style.display = 'none';
-            downloadsView.style.display = 'none'; favoritesView.style.display = 'none';
-            uploadView.style.display = 'none'; customBgView.style.display = 'none';
-            authView.style.display = 'none'; photoSettingsView.style.display = 'none';
-            noResult.style.display = 'none';
+        // ===== 背景设置 =====
+        const bgLayer = document.getElementById('bgLayer');
+        const bgFileInput = document.getElementById('bgFileInput');
+        const bgBlurRange = document.getElementById('bgBlurRange');
+        const bgBlurValue = document.getElementById('bgBlurValue');
+        const bgRemoveBtn = document.getElementById('bgRemoveBtn');
+        const bgResetBtn = document.getElementById('bgResetBtn');
+        const bgSelectBtn = document.getElementById('bgSelectBtn');
 
-            if (viewName === 'home' || viewName === 'album') {
-                searchSection.style.display = 'flex'; filterSection.style.display = 'flex';
-            } else {
-                searchSection.style.display = 'none'; filterSection.style.display = 'none';
-            }
-
-            if (viewName === 'home') { homeView.style.display = 'block'; renderAlbums(currentKeyword); }
-            else if (viewName === 'map') { mapView.style.display = 'block'; initMap(); }
-            else if (viewName === 'about') { aboutView.style.display = 'block'; }
-            else if (viewName === 'links') { linksView.style.display = 'block'; }
-            else if (viewName === 'auth') { authView.style.display = 'block'; }
-            else if (viewName === 'account') { accountView.style.display = 'block'; loadAccountForm(); }
-            else if (viewName === 'downloads') { downloadsView.style.display = 'block'; renderDownloads(); }
-            else if (viewName === 'favorites') { favoritesView.style.display = 'block'; renderFavorites(); }
-            else if (viewName === 'upload') { uploadView.style.display = 'block'; populateAlbumSelect(); }
-            else if (viewName === 'customBg') { customBgView.style.display = 'block'; }
-            else if (viewName === 'photoSettings') {
-                if (currentUser?.is_admin) {
-                    photoSettingsView.style.display = 'block';
-                    photoSettingsAlbumsContainer.style.display = 'grid';
-                    photoSettingsPhotosContainer.style.display = 'none';
-                    renderPhotoSettingsAlbums();
-                } else {
-                    location.hash = 'home';
-                    alert('无访问权限');
-                }
-            }
-            else if (viewName === 'album') {
-                photosContainer.style.display = 'block';
-                if (albumId) {
-                    const album = albums.find(a => a.id === albumId);
-                    if (album) { currentAlbumId = albumId; renderPhotos(album, currentKeyword); }
-                }
-            }
-            currentView = viewName;
-            updateNavActive(viewName === 'album' ? 'home' : viewName);
+        function loadBgSettings() {
+            const savedBg = localStorage.getItem('tempestBgImage');
+            const savedBlur = localStorage.getItem('tempestBgBlur') || '0';
+            if (savedBg) bgLayer.style.backgroundImage = `url(${savedBg})`;
+            bgLayer.style.filter = `blur(${savedBlur}px)`;
+            bgBlurRange.value = savedBlur;
+            bgBlurValue.textContent = savedBlur;
         }
-
-        function updateNavActive(page) {
-            navLinks.forEach(link => {
-                if (link.getAttribute('data-page') === page) link.classList.add('active');
-                else link.classList.remove('active');
-            });
-        }
-
-        navLinks.forEach(link => link.addEventListener('click', () => location.hash = link.getAttribute('data-page')));
-        window.addEventListener('hashchange', () => {
-            const hash = location.hash.slice(1);
-            if (hash === 'about') switchView('about');
-            else if (hash === 'map') switchView('map');
-            else if (hash === 'links') switchView('links');
-            else if (hash === 'auth') switchView('auth');
-            else if (hash === 'account') switchView('account');
-            else if (hash === 'downloads') switchView('downloads');
-            else if (hash === 'favorites') switchView('favorites');
-            else if (hash === 'upload') switchView('upload');
-            else if (hash === 'customBg') switchView('customBg');
-            else if (hash === 'photoSettings') switchView('photoSettings');
-            else if (hash.startsWith('album/')) switchView('album', hash.replace('album/', ''));
-            else switchView('home');
+        loadBgSettings();
+        bgSelectBtn.addEventListener('click', () => bgFileInput.click());
+        bgFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const maxW = 1920;
+                    const ratio = Math.min(1, maxW / img.width);
+                    canvas.width = img.width * ratio;
+                    canvas.height = img.height * ratio;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const compressed = canvas.toDataURL('image/jpeg', 0.7);
+                    try {
+                        localStorage.setItem('tempestBgImage', compressed);
+                        bgLayer.style.backgroundImage = `url(${compressed})`;
+                    } catch (err) {
+                        alert('背景图片存储空间不足，请使用更小的图片');
+                    }
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+        bgBlurRange.addEventListener('input', (e) => {
+            const val = e.target.value;
+            bgBlurValue.textContent = val;
+            bgLayer.style.filter = `blur(${val}px)`;
+            localStorage.setItem('tempestBgBlur', val);
+        });
+        bgRemoveBtn.addEventListener('click', () => {
+            localStorage.removeItem('tempestBgImage');
+            bgLayer.style.backgroundImage = '';
+            bgLayer.style.filter = 'blur(0px)';
+            bgBlurRange.value = '0'; bgBlurValue.textContent = '0';
+            localStorage.setItem('tempestBgBlur', '0');
+        });
+        bgResetBtn.addEventListener('click', () => {
+            localStorage.removeItem('tempestBgImage');
+            localStorage.removeItem('tempestBgBlur');
+            bgLayer.style.backgroundImage = '';
+            bgLayer.style.filter = 'blur(0px)';
+            bgBlurRange.value = '0'; bgBlurValue.textContent = '0';
         });
 
-        function openAlbum(albumId) { location.hash = 'album/' + albumId; }
-
-        function initMap() {
-            if (!mapInitialized && typeof L !== 'undefined') {
-                map = L.map('map', { center: [30.0, 115.0], zoom: 5, zoomControl: false });
-                L.control.zoom({ position: 'bottomright' }).addTo(map);
-                L.tileLayer(`https://t{s}.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${TIANDITU_KEY}`, {
-                    subdomains: ['0','1','2','3','4','5','6','7'], maxZoom: 18
-                }).addTo(map);
-                L.tileLayer(`https://t{s}.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${TIANDITU_KEY}`, {
-                    subdomains: ['0','1','2','3','4','5','6','7'], maxZoom: 18
-                }).addTo(map);
-                mapInitialized = true;
-                addCityMarkers();
-            } else if (mapInitialized) { setTimeout(() => map.invalidateSize(), 100); }
-        }
-
-        function addCityMarkers() {
-            const cityPhotos = {};
-            albums.forEach(album => {
-                (album.photos || []).forEach(photo => {
-                    if (photo.location && photo.location.trim() !== '') {
-                        const loc = photo.location.trim();
-                        if (!cityPhotos[loc]) cityPhotos[loc] = [];
-                        cityPhotos[loc].push({ ...photo, albumId: album.id, albumTitle: album.title });
-                    }
-                });
-            });
-            Object.keys(cityPhotos).forEach(city => {
-                const coords = cityCoords[city];
-                if (!coords) return;
-                const photos = cityPhotos[city];
-                const firstPhoto = photos[0].url;
-                const icon = L.divIcon({
-                    className: 'custom-marker',
-                    html: `<div class="marker-square"><img src="${firstPhoto}" alt="${city}"></div>`,
-                    iconSize: [42, 42], iconAnchor: [21, 21], popupAnchor: [0, -24]
-                });
-                let photosHTML = '';
-                if (photos.length <= 3) {
-                    photos.forEach(photo => { photosHTML += `<img src="${photo.url}" onclick="window.showPreview('${photo.url}')">`; });
-                } else {
-                    for (let i = 0; i < 2; i++) { photosHTML += `<img src="${photos[i].url}" onclick="window.showPreview('${photos[i].url}')">`; }
-                    photosHTML += `<div class="photo-stack" onclick="expandStack(this)">`;
-                    for (let i = 2; i < photos.length; i++) { photosHTML += `<img src="${photos[i].url}" onclick="event.stopPropagation(); window.showPreview('${photos[i].url}')">`; }
-                    photosHTML += `</div>`;
-                }
-                const popupHTML = `
-                    <div class="map-popup">
-                        <div class="popup-title">${city} · ${photos.length}张照片</div>
-                        <div class="photo-grid">${photosHTML}</div>
-                        <a class="popup-btn" href="#album/${photos[0].albumId}">前往该相册 <span>→</span></a>
-                    </div>`;
-                L.marker(coords, { icon: icon }).addTo(map).bindPopup(popupHTML, { maxWidth: 400 });
-            });
-        }
-        window.expandStack = function(el) { el.classList.add('expanded'); el.onclick = null; };
-        window.showPreview = showPreview;
-
-        function renderAlbums(filterKeyword = '') {
-            const container = document.getElementById('albumsContainer');
-            container.innerHTML = '';
-            const keyword = filterKeyword.toLowerCase().trim();
-            let hasVisible = false;
-            albums.forEach(album => {
-                const photos = album.photos || [];
-                if (currentType !== 'all') {
-                    const hasType = photos.some(p => getFileType(p.filename || p.url) === currentType);
-                    if (!hasType) return;
-                }
-                if (keyword && !(album.title.toLowerCase().includes(keyword) || (album.description || '').toLowerCase().includes(keyword))) return;
-                hasVisible = true;
-                const coverUrl = album.cover?.url || '';
-                const card = document.createElement('div');
-                card.className = 'album-card';
-                card.innerHTML = `<img src="${coverUrl}" alt="${album.title}"><div class="album-info"><div class="album-title">${album.title}</div><div class="album-desc">${album.description || ''}</div></div>`;
-                card.addEventListener('click', () => openAlbum(album.id));
-                container.appendChild(card);
-            });
-            noResult.style.display = hasVisible ? 'none' : 'block';
-            if (!hasVisible) noResult.textContent = '😕 没有找到匹配的相册';
-        }
-
-        function getFileType(filename) {
-            if (/video/i.test(filename)) return 'video';
-            if (/photo/i.test(filename)) return 'photo';
-            return 'photo';
-        }
-
-        function renderPhotos(album, filterKeyword = '') {
-            const container = document.getElementById('photosContainer');
-            container.innerHTML = '';
-            const introDiv = document.createElement('div');
-            introDiv.className = 'album-intro';
-            introDiv.innerHTML = `<span class="intro-bracket">「</span>${album.description || album.title}<span class="intro-bracket">」</span>`;
-            container.appendChild(introDiv);
-
-            const gridDiv = document.createElement('div');
-            gridDiv.className = 'photos-grid';
-            const photos = album.photos || [];
-            let hasVisible = false;
-            photos.forEach(photo => {
-                if (currentType !== 'all' && getFileType(photo.filename || photo.url) !== currentType) return;
-                const keyword = filterKeyword.toLowerCase().trim();
-                const combined = `${photo.title} ${photo.author || ''} ${photo.comment || ''} ${photo.location || ''}`.toLowerCase();
-                if (keyword && !combined.includes(keyword)) return;
-                hasVisible = true;
-                const favorited = isFavorited(photo.url);
-                const card = document.createElement('div');
-                card.className = 'photo-card';
-                card.innerHTML = `
-                    <img src="${photo.url}" alt="${photo.title}" onclick="showPreview('${photo.url}')">
-                    <div class="photo-info">
-                        <div class="photo-title">${photo.title}</div>
-                        <div class="photo-meta">
-                            <span class="meta-author">${photo.author || ''}</span>
-                            <span class="meta-comment">${photo.comment || ''}</span>
-                            <span class="meta-location">${photo.location || ''}</span>
-                        </div>
-                        <div class="photo-actions">
-                            <a class="action-btn" href="${photo.url}" download title="下载原图" onclick="recordDownload('${photo.url}', '${photo.title}')">${getDownloadIcon()}</a>
-                            <button class="action-btn" onclick="event.stopPropagation(); showPreview('${photo.url}')" title="预览照片">${getEyeIcon()}</button>
-                            <button class="action-btn ${favorited ? 'favorited' : ''}" onclick="event.stopPropagation(); toggleFavorite('${photo.url}', this)" title="收藏">${getStarIcon(favorited)}</button>
-                        </div>
-                    </div>
-                `;
-                gridDiv.appendChild(card);
-            });
-            container.appendChild(gridDiv);
-            if (!hasVisible) {
-                const empty = document.createElement('div');
-                empty.className = 'empty-state';
-                empty.textContent = '该相册暂无照片';
-                container.appendChild(empty);
-            }
-        }
-
-        function getDownloadIcon() {
-            return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
-        }
-        function getEyeIcon() {
-            return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
-        }
-        function getStarIcon(favorited) {
-            return `<svg viewBox="0 0 24 24" fill="${favorited ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
-        }
-
-        function showPreview(src) {
-            const existing = document.querySelector('.modal-overlay');
-            if (existing) existing.remove();
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay';
-            overlay.innerHTML = `<span class="modal-close">&times;</span><img src="${src}" onclick="event.stopPropagation()">`;
-            overlay.addEventListener('click', () => overlay.remove());
-            document.body.appendChild(overlay);
-        }
-
-        // ==================== 初始化 ====================
+        // ===== 初始化 =====
         async function initApp() {
-            try {
-                currentUser = await fetchCurrentUser();
-                if (currentUser) {
-                    userProfile = { name: currentUser.name, phone: currentUser.phone, gender: '保密' };
-                    localStorage.setItem('tempestUserProfile', JSON.stringify(userProfile));
-                }
-            } catch(e) {
-                currentUser = null;
-            }
-            renderUserUI();
+            // 检查登录状态
+            await checkAuth();
+
+            // 加载相册数据
             await loadAlbums();
+
+            // 根据 hash 初始化视图
             const initHash = location.hash.slice(1);
-            if (initHash === 'about') switchView('about');
-            else if (initHash === 'map') switchView('map');
-            else if (initHash === 'links') switchView('links');
-            else if (initHash === 'auth') switchView('auth');
-            else if (initHash === 'account') switchView('account');
-            else if (initHash === 'downloads') switchView('downloads');
-            else if (initHash === 'favorites') switchView('favorites');
-            else if (initHash === 'upload') switchView('upload');
-            else if (initHash === 'customBg') switchView('customBg');
-            else if (initHash === 'photoSettings') switchView('photoSettings');
-            else if (initHash.startsWith('album/')) switchView('album', initHash.replace('album/', ''));
-            else switchView('home');
+            if (initHash.startsWith('album/')) {
+                switchView('album', initHash.replace('album/', ''));
+            } else {
+                switchView(initHash || 'home');
+            }
         }
         initApp();
     </script>
