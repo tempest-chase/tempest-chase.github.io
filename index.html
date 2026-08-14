@@ -333,14 +333,30 @@
         .batch-settings .batch-row input {
             flex: 1; min-width: 120px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px;
             font-size: 0.85rem; background: rgba(255,255,255,0.7); color: #333; outline: none; font-family: inherit;
+            height: 38px;              /* 新增，统一高度 */
+            box-sizing: border-box;    /* 确保边框包含在高度内 */
         }
         body.dark-mode .batch-settings .batch-row input {
             background: rgba(30,42,58,0.7); border-color: #555; color: #ccc;
         }
         .batch-settings .btn-sm {
             flex-shrink: 0;
-            padding: 8px 16px;  /* 与输入框 padding 保持一致，确保垂直对齐 */
+            padding: 0 16px;          /* 垂直方向使用 flex 居中，不再使用 padding */
+            height: 38px;              /* 与输入框高度一致 */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background: transparent;
+            font-size: 0.8rem;
+            color: #555;
+            cursor: pointer;
+            font-family: inherit;
         }
+        body.dark-mode .batch-settings .btn-sm { color: #ddd; border-color: #555; }
+        .batch-settings .btn-sm:hover { background: rgba(0,0,0,0.05); }
+        body.dark-mode .batch-settings .btn-sm:hover { background: rgba(255,255,255,0.1); }
 
         .btn-sm {
             padding: 6px 16px; border: 1px solid #ddd; border-radius: 20px;
@@ -636,7 +652,7 @@
                 <div class="batch-settings">
                     <label style="margin-bottom:8px;">批量设置（可选）</label>
                     <div class="batch-row">
-                        <input type="text" id="batchTitlePrefix" placeholder="照片编码，如 RAGASA-照片">
+                        <input type="text" id="batchTitlePrefix" placeholder="标题前缀，如 RAGASA">
                         <input type="text" id="batchCategory" placeholder="分类，如 风毁">
                         <input type="text" id="batchLocation" placeholder="地点，如 珠海">
                         <button class="btn-sm" id="applyBatchBtn">应用到全部</button>
@@ -665,7 +681,7 @@
                 <input type="file" id="bgFileInput" accept="image/*">
                 <label>模糊程度：<span id="bgBlurValue">0</span>px</label>
                 <input type="range" id="bgBlurRange" min="0" max="30" value="0" step="1">
-                <p style="font-size: 0.75rem; color: #888;">若背景照片色调偏深，建议打开黑夜模式</p>
+                <p style="font-size: 0.75rem; color: #888;">上传图片后浏览器会保存在本地，不会上传到服务器</p>
             </div>
         </div>
     </div>
