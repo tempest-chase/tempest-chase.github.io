@@ -7,7 +7,7 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        /* ===== 样式部分保持不变，略作补充 ===== */
+        /* ===== 样式部分保持不变 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
@@ -119,7 +119,7 @@
         body.dark-mode .dropdown-item { color: #ddd; }
         body.dark-mode .dropdown-item:hover { background: rgba(255,255,255,0.1); }
 
-        .filter-section { max-width: 1300px; margin: 30px auto 0; padding: 0 20px; display: flex; align-items: center; gap: 24px; }
+        .filter-section { max-width: 1300px; margin: 30px auto 0; padding: 0 20px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
         .filter-btn {
             background: none; border: none; padding: 4px 0; font-size: 1rem; font-weight: 500;
             color: #999; cursor: pointer; transition: color 0.2s, font-weight 0.2s; font-family: inherit; line-height: 1.5;
@@ -380,6 +380,13 @@
         .popup-btn:hover { background: rgba(255,255,255,0.45); border-color: #aaa; transform: translateY(-1px); }
         .popup-btn .arrow { margin-left: 6px; font-size: 1em; }
 
+        .sync-albums-btn {
+            background: #5a9; color: white; border: none; border-radius: 20px;
+            padding: 6px 16px; font-size: 0.8rem; cursor: pointer; margin-left: auto;
+        }
+        .sync-albums-btn:hover { opacity: 0.9; }
+        body.dark-mode .sync-albums-btn { background: #4a8; }
+
         @media (max-width: 1200px) {
             .albums-container, .photos-grid, .favorites-grid, .photo-settings-grid { grid-template-columns: repeat(3, 1fr); }
         }
@@ -441,6 +448,7 @@
         <button class="filter-btn active" data-type="all">全部</button>
         <button class="filter-btn" data-type="photo">照片</button>
         <button class="filter-btn" data-type="video">视频</button>
+        <button class="sync-albums-btn" id="syncAlbumsBtn" style="display:none;">同步默认相册</button>
     </div>
 
     <div id="homeView">
@@ -606,10 +614,74 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         // ===== 全局配置 =====
-        const API_BASE = 'https://chase.moexin.cn';  // 留空表示同源，后端路径为 /api/...
+        const API_BASE = '';  // 留空表示同源，后端路径为 /api/...
         const TIANDITU_KEY = '7af52769cf10860155e93786bb66db9d';
 
-        // ===== 工具函数 =====
+        // ===== 默认相册数据（用于前端展示和同步） =====
+        const defaultAlbums = [
+            {
+                id: 'mujigae',
+                title: '台风桦加沙',
+                description: '珠三角自2018年以来影响最强台风',
+                cover: 'ragasa/ragasaphoto1.jpg',
+                keywords: '桦加沙',
+                videoTitle: '桦加沙追风视频',
+                videoUrl: 'https://www.bilibili.com/video/BV1GZHnzDEQk/',
+                photos: []
+            },
+            {
+                id: 'matmo',
+                title: '台风麦德姆',
+                description: '团队首次进入成熟的台风眼区',
+                cover: 'matmo/matmophoto1.jpg',
+                keywords: '麦德姆',
+                videoTitle: '麦德姆追风视频',
+                videoUrl: 'https://www.bilibili.com/video/BV1Ea4ezCEwX/',
+                photos: []
+            },
+            {
+                id: 'bavi',
+                title: '台风巴威',
+                description: '20年代厄年远洋台风先驱',
+                cover: 'bavi/baviphoto1.jpg',
+                keywords: '巴威',
+                videoTitle: '巴威地球风云系列视频',
+                videoUrl: 'https://www.bilibili.com/video/BV1n93463E3H/',
+                photos: []
+            },
+            {
+                id: 'noul',
+                title: '台风红霞',
+                description: '珠东地区自2003年以来影响最强台风',
+                cover: 'noul/noulphoto1.jpg',
+                keywords: '红霞',
+                videoTitle: '红霞追风视频',
+                videoUrl: 'https://www.bilibili.com/video/BV13Z3E6iE77/',
+                photos: []
+            },
+            {
+                id: 'thunderstorm',
+                title: '雷暴合集',
+                description: '用镜头捕捉天地间最原始的咆哮',
+                cover: 'storm/stormphoto1.jpg',
+                keywords: '强对流 雷暴',
+                videoTitle: '2026雷暴追击视频',
+                videoUrl: 'https://www.bilibili.com/video/BV1AeL36CEGn/',
+                photos: []
+            },
+            {
+                id: 'snow',
+                title: '雪原合集',
+                description: '记录那些被风雪覆盖的屋檐、树梢与足迹',
+                cover: 'snow/snowphoto1.jpg',
+                keywords: '降雪 雪',
+                videoTitle: '2026降雪追击视频',
+                videoUrl: 'https://www.bilibili.com/video/BV1rhkxBjExL/',
+                photos: []
+            }
+        ];
+
+        // ===== 工具函数：XSS 防护 =====
         function escapeHTML(str) {
             if (!str) return '';
             const div = document.createElement('div');
@@ -620,9 +692,11 @@
         // ===== API 模块 =====
         const api = {
             async request(url, options = {}) {
-                const defaultHeaders = { 'Content-Type': 'application/json' };
-                const headers = { ...defaultHeaders, ...(options.headers || {}) };
-                const config = { ...options, headers, credentials: 'include' }; // 携带 cookie
+                const headers = { ...(options.headers || {}) };
+                if (!(options.body instanceof FormData)) {
+                    headers['Content-Type'] = 'application/json';
+                }
+                const config = { ...options, headers, credentials: 'include' };
                 const response = await fetch(`${API_BASE}${url}`, config);
                 if (!response.ok) {
                     let errorMsg = `请求失败 (${response.status})`;
@@ -643,101 +717,93 @@
             },
 
             // 认证
-            async register(phone, password, name) {
+            register(phone, password, name) {
                 return this.request('/api/auth/register', {
                     method: 'POST',
                     body: JSON.stringify({ phone, password, name })
                 });
             },
-            async login(phone, password) {
+            login(phone, password) {
                 return this.request('/api/auth/login', {
                     method: 'POST',
                     body: JSON.stringify({ phone, password })
                 });
             },
-            async logout() {
+            logout() {
                 return this.request('/api/auth/logout', { method: 'POST' });
             },
-            async me() {
+            me() {
                 return this.request('/api/auth/me');
             },
 
             // 相册
-            async getAlbums() {
+            getAlbums() {
                 return this.request('/api/albums');
             },
-            async getAlbum(albumId) {
+            getAlbum(albumId) {
                 return this.request(`/api/albums/${albumId}`);
             },
-            async createAlbum(data) {
+            createAlbum(data) {
                 return this.request('/api/albums', { method: 'POST', body: JSON.stringify(data) });
             },
-            async updateAlbum(albumId, data) {
+            updateAlbum(albumId, data) {
                 return this.request(`/api/albums/${albumId}`, { method: 'PATCH', body: JSON.stringify(data) });
             },
-            async deleteAlbum(albumId) {
+            deleteAlbum(albumId) {
                 return this.request(`/api/albums/${albumId}`, { method: 'DELETE' });
             },
-            async updateAlbumCover(albumId, photoId) {
+            updateAlbumCover(albumId, photoId) {
                 return this.request(`/api/albums/${albumId}/cover`, { method: 'PATCH', body: JSON.stringify({ photo_id: photoId }) });
             },
 
             // 照片
-            async getPhotos(albumId = null, skip = 0, limit = 100) {
+            getPhotos(albumId = null, skip = 0, limit = 100) {
                 let query = `?skip=${skip}&limit=${limit}`;
                 if (albumId) query += `&album_id=${encodeURIComponent(albumId)}`;
                 return this.request(`/api/photos${query}`);
             },
-            async getPhoto(photoId) {
+            getPhoto(photoId) {
                 return this.request(`/api/photos/${photoId}`);
             },
-            async uploadPhoto(formData) {
-                // 注意：上传时不能设置 Content-Type，让浏览器自动添加 boundary
-                const headers = { ...(formData.getHeaders ? formData.getHeaders() : {}) };
+            uploadPhoto(formData) {
                 return this.request('/api/photos', {
                     method: 'POST',
-                    body: formData,
-                    headers: headers
+                    body: formData
                 });
             },
-            async updatePhoto(photoId, data) {
+            updatePhoto(photoId, data) {
                 return this.request(`/api/photos/${photoId}`, { method: 'PATCH', body: JSON.stringify(data) });
             },
-            async deletePhoto(photoId) {
+            deletePhoto(photoId) {
                 return this.request(`/api/photos/${photoId}`, { method: 'DELETE' });
             },
 
-            // 用户管理（管理员）
-            async getUsers(pendingApproval = null) {
+            // 用户管理
+            getUsers(pendingApproval = null) {
                 let query = '';
                 if (pendingApproval !== null) query = `?pending_upload_approval=${pendingApproval}`;
                 return this.request(`/api/auth/users${query}`);
             },
-            async updateUserApproval(userId, approved) {
+            updateUserApproval(userId, approved) {
                 return this.request(`/api/auth/users/${userId}/upload-approval`, {
                     method: 'PATCH',
                     body: JSON.stringify({ upload_approved: approved })
                 });
             },
-            async updateUser(userId, data) {
+            updateUser(userId, data) {
                 return this.request(`/api/auth/users/${userId}`, { method: 'PATCH', body: JSON.stringify(data) });
             },
-            async deleteUser(userId) {
+            deleteUser(userId) {
                 return this.request(`/api/auth/users/${userId}`, { method: 'DELETE' });
-            },
-
-            // 健康检查
-            async healthCheck() {
-                return this.request('/api/utils/health-check/');
             }
         };
 
         // ===== 全局状态 =====
-        let albums = [];
-        let currentUser = null; // UserPublic 对象
+        let albums = [];           // 合并后的相册列表
+        let backendAlbumIds = new Set(); // 后端已存在的相册ID
+        let currentUser = null;
         let favorites = JSON.parse(localStorage.getItem('tempestFavorites')) || [];
         let downloads = JSON.parse(localStorage.getItem('tempestDownloads')) || [];
-        let userProfile = { name: '', phone: '' }; // 本地缓存，可能不同步
 
         let currentType = 'all';
         let currentKeyword = '';
@@ -809,6 +875,7 @@
         const filterBtns = document.querySelectorAll('.filter-btn[data-type]');
         const announceBtn = document.getElementById('announceBtn');
         const loadingIndicator = document.getElementById('loadingIndicator');
+        const syncAlbumsBtn = document.getElementById('syncAlbumsBtn');
 
         // ===== 主题切换 =====
         function updateThemeIcon() {
@@ -852,6 +919,11 @@
                         ${extraMenu}
                     </div>
                 `;
+                if (currentUser.is_admin) {
+                    syncAlbumsBtn.style.display = 'inline-block';
+                } else {
+                    syncAlbumsBtn.style.display = 'none';
+                }
             } else {
                 avatarContainer.innerHTML = `
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -865,6 +937,7 @@
                         <button class="dropdown-item" data-page="customBg">自定义背景</button>
                     </div>
                 `;
+                syncAlbumsBtn.style.display = 'none';
             }
             const newDropdown = document.getElementById('userDropdown');
             if (newDropdown) {
@@ -887,9 +960,7 @@
             isRegisterMode = register;
             registerNameField.style.display = register ? 'block' : 'none';
             toggleAuthMode.textContent = register ? '切换到登录' : '切换到注册';
-            if (!register) {
-                authName.value = '';
-            }
+            if (!register) authName.value = '';
         }
         toggleAuthMode.addEventListener('click', (e) => {
             e.preventDefault();
@@ -901,10 +972,8 @@
                 const user = await api.me();
                 currentUser = user;
                 localStorage.setItem('tempestUser', JSON.stringify(user));
-                userProfile = { name: user.name, phone: user.phone };
                 renderUserUI();
             } catch (err) {
-                // 未登录或会话失效
                 currentUser = null;
                 localStorage.removeItem('tempestUser');
                 renderUserUI();
@@ -919,7 +988,6 @@
                 const user = await api.login(phone, password);
                 currentUser = user;
                 localStorage.setItem('tempestUser', JSON.stringify(user));
-                userProfile = { name: user.name, phone: user.phone };
                 renderUserUI();
                 location.hash = 'home';
                 alert('登录成功');
@@ -937,7 +1005,6 @@
                 const user = await api.register(phone, password, name);
                 currentUser = user;
                 localStorage.setItem('tempestUser', JSON.stringify(user));
-                userProfile = { name: user.name, phone: user.phone };
                 renderUserUI();
                 location.hash = 'home';
                 alert('注册成功，已自动登录');
@@ -969,12 +1036,9 @@
             const newName = accountName.value.trim();
             if (!newName) { alert('姓名不能为空'); return; }
             try {
-                // 注意：API 只提供管理员更新用户的接口，普通用户修改姓名可能需要其他方式，这里暂时只更新本地
-                // 实际上后端可能不允许普通用户修改 name，我们需要调用 /api/auth/me 相关的更新接口？但 OpenAPI 中没有提供普通用户更新。
-                // 这里仅做本地修改提示，实际需要后端支持。
+                // 注：OpenAPI 未提供普通用户更新姓名的接口，这里暂时仅本地更新（可后续扩展）
                 currentUser.name = newName;
                 localStorage.setItem('tempestUser', JSON.stringify(currentUser));
-                userProfile.name = newName;
                 alert('姓名已更新（仅本地）');
             } catch (err) {
                 alert(err.message);
@@ -1124,6 +1188,11 @@
             if (!titlePrefix) { alert('请输入照片标题前缀'); return; }
             if (!albumId) { alert('请选择相册'); return; }
             if (uploadedFiles.length === 0) { alert('请先选择文件'); return; }
+            // 检查相册是否在后端存在
+            if (!backendAlbumIds.has(albumId)) {
+                alert('所选相册尚未同步到服务器，请联系管理员点击“同步默认相册”按钮');
+                return;
+            }
 
             submitUploadBtn.disabled = true;
             submitUploadBtn.textContent = '上传中...';
@@ -1138,11 +1207,9 @@
                     await api.uploadPhoto(formData);
                 }
                 alert('上传成功！');
-                // 清空
                 uploadedFiles = [];
                 renderUploadFileList();
                 uploadInfoSection.style.display = 'none';
-                // 刷新相册照片
                 if (currentAlbumId === albumId) {
                     const album = albums.find(a => a.id === albumId);
                     if (album) loadPhotos(album);
@@ -1159,7 +1226,7 @@
         function renderPhotoSettingsAlbums() {
             photoSettingsAlbumsContainer.innerHTML = albums.map(album => `
                 <div class="album-card" onclick="openPhotoSettingsAlbum('${album.id}')">
-                    <img src="${escapeHTML(album.cover?.url || 'placeholder.jpg')}" alt="${escapeHTML(album.title)}">
+                    <img src="${escapeHTML(album.cover?.url || album.cover || 'placeholder.jpg')}" alt="${escapeHTML(album.title)}">
                     <div class="album-info">
                         <div class="album-title">${escapeHTML(album.title)}</div>
                         <div class="album-desc">${escapeHTML(album.description || '')}</div>
@@ -1174,7 +1241,6 @@
             if (!album) return;
             photoSettingsAlbumsContainer.style.display = 'none';
             photoSettingsPhotosContainer.style.display = 'grid';
-            // 加载照片
             loadPhotos(album).then(() => renderPhotoSettingsPhotos(album));
         }
 
@@ -1202,7 +1268,6 @@
             if (!confirm('确定删除这张照片吗？')) return;
             try {
                 await api.deletePhoto(photoId);
-                // 从当前相册移除
                 if (currentAlbumForSettings) {
                     const album = albums.find(a => a.id === currentAlbumForSettings);
                     if (album && album.photos) {
@@ -1258,6 +1323,189 @@
                 renderUserManagement();
             } catch (err) { alert(err.message); }
         };
+
+        // ===== 相册加载与同步 =====
+        async function loadAlbums() {
+            loadingIndicator.style.display = 'block';
+            try {
+                const backendAlbums = await api.getAlbums();
+                backendAlbumIds = new Set(backendAlbums.map(a => a.id));
+                // 合并默认相册与后端相册，默认相册优先，后端覆盖
+                const merged = [];
+                // 先加入默认相册（若后端有同ID则用后端数据覆盖）
+                for (const defAlbum of defaultAlbums) {
+                    const backendAlbum = backendAlbums.find(a => a.id === defAlbum.id);
+                    if (backendAlbum) {
+                        merged.push({ ...defAlbum, ...backendAlbum, photos: [] }); // 照片稍后加载
+                    } else {
+                        merged.push({ ...defAlbum, photos: [] }); // 使用默认数据，标记为未同步
+                    }
+                }
+                // 再加入后端独有的相册（例如测试相册）
+                for (const backendAlbum of backendAlbums) {
+                    if (!merged.some(a => a.id === backendAlbum.id)) {
+                        merged.push({ ...backendAlbum, photos: [] });
+                    }
+                }
+                albums = merged;
+                renderAlbums(currentKeyword);
+            } catch (err) {
+                console.error('加载相册失败，使用默认数据', err);
+                albums = defaultAlbums.map(a => ({ ...a, photos: [] }));
+                backendAlbumIds = new Set();
+                renderAlbums(currentKeyword);
+                alert('无法连接服务器，已显示本地默认相册。');
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        // 同步默认相册到后端（管理员）
+        async function syncDefaultAlbums() {
+            if (!currentUser?.is_admin) {
+                alert('需要管理员权限');
+                return;
+            }
+            const missing = defaultAlbums.filter(a => !backendAlbumIds.has(a.id));
+            if (missing.length === 0) {
+                alert('所有默认相册已存在');
+                return;
+            }
+            syncAlbumsBtn.disabled = true;
+            syncAlbumsBtn.textContent = '同步中...';
+            try {
+                for (const album of missing) {
+                    await api.createAlbum({
+                        id: album.id,
+                        title: album.title,
+                        description: album.description
+                    });
+                    backendAlbumIds.add(album.id);
+                }
+                alert(`成功同步 ${missing.length} 个相册`);
+                await loadAlbums(); // 重新加载
+            } catch (err) {
+                alert('同步失败：' + err.message);
+            } finally {
+                syncAlbumsBtn.disabled = false;
+                syncAlbumsBtn.textContent = '同步默认相册';
+            }
+        }
+        syncAlbumsBtn.addEventListener('click', syncDefaultAlbums);
+
+        // ===== 照片加载 =====
+        async function loadPhotos(album) {
+            if (album.photos && album.photos.length > 0) {
+                renderPhotos(album, currentKeyword);
+                return;
+            }
+            loadingIndicator.style.display = 'block';
+            try {
+                const result = await api.getPhotos(album.id, 0, 100);
+                album.photos = result.data || [];
+                renderPhotos(album, currentKeyword);
+            } catch (err) {
+                alert('加载照片失败：' + err.message);
+                console.error(err);
+                album.photos = [];
+                renderPhotos(album, currentKeyword); // 显示空状态
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        // ===== 渲染 =====
+        function renderAlbums(filterKeyword = '') {
+            const container = document.getElementById('albumsContainer');
+            container.innerHTML = '';
+            const keyword = filterKeyword.toLowerCase().trim();
+            let hasVisible = false;
+            albums.forEach(album => {
+                const albumText = (album.title + ' ' + (album.description || '')).toLowerCase();
+                if (keyword && !albumText.includes(keyword)) return;
+                if (currentType !== 'all') {
+                    // 忽略类型过滤（相册没有类型）
+                }
+                hasVisible = true;
+                const card = document.createElement('div');
+                card.className = 'album-card';
+                const coverUrl = album.cover?.url || album.cover || 'placeholder.jpg';
+                card.innerHTML = `<img src="${escapeHTML(coverUrl)}" alt="${escapeHTML(album.title)}"><div class="album-info"><div class="album-title">${escapeHTML(album.title)}</div><div class="album-desc">${escapeHTML(album.description || '')}</div></div>`;
+                card.addEventListener('click', () => openAlbum(album.id));
+                container.appendChild(card);
+            });
+            noResult.style.display = hasVisible ? 'none' : 'block';
+        }
+
+        function renderPhotos(album, filterKeyword = '') {
+            const container = document.getElementById('photosContainer');
+            container.innerHTML = '';
+            const introDiv = document.createElement('div');
+            introDiv.className = 'album-intro';
+            introDiv.innerHTML = `<span class="intro-bracket">「</span>${escapeHTML(album.description || '')}<span class="intro-bracket">」</span>`;
+            container.appendChild(introDiv);
+
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'photos-grid';
+            const keyword = filterKeyword.toLowerCase().trim();
+            let hasVisible = false;
+            const photos = album.photos || [];
+            if (photos.length === 0) {
+                gridDiv.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;">该相册暂无照片</div>';
+                container.appendChild(gridDiv);
+                return;
+            }
+            photos.forEach(photo => {
+                if (currentType !== 'all' && getFileType(photo.url) !== currentType) return;
+                const combined = (photo.title + ' ' + (photo.author || '') + ' ' + (photo.comment || '') + ' ' + (photo.location || '')).toLowerCase();
+                if (keyword && !combined.includes(keyword)) return;
+                hasVisible = true;
+                const favorited = isFavorited(photo.url);
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.innerHTML = `
+                    <img src="${escapeHTML(photo.url)}" alt="${escapeHTML(photo.title)}" onclick="showPreview('${escapeHTML(photo.url)}')">
+                    <div class="photo-info">
+                        <div class="photo-title">${escapeHTML(photo.title)}</div>
+                        <div class="photo-meta">
+                            <span class="meta-author">${escapeHTML(photo.author || '')}</span>
+                            <span class="meta-comment">${escapeHTML(photo.comment || '')}</span>
+                            <span class="meta-location">${escapeHTML(photo.location || '')}</span>
+                        </div>
+                        <div class="photo-actions">
+                            <a class="action-btn" href="${escapeHTML(photo.url)}" download title="下载原图" onclick="recordDownload('${escapeHTML(photo.url)}', '${escapeHTML(photo.title)}')">${getDownloadIcon()}</a>
+                            <button class="action-btn" onclick="event.stopPropagation(); showPreview('${escapeHTML(photo.url)}')" title="预览照片">${getEyeIcon()}</button>
+                            <button class="action-btn ${favorited ? 'favorited' : ''}" onclick="event.stopPropagation(); toggleFavorite('${escapeHTML(photo.url)}', this, { src: '${escapeHTML(photo.url)}', title: '${escapeHTML(photo.title)}', author: '${escapeHTML(photo.author || '')}', comment: '${escapeHTML(photo.comment || '')}', location: '${escapeHTML(photo.location || '')}' })" title="收藏">${getStarIcon(favorited)}</button>
+                        </div>
+                    </div>
+                `;
+                gridDiv.appendChild(card);
+            });
+            container.appendChild(gridDiv);
+            noResult.style.display = (!hasVisible && keyword !== '') ? 'block' : 'none';
+        }
+
+        function getFileType(url) {
+            if (/\.(mp4|webm|mov|avi|mkv|flv)$/i.test(url)) return 'video';
+            return 'photo';
+        }
+
+        function getDownloadIcon() {
+            return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+        }
+        function getEyeIcon() {
+            return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+        }
+
+        function showPreview(src) {
+            const existing = document.querySelector('.modal-overlay');
+            if (existing) existing.remove();
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `<span class="modal-close">&times;</span><img src="${escapeHTML(src)}" onclick="event.stopPropagation()">`;
+            overlay.addEventListener('click', () => overlay.remove());
+            document.body.appendChild(overlay);
+        }
 
         // ===== 状态管理与路由 =====
         const navLinks = document.querySelectorAll('.nav-menu a');
@@ -1384,7 +1632,6 @@
 
         async function loadMapMarkers() {
             try {
-                // 获取前100张照片（可能不够，后续可加分页）
                 const result = await api.getPhotos(null, 0, 100);
                 const photos = result.data || [];
                 const cityPhotos = {};
@@ -1395,7 +1642,6 @@
                         cityPhotos[loc].push(photo);
                     }
                 });
-                // 清除旧标记
                 if (map._markers) map._markers.forEach(m => map.removeLayer(m));
                 map._markers = [];
                 Object.keys(cityPhotos).forEach(city => {
@@ -1432,132 +1678,6 @@
         }
         window.expandStack = function(el) { el.classList.add('expanded'); el.onclick = null; };
         window.showPreview = showPreview;
-
-        // ===== 渲染相册 =====
-        async function loadAlbums() {
-            if (albums.length > 0) return;
-            loadingIndicator.style.display = 'block';
-            try {
-                albums = await api.getAlbums();
-                renderAlbums(currentKeyword);
-            } catch (err) {
-                alert('加载相册失败：' + err.message);
-            } finally {
-                loadingIndicator.style.display = 'none';
-            }
-        }
-
-        async function loadPhotos(album) {
-            if (album.photos && album.photos.length > 0) {
-                renderPhotos(album, currentKeyword);
-                return;
-            }
-            loadingIndicator.style.display = 'block';
-            try {
-                const result = await api.getPhotos(album.id, 0, 100); // 最多100张
-                album.photos = result.data || [];
-                renderPhotos(album, currentKeyword);
-            } catch (err) {
-                alert('加载照片失败：' + err.message);
-                console.error(err);
-            } finally {
-                loadingIndicator.style.display = 'none';
-            }
-        }
-
-        function renderAlbums(filterKeyword = '') {
-            const container = document.getElementById('albumsContainer');
-            container.innerHTML = '';
-            const keyword = filterKeyword.toLowerCase().trim();
-            let hasVisible = false;
-            albums.forEach(album => {
-                const albumText = (album.title + ' ' + (album.description || '')).toLowerCase();
-                if (keyword && !albumText.includes(keyword)) return;
-                // 类型过滤：相册没有类型信息，默认显示全部
-                if (currentType !== 'all') {
-                    // 如果没有照片数据，直接跳过？暂时先显示
-                }
-                hasVisible = true;
-                const card = document.createElement('div');
-                card.className = 'album-card';
-                const coverUrl = album.cover?.url || album.cover || 'placeholder.jpg';
-                card.innerHTML = `<img src="${escapeHTML(coverUrl)}" alt="${escapeHTML(album.title)}"><div class="album-info"><div class="album-title">${escapeHTML(album.title)}</div><div class="album-desc">${escapeHTML(album.description || '')}</div></div>`;
-                card.addEventListener('click', () => openAlbum(album.id));
-                container.appendChild(card);
-            });
-            noResult.style.display = hasVisible ? 'none' : 'block';
-        }
-
-        function renderPhotos(album, filterKeyword = '') {
-            const container = document.getElementById('photosContainer');
-            container.innerHTML = '';
-            const introDiv = document.createElement('div');
-            introDiv.className = 'album-intro';
-            introDiv.innerHTML = `<span class="intro-bracket">「</span>${escapeHTML(album.description || '')}<span class="intro-bracket">」</span>`;
-            container.appendChild(introDiv);
-
-            const gridDiv = document.createElement('div');
-            gridDiv.className = 'photos-grid';
-            const keyword = filterKeyword.toLowerCase().trim();
-            let hasVisible = false;
-            const photos = album.photos || [];
-            if (photos.length === 0) {
-                gridDiv.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;">该相册暂无照片</div>';
-                container.appendChild(gridDiv);
-                return;
-            }
-            photos.forEach(photo => {
-                if (currentType !== 'all' && getFileType(photo.url) !== currentType) return;
-                const combined = (photo.title + ' ' + (photo.author || '') + ' ' + (photo.comment || '') + ' ' + (photo.location || '')).toLowerCase();
-                if (keyword && !combined.includes(keyword)) return;
-                hasVisible = true;
-                const favorited = isFavorited(photo.url);
-                const card = document.createElement('div');
-                card.className = 'photo-card';
-                card.innerHTML = `
-                    <img src="${escapeHTML(photo.url)}" alt="${escapeHTML(photo.title)}" onclick="showPreview('${escapeHTML(photo.url)}')">
-                    <div class="photo-info">
-                        <div class="photo-title">${escapeHTML(photo.title)}</div>
-                        <div class="photo-meta">
-                            <span class="meta-author">${escapeHTML(photo.author || '')}</span>
-                            <span class="meta-comment">${escapeHTML(photo.comment || '')}</span>
-                            <span class="meta-location">${escapeHTML(photo.location || '')}</span>
-                        </div>
-                        <div class="photo-actions">
-                            <a class="action-btn" href="${escapeHTML(photo.url)}" download title="下载原图" onclick="recordDownload('${escapeHTML(photo.url)}', '${escapeHTML(photo.title)}')">${getDownloadIcon()}</a>
-                            <button class="action-btn" onclick="event.stopPropagation(); showPreview('${escapeHTML(photo.url)}')" title="预览照片">${getEyeIcon()}</button>
-                            <button class="action-btn ${favorited ? 'favorited' : ''}" onclick="event.stopPropagation(); toggleFavorite('${escapeHTML(photo.url)}', this, { src: '${escapeHTML(photo.url)}', title: '${escapeHTML(photo.title)}', author: '${escapeHTML(photo.author || '')}', comment: '${escapeHTML(photo.comment || '')}', location: '${escapeHTML(photo.location || '')}' })" title="收藏">${getStarIcon(favorited)}</button>
-                        </div>
-                    </div>
-                `;
-                gridDiv.appendChild(card);
-            });
-            container.appendChild(gridDiv);
-            noResult.style.display = (!hasVisible && keyword !== '') ? 'block' : 'none';
-        }
-
-        function getFileType(url) {
-            // 根据扩展名判断，简单实现
-            if (/\.(mp4|webm|mov|avi|mkv|flv)$/i.test(url)) return 'video';
-            return 'photo';
-        }
-
-        function getDownloadIcon() {
-            return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
-        }
-        function getEyeIcon() {
-            return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
-        }
-
-        function showPreview(src) {
-            const existing = document.querySelector('.modal-overlay');
-            if (existing) existing.remove();
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay';
-            overlay.innerHTML = `<span class="modal-close">&times;</span><img src="${escapeHTML(src)}" onclick="event.stopPropagation()">`;
-            overlay.addEventListener('click', () => overlay.remove());
-            document.body.appendChild(overlay);
-        }
 
         // ===== 公告 =====
         announceBtn.addEventListener('click', () => showAnnouncement());
@@ -1670,13 +1790,8 @@
 
         // ===== 初始化 =====
         async function initApp() {
-            // 检查登录状态
             await checkAuth();
-
-            // 加载相册数据
             await loadAlbums();
-
-            // 根据 hash 初始化视图
             const initHash = location.hash.slice(1);
             if (initHash.startsWith('album/')) {
                 switchView('album', initHash.replace('album/', ''));
