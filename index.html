@@ -7,7 +7,7 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        /* ===== 样式部分保持不变 ===== */
+        /* ===== 原有样式保留 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
@@ -387,6 +387,39 @@
         .sync-albums-btn:hover { opacity: 0.9; }
         body.dark-mode .sync-albums-btn { background: #4a8; }
 
+        /* 管理员中心样式 */
+        .admin-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding-bottom: 8px;
+        }
+        .admin-tab {
+            background: none;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #999;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .admin-tab:hover { background: rgba(0,0,0,0.05); color: #333; }
+        .admin-tab.active { background: #5a9; color: white; }
+        body.dark-mode .admin-tab:hover { background: rgba(255,255,255,0.1); color: #ddd; }
+        body.dark-mode .admin-tab.active { background: #4a8; }
+
+        .admin-panel { min-height: 200px; }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .panel-header span { font-weight: 600; }
+
         @media (max-width: 1200px) {
             .albums-container, .photos-grid, .favorites-grid, .photo-settings-grid { grid-template-columns: repeat(3, 1fr); }
         }
@@ -566,20 +599,32 @@
         </div>
     </div>
 
-    <!-- 照片设置（管理员） -->
-    <div id="photoSettingsView" style="display: none;">
+    <!-- 管理员中心 -->
+    <div id="adminCenterView" style="display: none;">
         <div class="page-content" style="max-width: 1300px;">
-            <h2>照片设置</h2>
-            <div id="photoSettingsAlbumsContainer" class="albums-container"></div>
-            <div id="photoSettingsPhotosContainer" class="photo-settings-grid"></div>
-        </div>
-    </div>
-
-    <!-- 用户管理（管理员） -->
-    <div id="userManagementView" style="display: none;">
-        <div class="page-content" style="max-width: 800px;">
-            <h2>用户管理</h2>
-            <div id="userManagementContainer"></div>
+            <h2>管理员中心</h2>
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-tab="albums">相册</button>
+                <button class="admin-tab" data-tab="photos">照片</button>
+                <button class="admin-tab" data-tab="users">用户管理</button>
+            </div>
+            <div id="adminAlbumsPanel" class="admin-panel">
+                <div class="panel-header">
+                    <span>所有相册</span>
+                    <button class="btn-sm" id="createAlbumBtn">新建相册</button>
+                </div>
+                <div id="adminAlbumsContainer" class="albums-container"></div>
+            </div>
+            <div id="adminPhotosPanel" class="admin-panel" style="display:none;">
+                <div class="panel-header">
+                    <span>所有照片（最多显示100张）</span>
+                    <button class="btn-sm" onclick="location.hash='upload'">上传照片</button>
+                </div>
+                <div id="adminPhotosContainer" class="photo-settings-grid"></div>
+            </div>
+            <div id="adminUsersPanel" class="admin-panel" style="display:none;">
+                <div id="adminUsersContainer"></div>
+            </div>
         </div>
     </div>
 
@@ -811,8 +856,8 @@
         let currentView = 'home';
         let mapInitialized = false;
         let map;
-        let currentAlbumForSettings = null;
         let uploadedFiles = [];
+        let adminCurrentTab = 'albums'; // 管理员中心当前 tab
 
         const cityCoords = {
             '珠海': [22.270978, 113.576677],
@@ -856,11 +901,17 @@
         const uploadCategory = document.getElementById('uploadCategory');
         const uploadLocation = document.getElementById('uploadLocation');
         const customBgView = document.getElementById('customBgView');
-        const photoSettingsView = document.getElementById('photoSettingsView');
-        const photoSettingsAlbumsContainer = document.getElementById('photoSettingsAlbumsContainer');
-        const photoSettingsPhotosContainer = document.getElementById('photoSettingsPhotosContainer');
-        const userManagementView = document.getElementById('userManagementView');
-        const userManagementContainer = document.getElementById('userManagementContainer');
+
+        // 管理员中心 DOM
+        const adminCenterView = document.getElementById('adminCenterView');
+        const adminTabs = document.querySelectorAll('.admin-tab');
+        const adminAlbumsPanel = document.getElementById('adminAlbumsPanel');
+        const adminPhotosPanel = document.getElementById('adminPhotosPanel');
+        const adminUsersPanel = document.getElementById('adminUsersPanel');
+        const adminAlbumsContainer = document.getElementById('adminAlbumsContainer');
+        const adminPhotosContainer = document.getElementById('adminPhotosContainer');
+        const adminUsersContainer = document.getElementById('adminUsersContainer');
+        const createAlbumBtn = document.getElementById('createAlbumBtn');
 
         const homeView = document.getElementById('homeView');
         const mapView = document.getElementById('mapView');
@@ -900,8 +951,7 @@
             if (currentUser) {
                 let extraMenu = '';
                 if (currentUser.is_admin) {
-                    extraMenu += '<button class="dropdown-item" data-page="photoSettings">照片设置</button>';
-                    extraMenu += '<button class="dropdown-item" data-page="userManagement">用户管理</button>';
+                    extraMenu += '<button class="dropdown-item" data-page="adminCenter">管理员中心</button>';
                 }
                 avatarContainer.innerHTML = `
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1188,7 +1238,6 @@
             if (!titlePrefix) { alert('请输入照片标题前缀'); return; }
             if (!albumId) { alert('请选择相册'); return; }
             if (uploadedFiles.length === 0) { alert('请先选择文件'); return; }
-            // 检查相册是否在后端存在
             if (!backendAlbumIds.has(albumId)) {
                 alert('所选相册尚未同步到服务器，请联系管理员点击“同步默认相册”按钮');
                 return;
@@ -1222,126 +1271,21 @@
             }
         });
 
-        // ===== 照片设置（管理员） =====
-        function renderPhotoSettingsAlbums() {
-            photoSettingsAlbumsContainer.innerHTML = albums.map(album => `
-                <div class="album-card" onclick="openPhotoSettingsAlbum('${album.id}')">
-                    <img src="${escapeHTML(album.cover?.url || album.cover || 'placeholder.jpg')}" alt="${escapeHTML(album.title)}">
-                    <div class="album-info">
-                        <div class="album-title">${escapeHTML(album.title)}</div>
-                        <div class="album-desc">${escapeHTML(album.description || '')}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function openPhotoSettingsAlbum(albumId) {
-            currentAlbumForSettings = albumId;
-            const album = albums.find(a => a.id === albumId);
-            if (!album) return;
-            photoSettingsAlbumsContainer.style.display = 'none';
-            photoSettingsPhotosContainer.style.display = 'grid';
-            loadPhotos(album).then(() => renderPhotoSettingsPhotos(album));
-        }
-
-        function renderPhotoSettingsPhotos(album) {
-            if (!album.photos || album.photos.length === 0) {
-                photoSettingsPhotosContainer.innerHTML = '<div class="empty-state">该相册暂无照片</div>';
-                return;
-            }
-            photoSettingsPhotosContainer.innerHTML = album.photos.map(photo => `
-                <div class="photo-card">
-                    <img src="${escapeHTML(photo.url)}" alt="${escapeHTML(photo.title)}">
-                    <div class="photo-info">
-                        <div class="photo-title">${escapeHTML(photo.title)}</div>
-                        <div class="photo-actions" style="justify-content: flex-end;">
-                            <button class="action-btn" onclick="deletePhoto('${photo.id}')" title="删除照片">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        window.deletePhoto = async function(photoId) {
-            if (!confirm('确定删除这张照片吗？')) return;
-            try {
-                await api.deletePhoto(photoId);
-                if (currentAlbumForSettings) {
-                    const album = albums.find(a => a.id === currentAlbumForSettings);
-                    if (album && album.photos) {
-                        album.photos = album.photos.filter(p => p.id !== photoId);
-                        renderPhotoSettingsPhotos(album);
-                    }
-                }
-                alert('照片已删除');
-            } catch (err) {
-                alert('删除失败：' + err.message);
-            }
-        };
-        window.openPhotoSettingsAlbum = openPhotoSettingsAlbum;
-
-        // ===== 用户管理（管理员） =====
-        async function renderUserManagement() {
-            try {
-                const users = await api.getUsers();
-                userManagementContainer.innerHTML = users.map(user => `
-                    <div class="download-item" style="margin-bottom:10px;">
-                        <div class="download-info">
-                            <div class="download-title">${escapeHTML(user.name)} (${escapeHTML(user.phone)})</div>
-                            <div class="download-time">管理员: ${user.is_admin ? '是' : '否'} | 上传审批: ${user.upload_approved ? '通过' : '未通过'}</div>
-                        </div>
-                        <div style="display:flex; gap:8px;">
-                            <button class="btn-sm" onclick="toggleApproval('${user.id}', ${!user.upload_approved})">${user.upload_approved ? '撤销审批' : '通过审批'}</button>
-                            <button class="btn-sm" onclick="toggleAdmin('${user.id}', ${!user.is_admin})">${user.is_admin ? '撤销管理员' : '设为管理员'}</button>
-                            <button class="btn-sm" onclick="deleteUser('${user.id}')">删除</button>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (err) {
-                userManagementContainer.innerHTML = `<div class="empty-state">加载失败：${escapeHTML(err.message)}</div>`;
-            }
-        }
-
-        window.toggleApproval = async function(userId, approved) {
-            try {
-                await api.updateUserApproval(userId, approved);
-                renderUserManagement();
-            } catch (err) { alert(err.message); }
-        };
-        window.toggleAdmin = async function(userId, isAdmin) {
-            try {
-                await api.updateUser(userId, { is_admin: isAdmin });
-                renderUserManagement();
-            } catch (err) { alert(err.message); }
-        };
-        window.deleteUser = async function(userId) {
-            if (!confirm('确定删除该用户吗？')) return;
-            try {
-                await api.deleteUser(userId);
-                renderUserManagement();
-            } catch (err) { alert(err.message); }
-        };
-
         // ===== 相册加载与同步 =====
         async function loadAlbums() {
             loadingIndicator.style.display = 'block';
             try {
                 const backendAlbums = await api.getAlbums();
                 backendAlbumIds = new Set(backendAlbums.map(a => a.id));
-                // 合并默认相册与后端相册，默认相册优先，后端覆盖
                 const merged = [];
-                // 先加入默认相册（若后端有同ID则用后端数据覆盖）
                 for (const defAlbum of defaultAlbums) {
                     const backendAlbum = backendAlbums.find(a => a.id === defAlbum.id);
                     if (backendAlbum) {
-                        merged.push({ ...defAlbum, ...backendAlbum, photos: [] }); // 照片稍后加载
+                        merged.push({ ...defAlbum, ...backendAlbum, photos: [] });
                     } else {
-                        merged.push({ ...defAlbum, photos: [] }); // 使用默认数据，标记为未同步
+                        merged.push({ ...defAlbum, photos: [] });
                     }
                 }
-                // 再加入后端独有的相册（例如测试相册）
                 for (const backendAlbum of backendAlbums) {
                     if (!merged.some(a => a.id === backendAlbum.id)) {
                         merged.push({ ...backendAlbum, photos: [] });
@@ -1360,7 +1304,6 @@
             }
         }
 
-        // 同步默认相册到后端（管理员）
         async function syncDefaultAlbums() {
             if (!currentUser?.is_admin) {
                 alert('需要管理员权限');
@@ -1383,7 +1326,7 @@
                     backendAlbumIds.add(album.id);
                 }
                 alert(`成功同步 ${missing.length} 个相册`);
-                await loadAlbums(); // 重新加载
+                await loadAlbums();
             } catch (err) {
                 alert('同步失败：' + err.message);
             } finally {
@@ -1408,7 +1351,7 @@
                 alert('加载照片失败：' + err.message);
                 console.error(err);
                 album.photos = [];
-                renderPhotos(album, currentKeyword); // 显示空状态
+                renderPhotos(album, currentKeyword);
             } finally {
                 loadingIndicator.style.display = 'none';
             }
@@ -1423,9 +1366,6 @@
             albums.forEach(album => {
                 const albumText = (album.title + ' ' + (album.description || '')).toLowerCase();
                 if (keyword && !albumText.includes(keyword)) return;
-                if (currentType !== 'all') {
-                    // 忽略类型过滤（相册没有类型）
-                }
                 hasVisible = true;
                 const card = document.createElement('div');
                 card.className = 'album-card';
@@ -1507,6 +1447,194 @@
             document.body.appendChild(overlay);
         }
 
+        // ===== 管理员中心功能 =====
+        adminTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                adminTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                adminCurrentTab = tab.dataset.tab;
+                switchAdminTab(adminCurrentTab);
+            });
+        });
+
+        function switchAdminTab(tab) {
+            adminAlbumsPanel.style.display = tab === 'albums' ? 'block' : 'none';
+            adminPhotosPanel.style.display = tab === 'photos' ? 'block' : 'none';
+            adminUsersPanel.style.display = tab === 'users' ? 'block' : 'none';
+            if (tab === 'albums') renderAdminAlbums();
+            else if (tab === 'photos') renderAdminPhotos();
+            else if (tab === 'users') renderAdminUsers();
+        }
+
+        async function renderAdminAlbums() {
+            try {
+                const backendAlbums = await api.getAlbums();
+                adminAlbumsContainer.innerHTML = '';
+                if (backendAlbums.length === 0) {
+                    adminAlbumsContainer.innerHTML = '<div class="empty-state">暂无相册</div>';
+                    return;
+                }
+                backendAlbums.forEach(album => {
+                    const card = document.createElement('div');
+                    card.className = 'album-card';
+                    const coverUrl = album.cover?.url || 'placeholder.jpg';
+                    card.innerHTML = `
+                        <img src="${escapeHTML(coverUrl)}" alt="${escapeHTML(album.title)}">
+                        <div class="album-info">
+                            <div class="album-title">${escapeHTML(album.title)}</div>
+                            <div class="album-desc">${escapeHTML(album.description || '')}</div>
+                            <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                                <button class="btn-sm" onclick="deleteAlbum('${album.id}')">删除</button>
+                            </div>
+                        </div>
+                    `;
+                    adminAlbumsContainer.appendChild(card);
+                });
+            } catch (err) {
+                adminAlbumsContainer.innerHTML = `<div class="empty-state">加载失败：${escapeHTML(err.message)}</div>`;
+            }
+        }
+
+        async function renderAdminPhotos() {
+            try {
+                const result = await api.getPhotos(null, 0, 100);
+                const photos = result.data || [];
+                adminPhotosContainer.innerHTML = '';
+                if (photos.length === 0) {
+                    adminPhotosContainer.innerHTML = '<div class="empty-state">暂无照片</div>';
+                    return;
+                }
+                photos.forEach(photo => {
+                    const card = document.createElement('div');
+                    card.className = 'photo-card';
+                    card.innerHTML = `
+                        <img src="${escapeHTML(photo.url)}" alt="${escapeHTML(photo.title)}">
+                        <div class="photo-info">
+                            <div class="photo-title">${escapeHTML(photo.title)}</div>
+                            <div class="photo-meta">
+                                <span>${escapeHTML(photo.author || '')}</span>
+                                <span>${escapeHTML(photo.location || '')}</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                                <button class="btn-sm" onclick="deletePhoto('${photo.id}')">删除</button>
+                            </div>
+                        </div>
+                    `;
+                    adminPhotosContainer.appendChild(card);
+                });
+            } catch (err) {
+                adminPhotosContainer.innerHTML = `<div class="empty-state">加载失败：${escapeHTML(err.message)}</div>`;
+            }
+        }
+
+        async function renderAdminUsers() {
+            try {
+                const users = await api.getUsers();
+                adminUsersContainer.innerHTML = users.map(user => `
+                    <div class="download-item" style="margin-bottom:10px;">
+                        <div class="download-info">
+                            <div class="download-title">${escapeHTML(user.name)} (${escapeHTML(user.phone)})</div>
+                            <div class="download-time">管理员: ${user.is_admin ? '是' : '否'} | 上传审批: ${user.upload_approved ? '通过' : '未通过'}</div>
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn-sm" onclick="toggleApproval('${user.id}', ${!user.upload_approved})">${user.upload_approved ? '撤销审批' : '通过审批'}</button>
+                            <button class="btn-sm" onclick="toggleAdmin('${user.id}', ${!user.is_admin})">${user.is_admin ? '撤销管理员' : '设为管理员'}</button>
+                            <button class="btn-sm" onclick="deleteUser('${user.id}')">删除</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                adminUsersContainer.innerHTML = `<div class="empty-state">加载失败：${escapeHTML(err.message)}</div>`;
+            }
+        }
+
+        window.deleteAlbum = async function(albumId) {
+            if (!confirm('确定删除该相册吗？此操作会删除相册及其中所有照片？')) return;
+            try {
+                await api.deleteAlbum(albumId);
+                // 从本地 albums 移除
+                albums = albums.filter(a => a.id !== albumId);
+                backendAlbumIds.delete(albumId);
+                renderAdminAlbums();
+                if (currentView === 'home') renderAlbums(currentKeyword);
+                alert('相册已删除');
+            } catch (err) {
+                alert('删除失败：' + err.message);
+            }
+        };
+
+        window.deletePhoto = async function(photoId) {
+            if (!confirm('确定删除该照片吗？')) return;
+            try {
+                await api.deletePhoto(photoId);
+                renderAdminPhotos();
+                alert('照片已删除');
+            } catch (err) {
+                alert('删除失败：' + err.message);
+            }
+        };
+
+        window.toggleApproval = async function(userId, approved) {
+            try {
+                await api.updateUserApproval(userId, approved);
+                renderAdminUsers();
+            } catch (err) { alert(err.message); }
+        };
+        window.toggleAdmin = async function(userId, isAdmin) {
+            try {
+                await api.updateUser(userId, { is_admin: isAdmin });
+                renderAdminUsers();
+            } catch (err) { alert(err.message); }
+        };
+        window.deleteUser = async function(userId) {
+            if (!confirm('确定删除该用户吗？')) return;
+            try {
+                await api.deleteUser(userId);
+                renderAdminUsers();
+            } catch (err) { alert(err.message); }
+        };
+
+        // 新建相册
+        createAlbumBtn.addEventListener('click', () => {
+            showCreateAlbumModal();
+        });
+
+        function showCreateAlbumModal() {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="announce-content" style="max-width: 400px;">
+                    <h3 style="margin-bottom: 16px;">新建相册</h3>
+                    <label for="newAlbumId">相册ID（英文/数字/下划线）</label>
+                    <input type="text" id="newAlbumId" style="width:100%; margin-bottom: 12px; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                    <label for="newAlbumTitle">相册标题</label>
+                    <input type="text" id="newAlbumTitle" style="width:100%; margin-bottom: 12px; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                    <label for="newAlbumDesc">描述</label>
+                    <input type="text" id="newAlbumDesc" style="width:100%; margin-bottom: 12px; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn-sm" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                        <button class="btn-sm" id="confirmCreateAlbumBtn">确认创建</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            overlay.querySelector('#confirmCreateAlbumBtn').addEventListener('click', async () => {
+                const id = overlay.querySelector('#newAlbumId').value.trim();
+                const title = overlay.querySelector('#newAlbumTitle').value.trim();
+                const desc = overlay.querySelector('#newAlbumDesc').value.trim();
+                if (!id || !title) { alert('请填写相册ID和标题'); return; }
+                try {
+                    await api.createAlbum({ id, title, description: desc });
+                    overlay.remove();
+                    alert('相册创建成功');
+                    await loadAlbums();
+                    renderAdminAlbums();
+                } catch (err) {
+                    alert('创建失败：' + err.message);
+                }
+            });
+        }
+
         // ===== 状态管理与路由 =====
         const navLinks = document.querySelectorAll('.nav-menu a');
 
@@ -1516,8 +1644,8 @@
             linksView.style.display = 'none'; accountView.style.display = 'none';
             downloadsView.style.display = 'none'; favoritesView.style.display = 'none';
             uploadView.style.display = 'none'; customBgView.style.display = 'none';
-            authView.style.display = 'none'; photoSettingsView.style.display = 'none';
-            userManagementView.style.display = 'none';
+            authView.style.display = 'none';
+            adminCenterView.style.display = 'none';
             noResult.style.display = 'none';
             loadingIndicator.style.display = 'none';
 
@@ -1566,17 +1694,13 @@
                 case 'customBg':
                     customBgView.style.display = 'block';
                     break;
-                case 'photoSettings':
+                case 'adminCenter':
                     if (!currentUser?.is_admin) { location.hash = 'home'; alert('无访问权限'); break; }
-                    photoSettingsView.style.display = 'block';
-                    photoSettingsAlbumsContainer.style.display = 'grid';
-                    photoSettingsPhotosContainer.style.display = 'none';
-                    renderPhotoSettingsAlbums();
-                    break;
-                case 'userManagement':
-                    if (!currentUser?.is_admin) { location.hash = 'home'; alert('无访问权限'); break; }
-                    userManagementView.style.display = 'block';
-                    renderUserManagement();
+                    adminCenterView.style.display = 'block';
+                    // 默认显示相册 tab
+                    adminTabs.forEach(t => t.classList.remove('active'));
+                    adminTabs[0].classList.add('active');
+                    switchAdminTab('albums');
                     break;
                 case 'album':
                     if (albumId) {
