@@ -339,7 +339,7 @@
         }
         .batch-settings .btn-sm {
             flex-shrink: 0;
-            height: 38px;
+            padding: 8px 16px;  /* 与输入框 padding 保持一致，确保垂直对齐 */
         }
 
         .btn-sm {
@@ -365,9 +365,10 @@
         .video-btn:hover { background: #e05a7f; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(251,114,153,0.4); }
         .bili-tv-icon { display: inline-block; width: 1.2em; height: 1.2em; vertical-align: middle; }
 
+        /* 遮罩层 z-index 提升至 2000，覆盖顶部导航栏 */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75);
-            backdrop-filter: blur(10px); z-index: 200; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(10px); z-index: 2000; display: flex; align-items: center; justify-content: center;
             animation: fadeIn 0.2s;
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -635,7 +636,7 @@
                 <div class="batch-settings">
                     <label style="margin-bottom:8px;">批量设置（可选）</label>
                     <div class="batch-row">
-                        <input type="text" id="batchTitlePrefix" placeholder="标题前缀，如 RAGASA-照片">
+                        <input type="text" id="batchTitlePrefix" placeholder="编号，如 RAGASA-照片">
                         <input type="text" id="batchCategory" placeholder="分类，如 风毁">
                         <input type="text" id="batchLocation" placeholder="地点，如 珠海">
                         <button class="btn-sm" id="applyBatchBtn">应用到全部</button>
@@ -664,7 +665,7 @@
                 <input type="file" id="bgFileInput" accept="image/*">
                 <label>模糊程度：<span id="bgBlurValue">0</span>px</label>
                 <input type="range" id="bgBlurRange" min="0" max="30" value="0" step="1">
-                <p style="font-size: 0.75rem; color: #888;">上传图片后浏览器会保存在本地，不会上传到服务器</p>
+                <p style="font-size: 0.75rem; color: #888;">若选择的背景照片色调偏深，建议开启黑夜模式</p>
             </div>
         </div>
     </div>
