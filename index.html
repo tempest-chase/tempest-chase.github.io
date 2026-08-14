@@ -284,13 +284,28 @@
         body.dark-mode .upload-dropzone p { color: #aaa; }
         .upload-file-list { margin-top: 20px; }
         .upload-file-item {
-            display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+            display: flex; align-items: flex-start; gap: 12px; padding: 12px;
             background: rgba(255,255,255,0.4); backdrop-filter: blur(8px); border-radius: 8px; margin-bottom: 8px;
         }
         body.dark-mode .upload-file-item { background: rgba(30,42,58,0.5); }
-        .upload-file-item .file-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.05); border-radius: 6px; }
-        .upload-file-item .file-name { flex: 1; font-size: 0.9rem; word-break: break-all; }
-        .upload-file-item .file-size { font-size: 0.75rem; color: #888; }
+        .upload-file-item .file-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.05); border-radius: 6px; flex-shrink: 0; }
+        .upload-file-item .file-info { flex: 1; }
+        .upload-file-item .file-name { font-size: 0.9rem; word-break: break-all; margin-bottom: 4px; }
+        .upload-file-item .file-size { font-size: 0.75rem; color: #888; margin-bottom: 8px; }
+        .upload-file-item .file-fields { display: flex; flex-wrap: wrap; gap: 8px; }
+        .upload-file-item .file-fields input {
+            flex: 1; min-width: 120px; padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;
+            font-size: 0.85rem; background: rgba(255,255,255,0.7); color: #333; outline: none; font-family: inherit;
+        }
+        body.dark-mode .upload-file-item .file-fields input {
+            background: rgba(30,42,58,0.7); border-color: #555; color: #ccc;
+        }
+        .upload-file-item .file-remove-btn {
+            background: none; border: none; cursor: pointer; font-size: 1.2rem; color: #999;
+            line-height: 1; padding: 4px;
+        }
+        .upload-file-item .file-remove-btn:hover { color: #e55; }
+
         .upload-info-section {
             margin-top: 24px; padding: 20px; background: rgba(255,255,255,0.4);
             backdrop-filter: blur(8px); border-radius: 12px;
@@ -307,6 +322,22 @@
             background: rgba(30,42,58,0.7); border-color: #555; color: #ccc;
         }
         .upload-info-section .btn-row { display: flex; justify-content: flex-end; margin-top: 8px; }
+
+        .batch-settings {
+            background: rgba(0,0,0,0.03); padding: 12px; border-radius: 8px; margin-bottom: 16px;
+        }
+        body.dark-mode .batch-settings { background: rgba(255,255,255,0.05); }
+        .batch-settings .batch-row {
+            display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+        }
+        .batch-settings .batch-row input {
+            flex: 1; min-width: 120px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px;
+            font-size: 0.85rem; background: rgba(255,255,255,0.7); color: #333; outline: none; font-family: inherit;
+        }
+        body.dark-mode .batch-settings .batch-row input {
+            background: rgba(30,42,58,0.7); border-color: #555; color: #ccc;
+        }
+        .batch-settings .btn-sm { flex-shrink: 0; }
 
         .btn-sm {
             padding: 6px 16px; border: 1px solid #ddd; border-radius: 20px;
@@ -586,30 +617,29 @@
 
     <!-- 上传 -->
     <div id="uploadView" style="display: none;">
-        <div class="page-content" style="max-width: 700px;">
+        <div class="page-content" style="max-width: 800px;">
             <h2>上传照片</h2>
             <div class="upload-dropzone" id="uploadDropzone">
                 <p>拖拽文件或文件夹到此处，或点击下方按钮选择文件</p>
                 <button class="btn-sm" id="chooseFilesBtn">选择文件</button>
                 <input type="file" id="fileInput" multiple webkitdirectory style="display:none;">
             </div>
-            <div class="upload-file-list" id="uploadFileList"></div>
             <div class="upload-info-section" id="uploadInfoSection" style="display:none;">
                 <h3>填写照片信息</h3>
-                <label for="uploadAlbum">选择相册</label>
-                <select id="uploadAlbum">
-                    <!-- 相册选项由 JS 动态填充 -->
-                </select>
-                <label for="uploadTitlePrefix">填写照片编码</label>
-                <input type="text" id="uploadTitlePrefix" placeholder="例如：RAGASA-照片1">
-                <label for="uploadCategory">分类（comment）</label>
-                <select id="uploadCategory">
-                    <option value="风毁">风毁</option>
-                    <option value="实况">实况</option>
-                    <option value="实景">实景</option>
-                </select>
-                <label for="uploadLocation">地点</label>
-                <input type="text" id="uploadLocation" placeholder="例如：珠海">
+                <label for="uploadAlbum">选择相册（所有照片将上传到此相册）</label>
+                <select id="uploadAlbum"></select>
+
+                <div class="batch-settings">
+                    <label style="margin-bottom:8px;">批量设置（可选）</label>
+                    <div class="batch-row">
+                        <input type="text" id="batchTitlePrefix" placeholder="标题前缀，如 RAGASA">
+                        <input type="text" id="batchCategory" placeholder="分类，如 风毁">
+                        <input type="text" id="batchLocation" placeholder="地点，如 珠海">
+                        <button class="btn-sm" id="applyBatchBtn">应用到全部</button>
+                    </div>
+                </div>
+
+                <div class="upload-file-list" id="uploadFileList"></div>
                 <div class="btn-row">
                     <button class="btn-sm" id="submitUploadBtn">上传</button>
                 </div>
@@ -895,7 +925,7 @@
         let currentView = 'home';
         let mapInitialized = false;
         let map;
-        let uploadedFiles = [];
+        let uploadedFiles = [];   // 改为对象数组：{ file, title, category, location }
         let adminCurrentTab = 'albums';
 
         const cityCoords = {
@@ -937,9 +967,10 @@
         const uploadInfoSection = document.getElementById('uploadInfoSection');
         const submitUploadBtn = document.getElementById('submitUploadBtn');
         const uploadAlbumSelect = document.getElementById('uploadAlbum');
-        const uploadTitlePrefix = document.getElementById('uploadTitlePrefix');
-        const uploadCategory = document.getElementById('uploadCategory');
-        const uploadLocation = document.getElementById('uploadLocation');
+        const batchTitlePrefix = document.getElementById('batchTitlePrefix');
+        const batchCategory = document.getElementById('batchCategory');
+        const batchLocation = document.getElementById('batchLocation');
+        const applyBatchBtn = document.getElementById('applyBatchBtn');
         const customBgView = document.getElementById('customBgView');
 
         const adminCenterView = document.getElementById('adminCenterView');
@@ -1219,24 +1250,81 @@
         }
 
         function handleFiles(files) {
-            uploadedFiles = Array.from(files);
+            uploadedFiles = Array.from(files).map(file => ({
+                file: file,
+                title: '',
+                category: '',
+                location: ''
+            }));
             renderUploadFileList();
             uploadInfoSection.style.display = uploadedFiles.length > 0 ? 'block' : 'none';
+            if (uploadedFiles.length > 0 && albums.length > 0) {
+                populateAlbumSelect();
+            }
         }
 
         function renderUploadFileList() {
             if (!uploadFileList) return;
-            uploadFileList.innerHTML = uploadedFiles.map((file) => {
-                const sizeKB = (file.size / 1024).toFixed(1);
+            if (uploadedFiles.length === 0) {
+                uploadFileList.innerHTML = '';
+                return;
+            }
+            uploadFileList.innerHTML = uploadedFiles.map((item, index) => {
+                const sizeKB = (item.file.size / 1024).toFixed(1);
                 return `
-                    <div class="upload-file-item">
+                    <div class="upload-file-item" data-index="${index}">
                         <div class="file-icon">📄</div>
-                        <div class="file-name">${escapeHTML(file.name)}</div>
-                        <div class="file-size">${sizeKB} KB</div>
+                        <div class="file-info">
+                            <div class="file-name">${escapeHTML(item.file.name)}</div>
+                            <div class="file-size">${sizeKB} KB</div>
+                            <div class="file-fields">
+                                <input type="text" class="file-title" placeholder="标题" value="${escapeHTML(item.title)}" oninput="updateFileField(${index}, 'title', this.value)">
+                                <input type="text" class="file-category" placeholder="分类（如风毁/实况）" value="${escapeHTML(item.category)}" oninput="updateFileField(${index}, 'category', this.value)">
+                                <input type="text" class="file-location" placeholder="地点" value="${escapeHTML(item.location)}" oninput="updateFileField(${index}, 'location', this.value)">
+                            </div>
+                        </div>
+                        <button class="file-remove-btn" onclick="removeUploadFile(${index})" title="移除">×</button>
                     </div>
                 `;
             }).join('');
         }
+
+        window.updateFileField = function(index, field, value) {
+            if (uploadedFiles[index]) {
+                uploadedFiles[index][field] = value;
+            }
+        };
+
+        window.removeUploadFile = function(index) {
+            uploadedFiles.splice(index, 1);
+            renderUploadFileList();
+            if (uploadedFiles.length === 0) {
+                uploadInfoSection.style.display = 'none';
+            }
+        };
+
+        // 批量设置
+        applyBatchBtn.addEventListener('click', () => {
+            const prefix = batchTitlePrefix.value.trim();
+            const category = batchCategory.value.trim();
+            const location = batchLocation.value.trim();
+            if (!prefix && !category && !location) {
+                alert('请至少填写一个批量设置字段');
+                return;
+            }
+            uploadedFiles.forEach((item, index) => {
+                if (prefix) {
+                    item.title = `${prefix}-${index + 1}`;
+                }
+                if (category) {
+                    item.category = category;
+                }
+                if (location) {
+                    item.location = location;
+                }
+            });
+            renderUploadFileList();
+        });
 
         chooseFilesBtn.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
@@ -1286,11 +1374,7 @@
                 location.hash = 'auth';
                 return;
             }
-            const titlePrefix = uploadTitlePrefix.value.trim();
-            const category = uploadCategory.value;
-            const location = uploadLocation.value.trim();
             const albumId = uploadAlbumSelect.value;
-            if (!titlePrefix) { alert('请输入照片标题前缀'); return; }
             if (!albumId) { alert('请选择相册'); return; }
             if (uploadedFiles.length === 0) { alert('请先选择文件'); return; }
             if (!backendAlbumIds.has(albumId)) {
@@ -1298,22 +1382,39 @@
                 return;
             }
 
+            // 检查是否所有文件都填写了标题
+            const missingTitle = uploadedFiles.some(item => !item.title.trim());
+            if (missingTitle) {
+                if (!confirm('有照片未填写标题，将使用文件名作为标题，是否继续？')) {
+                    return;
+                }
+                uploadedFiles.forEach(item => {
+                    if (!item.title.trim()) {
+                        item.title = item.file.name.replace(/\.[^/.]+$/, '');
+                    }
+                });
+                renderUploadFileList();
+            }
+
             submitUploadBtn.disabled = true;
             submitUploadBtn.textContent = '上传中...';
             try {
-                for (const file of uploadedFiles) {
+                for (const item of uploadedFiles) {
                     const formData = new FormData();
-                    formData.append('file', file);
+                    formData.append('file', item.file);
                     formData.append('album_id', albumId);
-                    formData.append('title', `${titlePrefix}-${uploadedFiles.indexOf(file) + 1}`);
-                    formData.append('comment', category);
-                    formData.append('location', location);
+                    formData.append('title', item.title.trim());
+                    formData.append('comment', item.category.trim());
+                    formData.append('location', item.location.trim());
                     await api.uploadPhoto(formData);
                 }
                 alert('上传成功！');
                 uploadedFiles = [];
                 renderUploadFileList();
                 uploadInfoSection.style.display = 'none';
+                batchTitlePrefix.value = '';
+                batchCategory.value = '';
+                batchLocation.value = '';
                 if (currentAlbumId === albumId) {
                     const album = albums.find(a => a.id === albumId);
                     if (album) loadPhotos(album);
@@ -1348,11 +1449,13 @@
                 }
                 albums = merged;
                 renderAlbums(currentKeyword);
+                populateAlbumSelect(); // 更新上传相册选择
             } catch (err) {
                 console.error('加载相册失败，使用默认数据', err);
                 albums = defaultAlbums.map(a => ({ ...a, photos: [] }));
                 backendAlbumIds = new Set();
                 renderAlbums(currentKeyword);
+                populateAlbumSelect();
                 alert('无法连接服务器，已显示本地默认相册。');
             } finally {
                 loadingIndicator.style.display = 'none';
@@ -1655,7 +1758,6 @@
         // 二次修改照片
         window.editPhoto = async function(photoId) {
             try {
-                // 获取照片详情
                 const photo = await api.getPhoto(photoId);
                 const overlay = document.createElement('div');
                 overlay.className = 'modal-overlay';
@@ -1684,7 +1786,7 @@
                         await api.updatePhoto(photoId, { title, comment, location });
                         overlay.remove();
                         alert('照片信息已更新');
-                        renderAdminPhotos(); // 刷新列表
+                        renderAdminPhotos();
                     } catch (err) {
                         alert('更新失败：' + err.message);
                     }
@@ -1956,7 +2058,7 @@
                 <span class="modal-close">&times;</span>
                 <div class="announce-content">
                     <h2>📢 网站公告</h2>
-                    <p>Tempest Chase V2（PRO-满血版）正式发布，网站目前所规划功能与版面设计已全部上线。</p>
+                    <p>Tempest Chase V2（公测版）正式发布，网站目前所规划功能与版面设计已全部上线。</p>
                     <p style="margin-top: 16px; font-size: 0.9rem; color: #888;">（点击遮罩或右上角关闭按钮退出）</p>
                 </div>
             `;
