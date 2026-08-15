@@ -678,7 +678,7 @@
                 <button class="btn-sm" id="chooseFilesBtn">选择文件</button>
                 <button class="btn-sm" id="chooseFolderBtn">选择文件夹</button>
             </div>
-            <input type="file" id="fileInput" multiple style="display:none;">
+            <input type="file" id="fileInput" multiple accept="image/*,video/*" style="display:none;">
             <input type="file" id="folderInput" webkitdirectory style="display:none;">
         </div>
             <div class="upload-info-section" id="uploadInfoSection" style="display:none;">
@@ -1507,11 +1507,14 @@
             submitUploadBtn.textContent = '上传中...';
             try {
                 for (const item of uploadedFiles) {
-                    // 将 PNG 转换为 JPEG（后端可能不支持 PNG）
-                    const processedFile = await convertToJpegIfNeeded(item.file);
-
+                    let fileToUpload = item.file;
+                    // 仅对图片进行 PNG 转换，视频原样上传
+                    if (fileToUpload.type.startsWith('image/')) {
+                        fileToUpload = await convertToJpegIfNeeded(fileToUpload);
+                    }
+                    // 构建 FormData 并上传 fileToUpload
                     const formData = new FormData();
-                    formData.append('file', processedFile);
+                    formData.append('file', fileToUpload);
                     formData.append('album_id', albumId);
                     formData.append('title', item.title.trim());
                     formData.append('comment', item.category.trim());
@@ -1736,10 +1739,15 @@
                 if (keyword && !combined.includes(keyword)) return;
                 hasVisible = true;
                 const favorited = isFavorited(photo.url);
+                const isVideo = getFileType(photo.url) === 'video';
+                const mediaHTML = isVideo
+                    ? `<video src="${escapeHTML(photo.url)}" controls style="width:100%; height:220px; object-fit:cover;"></video>`
+                    : `<img src="${escapeHTML(photo.url)}" alt="${escapeHTML(photo.title)}" onclick="showPreview('${escapeHTML(photo.url)}')">`;
+
                 const card = document.createElement('div');
                 card.className = 'photo-card';
                 card.innerHTML = `
-                    <img src="${escapeHTML(photo.url)}" alt="${escapeHTML(photo.title)}" onclick="showPreview('${escapeHTML(photo.url)}')">
+                    ${mediaHTML}
                     <div class="photo-info">
                         <div class="photo-title">${escapeHTML(photo.title)}</div>
                         <div class="photo-meta">
@@ -1781,7 +1789,11 @@
             if (existing) existing.remove();
             const overlay = document.createElement('div');
             overlay.className = 'modal-overlay';
-            overlay.innerHTML = `<span class="modal-close">&times;</span><img src="${escapeHTML(src)}" onclick="event.stopPropagation()">`;
+            const isVideo = /\.(mp4|webm|ogg|ogv|mov|avi|mkv|flv)$/i.test(src);
+            const mediaHTML = isVideo
+                ? `<video src="${escapeHTML(src)}" controls style="max-width:90%; max-height:90%; border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,0.4);"></video>`
+                : `<img src="${escapeHTML(src)}" onclick="event.stopPropagation()">`;
+            overlay.innerHTML = `<span class="modal-close">&times;</span>${mediaHTML}`;
             overlay.addEventListener('click', () => overlay.remove());
             document.body.appendChild(overlay);
         }
