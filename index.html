@@ -671,7 +671,7 @@
     <!-- 上传 -->
     <div id="uploadView" style="display: none;">
         <div class="page-content" style="max-width: 800px;">
-            <h2>上传照片</h2>
+            <h2>上传素材</h2>
         <div class="upload-dropzone" id="uploadDropzone">
             <p>拖拽文件或文件夹到此处，或使用下方按钮选择</p>
             <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
@@ -682,16 +682,16 @@
             <input type="file" id="folderInput" webkitdirectory style="display:none;">
         </div>
             <div class="upload-info-section" id="uploadInfoSection" style="display:none;">
-                <h3>填写照片信息</h3>
-                <label for="uploadAlbum">选择相册（所有照片将上传到此相册）</label>
+                <h3>填写素材信息</h3>
+                <label for="uploadAlbum">选择相册（所有素材将上传到此相册）</label>
                 <select id="uploadAlbum"></select>
 
                 <div class="batch-settings">
                     <label style="margin-bottom:8px;">批量设置（可选）</label>
                     <div class="batch-row">
-                        <input type="text" id="batchTitlePrefix" placeholder="编码，如 RAGASA-照片" autocomplete="off">
-                        <input type="text" id="batchCategory" placeholder="分类，如 风毁" autocomplete="off">
-                        <input type="text" id="batchLocation" placeholder="地点，如 珠海" autocomplete="off">
+                        <input type="text" id="batchTitlePrefix" placeholder="编码 如 RAGASA-照片/视频" autocomplete="off">
+                        <input type="text" id="batchCategory" placeholder="分类 如 风毁" autocomplete="off">
+                        <input type="text" id="batchLocation" placeholder="地点 如 珠海" autocomplete="off">
                         <button class="btn-sm" id="applyBatchBtn">应用到全部</button>
                     </div>
                 </div>
@@ -741,8 +741,8 @@
             </div>
             <div id="adminPhotosPanel" class="admin-panel" style="display:none;">
                 <div class="panel-header">
-                    <span>所有照片（最多显示100张）</span>
-                    <button class="btn-sm" onclick="location.hash='upload'">上传照片</button>
+                    <span>所有素材（最多显示100个）</span>
+                    <button class="btn-sm" onclick="location.hash='upload'">上传素材</button>
                 </div>
                 <div id="adminPhotosContainer" class="photo-settings-grid"></div>
             </div>
@@ -1558,6 +1558,13 @@
             };
         }
 
+        function calcAlbumMediaFlags(album) {
+            const photos = album.photos || [];
+            album.has_video = album.has_video || photos.some(photo => getFileType(photo.url) === 'video');
+            album.has_photo = album.has_photo || photos.some(photo => getFileType(photo.url) === 'photo');
+            return album;
+        }
+
         function constructDescription(cardDesc, introText) {
             return JSON.stringify({ cardDesc: cardDesc, introText: introText });
         }
@@ -1579,7 +1586,7 @@
                             introText: introText || defAlbum.description,
                             photos: []
                         };
-                        merged.push(mergedAlbum);
+                        merged.push(calcAlbumMediaFlags(mergedAlbum));
                     } else {
                         const { cardDesc, introText } = parseDescriptionToFields(defAlbum.description);
                         const fallbackAlbum = {
@@ -1588,18 +1595,18 @@
                             introText: introText || defAlbum.description,
                             photos: []
                         };
-                        merged.push(fallbackAlbum);
+                        merged.push(calcAlbumMediaFlags(fallbackAlbum));
                     }
                 }
                 for (const backendAlbum of backendAlbums) {
                     if (!merged.some(a => a.id === backendAlbum.id)) {
                         const { cardDesc, introText } = parseDescriptionToFields(backendAlbum.description);
-                        merged.push({
+                        merged.push(calcAlbumMediaFlags({
                             ...backendAlbum,
                             cardDesc: cardDesc || backendAlbum.description,
                             introText: introText || backendAlbum.description,
                             photos: []
-                        });
+                        }));
                     }
                 }
                 albums = merged;
@@ -1609,12 +1616,12 @@
                 console.error('加载相册失败，使用默认数据', err);
                 albums = defaultAlbums.map(a => {
                     const { cardDesc, introText } = parseDescriptionToFields(a.description);
-                    return {
+                    return calcAlbumMediaFlags({
                         ...a,
                         cardDesc: cardDesc || a.description,
                         introText: introText || a.description,
                         photos: []
-                    };
+                    });
                 });
                 backendAlbumIds = new Set();
                 renderAlbums(currentKeyword);
@@ -1660,6 +1667,7 @@
         // ===== 照片加载 =====
         async function loadPhotos(album) {
             if (album.photos && album.photos.length > 0) {
+                calcAlbumMediaFlags(album);
                 renderPhotos(album, currentKeyword);
                 return;
             }
@@ -1667,11 +1675,13 @@
             try {
                 const result = await api.getPhotos(album.id, 0, 100);
                 album.photos = result.data || [];
+                calcAlbumMediaFlags(album);
                 renderPhotos(album, currentKeyword);
             } catch (err) {
                 alert('加载照片失败：' + err.message);
                 console.error(err);
                 album.photos = [];
+                calcAlbumMediaFlags(album);
                 renderPhotos(album, currentKeyword);
             } finally {
                 loadingIndicator.style.display = 'none';
@@ -1687,6 +1697,11 @@
             albums.forEach(album => {
                 const albumText = (album.title + ' ' + (album.cardDesc || album.description || '')).toLowerCase();
                 if (keyword && !albumText.includes(keyword)) return;
+
+                // 类型过滤：只显示含有对应类型文件的相册
+                if (currentType === 'video' && !album.has_video) return;
+                if (currentType === 'photo' && !album.has_photo) return;
+
                 hasVisible = true;
                 const card = document.createElement('div');
                 card.className = 'album-card';
