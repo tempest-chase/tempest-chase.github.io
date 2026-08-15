@@ -570,8 +570,8 @@
         </div>
         <div class="search-section" id="searchSection">
             <div class="search-box-wrapper">
-                <!-- 阻止自动填充 -->
-                <input type="text" id="searchInput" placeholder="搜索相册或照片…" autocomplete="off">
+                <!-- 防自动填充：使用 autocomplete="off" 和随机 name -->
+                <input type="text" id="searchInput" placeholder="搜索相册或照片…" autocomplete="off" name="search_field_xyz">
                 <button class="search-btn" id="searchBtn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </button>
@@ -683,7 +683,7 @@
                 <div class="batch-settings">
                     <label style="margin-bottom:8px;">批量设置（可选）</label>
                     <div class="batch-row">
-                        <input type="text" id="batchTitlePrefix" placeholder="标题前缀，如 RAGASA" autocomplete="off">
+                        <input type="text" id="batchTitlePrefix" placeholder="编码，如 RAGASA-照片" autocomplete="off">
                         <input type="text" id="batchCategory" placeholder="分类，如 风毁" autocomplete="off">
                         <input type="text" id="batchLocation" placeholder="地点，如 珠海" autocomplete="off">
                         <button class="btn-sm" id="applyBatchBtn">应用到全部</button>
@@ -712,7 +712,7 @@
                 <input type="file" id="bgFileInput" accept="image/*">
                 <label>模糊程度：<span id="bgBlurValue">0</span>px</label>
                 <input type="range" id="bgBlurRange" min="0" max="30" value="0" step="1">
-                <p style="font-size: 0.75rem; color: #888;">上传图片后浏览器会保存在本地，不会上传到服务器</p>
+                <p style="font-size: 0.75rem; color: #888;">若照片色调偏深，建议开启黑夜模式</p>
             </div>
         </div>
     </div>
@@ -988,6 +988,18 @@
             '东莞': [23.0207, 113.7518],
             '烟台': [37.4638, 121.4479]
         };
+
+        // 存储额外文字栏到 localStorage 的辅助函数
+        function getStoredIntroText(albumId) {
+            return localStorage.getItem(`tempestIntroText_${albumId}`) || '';
+        }
+        function setStoredIntroText(albumId, text) {
+            if (text) {
+                localStorage.setItem(`tempestIntroText_${albumId}`, text);
+            } else {
+                localStorage.removeItem(`tempestIntroText_${albumId}`);
+            }
+        }
 
         // ===== DOM 元素 =====
         const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -1433,7 +1445,6 @@
                 return;
             }
 
-            // 检查是否所有文件都填写了标题
             const missingTitle = uploadedFiles.some(item => !item.title.trim());
             if (missingTitle) {
                 if (!confirm('有照片未填写标题，将使用文件名作为标题，是否继续？')) {
@@ -1488,14 +1499,21 @@
                 for (const defAlbum of defaultAlbums) {
                     const backendAlbum = backendAlbums.find(a => a.id === defAlbum.id);
                     if (backendAlbum) {
-                        merged.push({ ...defAlbum, ...backendAlbum, photos: [] });
+                        const mergedAlbum = { ...defAlbum, ...backendAlbum, photos: [] };
+                        // 从 localStorage 读取额外文字栏（顶部简介）
+                        mergedAlbum.introText = getStoredIntroText(defAlbum.id) || defAlbum.description || '';
+                        merged.push(mergedAlbum);
                     } else {
-                        merged.push({ ...defAlbum, photos: [] });
+                        const fallbackAlbum = { ...defAlbum, photos: [] };
+                        fallbackAlbum.introText = getStoredIntroText(defAlbum.id) || defAlbum.description || '';
+                        merged.push(fallbackAlbum);
                     }
                 }
                 for (const backendAlbum of backendAlbums) {
                     if (!merged.some(a => a.id === backendAlbum.id)) {
-                        merged.push({ ...backendAlbum, photos: [] });
+                        const extraAlbum = { ...backendAlbum, photos: [] };
+                        extraAlbum.introText = getStoredIntroText(extraAlbum.id) || extraAlbum.description || '';
+                        merged.push(extraAlbum);
                     }
                 }
                 albums = merged;
@@ -1503,7 +1521,11 @@
                 populateAlbumSelect();
             } catch (err) {
                 console.error('加载相册失败，使用默认数据', err);
-                albums = defaultAlbums.map(a => ({ ...a, photos: [] }));
+                albums = defaultAlbums.map(a => {
+                    const album = { ...a, photos: [] };
+                    album.introText = getStoredIntroText(a.id) || a.description || '';
+                    return album;
+                });
                 backendAlbumIds = new Set();
                 renderAlbums(currentKeyword);
                 populateAlbumSelect();
@@ -1590,13 +1612,14 @@
             const container = document.getElementById('photosContainer');
             container.innerHTML = '';
 
-            // 相册简介
+            // 顶部简介栏，使用 album.introText 或 description
+            const introText = album.introText || album.description || '';
             const introDiv = document.createElement('div');
             introDiv.className = 'album-intro';
-            introDiv.innerHTML = `<span class="intro-bracket">「</span>${escapeHTML(album.description || '')}<span class="intro-bracket">」</span>`;
+            introDiv.innerHTML = `<span class="intro-bracket">「</span>${escapeHTML(introText)}<span class="intro-bracket">」</span>`;
             container.appendChild(introDiv);
 
-            // 视频按钮（如果有）
+            // 视频按钮
             if (album.videoTitle && album.videoUrl) {
                 const linkWrapper = document.createElement('div');
                 linkWrapper.className = 'video-link-wrapper';
@@ -1604,7 +1627,6 @@
                 container.appendChild(linkWrapper);
             }
 
-            // 照片网格
             const gridDiv = document.createElement('div');
             gridDiv.className = 'photos-grid';
             const keyword = filterKeyword.toLowerCase().trim();
@@ -1822,23 +1844,25 @@
             }
         };
 
-        // 编辑相册
+        // 编辑相册：新增顶部简介文字
         window.editAlbum = async function(albumId) {
             try {
                 const album = albums.find(a => a.id === albumId);
                 if (!album) {
-                    // 尝试从后端获取
                     album = await api.getAlbum(albumId);
                 }
+                const currentIntro = album.introText || getStoredIntroText(albumId) || album.description || '';
                 const overlay = document.createElement('div');
                 overlay.className = 'modal-overlay';
                 overlay.innerHTML = `
-                    <div class="announce-content" style="max-width: 400px;">
+                    <div class="announce-content" style="max-width: 500px;">
                         <h3 style="margin-bottom:16px;">编辑相册</h3>
                         <label for="editAlbumTitle">标题</label>
                         <input type="text" id="editAlbumTitle" value="${escapeHTML(album.title)}" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px;">
-                        <label for="editAlbumDesc">描述（简介）</label>
-                        <textarea id="editAlbumDesc" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px; min-height:80px;">${escapeHTML(album.description || '')}</textarea>
+                        <label for="editAlbumDesc">描述（卡片简介）</label>
+                        <textarea id="editAlbumDesc" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px; min-height:60px;">${escapeHTML(album.description || '')}</textarea>
+                        <label for="editAlbumIntroText">顶部简介文字（「」内显示）</label>
+                        <textarea id="editAlbumIntroText" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px; min-height:60px;">${escapeHTML(currentIntro)}</textarea>
                         <div style="display:flex; gap:10px; justify-content:flex-end;">
                             <button class="btn-sm" onclick="this.closest('.modal-overlay').remove()">取消</button>
                             <button class="btn-sm" id="confirmEditAlbumBtn">保存修改</button>
@@ -1849,12 +1873,22 @@
                 overlay.querySelector('#confirmEditAlbumBtn').addEventListener('click', async () => {
                     const title = overlay.querySelector('#editAlbumTitle').value.trim();
                     const description = overlay.querySelector('#editAlbumDesc').value.trim();
+                    const introText = overlay.querySelector('#editAlbumIntroText').value.trim();
                     if (!title) { alert('标题不能为空'); return; }
                     try {
+                        // 更新后端 title 和 description
                         await api.updateAlbum(albumId, { title, description });
+                        // 保存顶部简介文字到 localStorage
+                        setStoredIntroText(albumId, introText);
+                        // 更新本地 albums 数组
+                        const localAlbum = albums.find(a => a.id === albumId);
+                        if (localAlbum) {
+                            localAlbum.title = title;
+                            localAlbum.description = description;
+                            localAlbum.introText = introText;
+                        }
                         overlay.remove();
                         alert('相册信息已更新');
-                        await loadAlbums();
                         renderAdminAlbums();
                         if (currentAlbumId === albumId) {
                             const updatedAlbum = albums.find(a => a.id === albumId);
@@ -1916,6 +1950,7 @@
                 await api.deleteAlbum(albumId);
                 albums = albums.filter(a => a.id !== albumId);
                 backendAlbumIds.delete(albumId);
+                localStorage.removeItem(`tempestIntroText_${albumId}`);
                 renderAdminAlbums();
                 if (currentView === 'home') renderAlbums(currentKeyword);
                 alert('相册已删除');
@@ -2274,6 +2309,16 @@
 
         // ===== 初始化 =====
         async function initApp() {
+            // 防止浏览器自动填充搜索框
+            searchInput.value = '';
+            searchInput.setAttribute('autocomplete', 'off');
+            searchInput.readOnly = true;
+            setTimeout(() => {
+                searchInput.readOnly = false;
+                searchInput.focus();
+                searchInput.blur();
+            }, 100);
+
             await checkAuth();
             await loadAlbums();
             const initHash = location.hash.slice(1);
