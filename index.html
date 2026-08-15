@@ -569,13 +569,15 @@
             <span class="site-title">Tempest Chase V2</span>
         </div>
         <div class="search-section" id="searchSection">
-            <div class="search-box-wrapper">
-                <!-- 防自动填充：使用 autocomplete="off" 和随机 name -->
-                <input type="text" id="searchInput" placeholder="搜索相册或照片…" autocomplete="off" name="search_field_xyz">
-                <button class="search-btn" id="searchBtn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                </button>
-            </div>
+            <form autocomplete="off" onsubmit="return false;">
+                <div class="search-box-wrapper">
+                    <!-- 防自动填充：使用 type="search" 和随机 name -->
+                    <input type="search" id="searchInput" placeholder="搜索相册或照片…" autocomplete="off" name="search_field_xyz">
+                    <button class="search-btn" id="searchBtn" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </button>
+                </div>
+            </form>
         </div>
         <ul class="nav-menu" id="navMenu">
             <li><a data-page="home" class="active">首页</a></li>
@@ -683,7 +685,7 @@
                 <div class="batch-settings">
                     <label style="margin-bottom:8px;">批量设置（可选）</label>
                     <div class="batch-row">
-                        <input type="text" id="batchTitlePrefix" placeholder="编码，如 RAGASA-照片" autocomplete="off">
+                        <input type="text" id="batchTitlePrefix" placeholder="标题前缀，如 RAGASA" autocomplete="off">
                         <input type="text" id="batchCategory" placeholder="分类，如 风毁" autocomplete="off">
                         <input type="text" id="batchLocation" placeholder="地点，如 珠海" autocomplete="off">
                         <button class="btn-sm" id="applyBatchBtn">应用到全部</button>
@@ -712,7 +714,7 @@
                 <input type="file" id="bgFileInput" accept="image/*">
                 <label>模糊程度：<span id="bgBlurValue">0</span>px</label>
                 <input type="range" id="bgBlurRange" min="0" max="30" value="0" step="1">
-                <p style="font-size: 0.75rem; color: #888;">若照片色调偏深，建议开启黑夜模式</p>
+                <p style="font-size: 0.75rem; color: #888;">上传图片后浏览器会保存在本地，不会上传到服务器</p>
             </div>
         </div>
     </div>
@@ -978,6 +980,7 @@
         let map;
         let uploadedFiles = [];
         let adminCurrentTab = 'albums';
+        let userTyped = false; // 用于检测用户是否主动输入过搜索词
 
         const cityCoords = {
             '珠海': [22.270978, 113.576677],
@@ -988,18 +991,6 @@
             '东莞': [23.0207, 113.7518],
             '烟台': [37.4638, 121.4479]
         };
-
-        // 存储额外文字栏到 localStorage 的辅助函数
-        function getStoredIntroText(albumId) {
-            return localStorage.getItem(`tempestIntroText_${albumId}`) || '';
-        }
-        function setStoredIntroText(albumId, text) {
-            if (text) {
-                localStorage.setItem(`tempestIntroText_${albumId}`, text);
-            } else {
-                localStorage.removeItem(`tempestIntroText_${albumId}`);
-            }
-        }
 
         // ===== DOM 元素 =====
         const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -1490,6 +1481,27 @@
         });
 
         // ===== 相册加载与同步 =====
+        function parseDescriptionToFields(description) {
+            try {
+                const data = JSON.parse(description);
+                if (data && typeof data === 'object' && 'cardDesc' in data && 'introText' in data) {
+                    return {
+                        cardDesc: data.cardDesc || '',
+                        introText: data.introText || ''
+                    };
+                }
+            } catch (e) {}
+            // 兼容旧数据：直接使用原字符串
+            return {
+                cardDesc: description || '',
+                introText: description || ''
+            };
+        }
+
+        function constructDescription(cardDesc, introText) {
+            return JSON.stringify({ cardDesc: cardDesc, introText: introText });
+        }
+
         async function loadAlbums() {
             loadingIndicator.style.display = 'block';
             try {
@@ -1499,21 +1511,35 @@
                 for (const defAlbum of defaultAlbums) {
                     const backendAlbum = backendAlbums.find(a => a.id === defAlbum.id);
                     if (backendAlbum) {
-                        const mergedAlbum = { ...defAlbum, ...backendAlbum, photos: [] };
-                        // 从 localStorage 读取额外文字栏（顶部简介）
-                        mergedAlbum.introText = getStoredIntroText(defAlbum.id) || defAlbum.description || '';
+                        const { cardDesc, introText } = parseDescriptionToFields(backendAlbum.description);
+                        const mergedAlbum = {
+                            ...defAlbum,
+                            ...backendAlbum,
+                            cardDesc: cardDesc || defAlbum.description,
+                            introText: introText || defAlbum.description,
+                            photos: []
+                        };
                         merged.push(mergedAlbum);
                     } else {
-                        const fallbackAlbum = { ...defAlbum, photos: [] };
-                        fallbackAlbum.introText = getStoredIntroText(defAlbum.id) || defAlbum.description || '';
+                        const { cardDesc, introText } = parseDescriptionToFields(defAlbum.description);
+                        const fallbackAlbum = {
+                            ...defAlbum,
+                            cardDesc: cardDesc || defAlbum.description,
+                            introText: introText || defAlbum.description,
+                            photos: []
+                        };
                         merged.push(fallbackAlbum);
                     }
                 }
                 for (const backendAlbum of backendAlbums) {
                     if (!merged.some(a => a.id === backendAlbum.id)) {
-                        const extraAlbum = { ...backendAlbum, photos: [] };
-                        extraAlbum.introText = getStoredIntroText(extraAlbum.id) || extraAlbum.description || '';
-                        merged.push(extraAlbum);
+                        const { cardDesc, introText } = parseDescriptionToFields(backendAlbum.description);
+                        merged.push({
+                            ...backendAlbum,
+                            cardDesc: cardDesc || backendAlbum.description,
+                            introText: introText || backendAlbum.description,
+                            photos: []
+                        });
                     }
                 }
                 albums = merged;
@@ -1522,9 +1548,13 @@
             } catch (err) {
                 console.error('加载相册失败，使用默认数据', err);
                 albums = defaultAlbums.map(a => {
-                    const album = { ...a, photos: [] };
-                    album.introText = getStoredIntroText(a.id) || a.description || '';
-                    return album;
+                    const { cardDesc, introText } = parseDescriptionToFields(a.description);
+                    return {
+                        ...a,
+                        cardDesc: cardDesc || a.description,
+                        introText: introText || a.description,
+                        photos: []
+                    };
                 });
                 backendAlbumIds = new Set();
                 renderAlbums(currentKeyword);
@@ -1549,6 +1579,7 @@
             syncAlbumsBtn.textContent = '同步中...';
             try {
                 for (const album of missing) {
+                    // 创建时使用原始 description（普通字符串），加载后会自动解析
                     await api.createAlbum({
                         id: album.id,
                         title: album.title,
@@ -1595,13 +1626,19 @@
             const keyword = filterKeyword.toLowerCase().trim();
             let hasVisible = false;
             albums.forEach(album => {
-                const albumText = (album.title + ' ' + (album.description || '')).toLowerCase();
+                const albumText = (album.title + ' ' + (album.cardDesc || album.description || '')).toLowerCase();
                 if (keyword && !albumText.includes(keyword)) return;
                 hasVisible = true;
                 const card = document.createElement('div');
                 card.className = 'album-card';
                 const coverUrl = album.cover?.url || album.cover || 'placeholder.jpg';
-                card.innerHTML = `<img src="${escapeHTML(coverUrl)}" alt="${escapeHTML(album.title)}"><div class="album-info"><div class="album-title">${escapeHTML(album.title)}</div><div class="album-desc">${escapeHTML(album.description || '')}</div></div>`;
+                card.innerHTML = `
+                    <img src="${escapeHTML(coverUrl)}" alt="${escapeHTML(album.title)}">
+                    <div class="album-info">
+                        <div class="album-title">${escapeHTML(album.title)}</div>
+                        <div class="album-desc">${escapeHTML(album.cardDesc || album.description || '')}</div>
+                    </div>
+                `;
                 card.addEventListener('click', () => openAlbum(album.id));
                 container.appendChild(card);
             });
@@ -1612,7 +1649,7 @@
             const container = document.getElementById('photosContainer');
             container.innerHTML = '';
 
-            // 顶部简介栏，使用 album.introText 或 description
+            // 顶部简介栏
             const introText = album.introText || album.description || '';
             const introDiv = document.createElement('div');
             introDiv.className = 'album-intro';
@@ -1724,11 +1761,12 @@
                     const card = document.createElement('div');
                     card.className = 'album-card';
                     const coverUrl = album.cover?.url || 'placeholder.jpg';
+                    const { cardDesc } = parseDescriptionToFields(album.description);
                     card.innerHTML = `
                         <img src="${escapeHTML(coverUrl)}" alt="${escapeHTML(album.title)}">
                         <div class="album-info">
                             <div class="album-title">${escapeHTML(album.title)}</div>
-                            <div class="album-desc">${escapeHTML(album.description || '')}</div>
+                            <div class="album-desc">${escapeHTML(cardDesc || '')}</div>
                             <div style="display:flex; justify-content:space-between; margin-top:8px; gap:8px; flex-wrap:wrap;">
                                 <button class="btn-sm" onclick="setCover('${album.id}')">设置封面</button>
                                 <button class="btn-sm" onclick="editAlbum('${album.id}')">编辑</button>
@@ -1844,14 +1882,14 @@
             }
         };
 
-        // 编辑相册：新增顶部简介文字
+        // 编辑相册（使用 JSON 编码 description 保存两个字段）
         window.editAlbum = async function(albumId) {
             try {
                 const album = albums.find(a => a.id === albumId);
                 if (!album) {
                     album = await api.getAlbum(albumId);
                 }
-                const currentIntro = album.introText || getStoredIntroText(albumId) || album.description || '';
+                const { cardDesc, introText } = parseDescriptionToFields(album.description);
                 const overlay = document.createElement('div');
                 overlay.className = 'modal-overlay';
                 overlay.innerHTML = `
@@ -1859,10 +1897,10 @@
                         <h3 style="margin-bottom:16px;">编辑相册</h3>
                         <label for="editAlbumTitle">标题</label>
                         <input type="text" id="editAlbumTitle" value="${escapeHTML(album.title)}" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px;">
-                        <label for="editAlbumDesc">描述（卡片简介）</label>
-                        <textarea id="editAlbumDesc" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px; min-height:60px;">${escapeHTML(album.description || '')}</textarea>
+                        <label for="editAlbumDesc">卡片简介</label>
+                        <textarea id="editAlbumDesc" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px; min-height:60px;">${escapeHTML(cardDesc)}</textarea>
                         <label for="editAlbumIntroText">顶部简介文字（「」内显示）</label>
-                        <textarea id="editAlbumIntroText" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px; min-height:60px;">${escapeHTML(currentIntro)}</textarea>
+                        <textarea id="editAlbumIntroText" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px; min-height:60px;">${escapeHTML(introText)}</textarea>
                         <div style="display:flex; gap:10px; justify-content:flex-end;">
                             <button class="btn-sm" onclick="this.closest('.modal-overlay').remove()">取消</button>
                             <button class="btn-sm" id="confirmEditAlbumBtn">保存修改</button>
@@ -1872,19 +1910,18 @@
                 document.body.appendChild(overlay);
                 overlay.querySelector('#confirmEditAlbumBtn').addEventListener('click', async () => {
                     const title = overlay.querySelector('#editAlbumTitle').value.trim();
-                    const description = overlay.querySelector('#editAlbumDesc').value.trim();
+                    const cardDesc = overlay.querySelector('#editAlbumDesc').value.trim();
                     const introText = overlay.querySelector('#editAlbumIntroText').value.trim();
                     if (!title) { alert('标题不能为空'); return; }
+                    // 将两个字段编码为 JSON 字符串存入 description
+                    const description = constructDescription(cardDesc, introText);
                     try {
-                        // 更新后端 title 和 description
                         await api.updateAlbum(albumId, { title, description });
-                        // 保存顶部简介文字到 localStorage
-                        setStoredIntroText(albumId, introText);
-                        // 更新本地 albums 数组
                         const localAlbum = albums.find(a => a.id === albumId);
                         if (localAlbum) {
                             localAlbum.title = title;
                             localAlbum.description = description;
+                            localAlbum.cardDesc = cardDesc;
                             localAlbum.introText = introText;
                         }
                         overlay.remove();
@@ -1950,7 +1987,6 @@
                 await api.deleteAlbum(albumId);
                 albums = albums.filter(a => a.id !== albumId);
                 backendAlbumIds.delete(albumId);
-                localStorage.removeItem(`tempestIntroText_${albumId}`);
                 renderAdminAlbums();
                 if (currentView === 'home') renderAlbums(currentKeyword);
                 alert('相册已删除');
@@ -2020,6 +2056,7 @@
                 const desc = overlay.querySelector('#newAlbumDesc').value.trim();
                 if (!id || !title) { alert('请填写相册ID和标题'); return; }
                 try {
+                    // 创建时使用普通字符串，加载后会自动解析
                     await api.createAlbum({ id, title, description: desc });
                     overlay.remove();
                     alert('相册创建成功');
@@ -2049,6 +2086,11 @@
                 searchSection.style.display = 'flex'; filterSection.style.display = 'flex';
             } else {
                 searchSection.style.display = 'none'; filterSection.style.display = 'none';
+            }
+
+            // 清理搜索框自动填充（如果非用户输入）
+            if (!userTyped && searchInput.value.trim() !== '') {
+                searchInput.value = '';
             }
 
             switch (viewName) {
@@ -2231,6 +2273,7 @@
 
         function performSearch() {
             currentKeyword = searchInput.value;
+            userTyped = true;
             if (currentView === 'home') renderAlbums(currentKeyword);
             else if (currentAlbumId) {
                 const album = albums.find(a => a.id === currentAlbumId);
@@ -2239,7 +2282,10 @@
         }
         searchBtn.addEventListener('click', performSearch);
         searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') performSearch(); });
-        searchInput.addEventListener('input', performSearch);
+        searchInput.addEventListener('input', () => {
+            userTyped = true;
+            performSearch();
+        });
 
         // ===== 背景设置 =====
         const bgLayer = document.getElementById('bgLayer');
@@ -2309,7 +2355,7 @@
 
         // ===== 初始化 =====
         async function initApp() {
-            // 防止浏览器自动填充搜索框
+            // 清理搜索框自动填充
             searchInput.value = '';
             searchInput.setAttribute('autocomplete', 'off');
             searchInput.readOnly = true;
