@@ -672,11 +672,15 @@
     <div id="uploadView" style="display: none;">
         <div class="page-content" style="max-width: 800px;">
             <h2>上传照片</h2>
-            <div class="upload-dropzone" id="uploadDropzone">
-                <p>拖拽文件或文件夹到此处，或点击下方按钮选择文件</p>
+        <div class="upload-dropzone" id="uploadDropzone">
+            <p>拖拽文件或文件夹到此处，或使用下方按钮选择</p>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
                 <button class="btn-sm" id="chooseFilesBtn">选择文件</button>
-                <input type="file" id="fileInput" multiple webkitdirectory style="display:none;">
+                <button class="btn-sm" id="chooseFolderBtn">选择文件夹</button>
             </div>
+            <input type="file" id="fileInput" multiple style="display:none;">
+            <input type="file" id="folderInput" webkitdirectory style="display:none;">
+        </div>
             <div class="upload-info-section" id="uploadInfoSection" style="display:none;">
                 <h3>填写照片信息</h3>
                 <label for="uploadAlbum">选择相册（所有照片将上传到此相册）</label>
@@ -685,7 +689,7 @@
                 <div class="batch-settings">
                     <label style="margin-bottom:8px;">批量设置（可选）</label>
                     <div class="batch-row">
-                        <input type="text" id="batchTitlePrefix" placeholder="标题前缀，如 RAGASA" autocomplete="off">
+                        <input type="text" id="batchTitlePrefix" placeholder="编码，如 RAGASA-照片" autocomplete="off">
                         <input type="text" id="batchCategory" placeholder="分类，如 风毁" autocomplete="off">
                         <input type="text" id="batchLocation" placeholder="地点，如 珠海" autocomplete="off">
                         <button class="btn-sm" id="applyBatchBtn">应用到全部</button>
@@ -1303,6 +1307,32 @@
             uploadAlbumSelect.innerHTML = options;
         }
 
+/**
+         * 如果文件是 PNG，则转换为 JPEG；否则返回原文件。
+         * 防止后端不支持 PNG 导致上传失败。
+         */
+        async function convertToJpegIfNeeded(file) {
+            if (file.type === 'image/png') {
+                try {
+                    const img = await createImageBitmap(file);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    // 用白色背景填充，避免透明区域变黑
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+                    return new File([blob], file.name.replace(/\.png$/i, '.jpg'), { type: 'image/jpeg' });
+                } catch (err) {
+                    console.warn('PNG转换失败，将原样上传', err);
+                    return file;
+                }
+            }
+            return file;
+        }
+
         function handleFiles(files) {
             uploadedFiles = Array.from(files).map(file => ({
                 file: file,
@@ -1380,8 +1410,22 @@
             renderUploadFileList();
         });
 
+        // 获取新增的 DOM 元素
+        const chooseFolderBtn = document.getElementById('chooseFolderBtn');
+        const folderInput = document.getElementById('folderInput');
+
+        // 选择文件按钮：触发 fileInput
         chooseFilesBtn.addEventListener('click', () => fileInput.click());
+
+        // 选择文件夹按钮：触发 folderInput
+        chooseFolderBtn.addEventListener('click', () => folderInput.click());
+
+        // fileInput 变化时处理文件
         fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        // folderInput 变化时处理文件夹
+        folderInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
         uploadDropzone.addEventListener('dragover', (e) => { e.preventDefault(); uploadDropzone.classList.add('dragover'); });
         uploadDropzone.addEventListener('dragleave', () => uploadDropzone.classList.remove('dragover'));
         uploadDropzone.addEventListener('drop', async (e) => {
@@ -1453,8 +1497,11 @@
             submitUploadBtn.textContent = '上传中...';
             try {
                 for (const item of uploadedFiles) {
+                    // 将 PNG 转换为 JPEG（后端可能不支持 PNG）
+                    const processedFile = await convertToJpegIfNeeded(item.file);
+
                     const formData = new FormData();
-                    formData.append('file', item.file);
+                    formData.append('file', processedFile);
                     formData.append('album_id', albumId);
                     formData.append('title', item.title.trim());
                     formData.append('comment', item.category.trim());
@@ -1885,7 +1932,7 @@
         // 编辑相册（使用 JSON 编码 description 保存两个字段）
         window.editAlbum = async function(albumId) {
             try {
-                const album = albums.find(a => a.id === albumId);
+                let album = albums.find(a => a.id === albumId);
                 if (!album) {
                     album = await api.getAlbum(albumId);
                 }
