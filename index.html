@@ -718,7 +718,7 @@
                 <input type="file" id="bgFileInput" accept="image/*">
                 <label>模糊程度：<span id="bgBlurValue">0</span>px</label>
                 <input type="range" id="bgBlurRange" min="0" max="30" value="0" step="1">
-                <p style="font-size: 0.75rem; color: #888;">上传图片后浏览器会保存在本地，不会上传到服务器</p>
+                <p style="font-size: 0.75rem; color: #888;">若上传照片色调偏深，建议开启黑夜模式</p>
             </div>
         </div>
     </div>
@@ -755,7 +755,10 @@
     <div id="aboutView" style="display: none;">
         <div class="page-content">
             <h2>关于网站</h2>
-            <p class="intro-text">这里是<strong>华南气象爱好者的追风小分队</strong>，记录团队追逐过的风暴。点击相册浏览照片，所有的图片与视频在非商用的前提下均可下载。</p>
+            <p class="intro-text">这里是<strong>华南气象爱好者的追风小分队</strong>，记录团队追逐过的风暴。点击相册浏览照片。</p>
+            <p>本网站所有内容均为团队原创，非商用前提下可自由下载使用。若用于商业用途，请联系团队获取授权。</p>
+            <p>开发支持：Deepseek Claude</p>
+            <p>后端支持：冷涡</p>
             <h2>关于我们</h2>
             <p><strong>华南气象爱好者追风小分队</strong>成立于2025年，是一群热爱气象、追逐风暴的年轻人。我们穿梭于台风、暴雨、雷暴和雪原之间，用镜头记录大自然的狂暴与温柔。</p>
             <p>团队成员来自珠三角各地，有气象专业的学生，也有业余的摄影爱好者。</p>
@@ -1878,6 +1881,7 @@
                         </div>
                         <div style="display:flex; gap:8px; flex-wrap:wrap;">
                             <button class="btn-sm" onclick="editUserName('${user.id}', '${escapeHTML(user.name)}')">修改昵称</button>
+                            <button class="btn-sm" onclick="changeUserPassword('${user.id}')">修改密码</button>
                             <button class="btn-sm" onclick="toggleApproval('${user.id}', ${!user.upload_approved})">${user.upload_approved ? '撤销审批' : '通过审批'}</button>
                             <button class="btn-sm" onclick="toggleAdmin('${user.id}', ${!user.is_admin})">${user.is_admin ? '撤销管理员' : '设为管理员'}</button>
                             <button class="btn-sm" onclick="deleteUser('${user.id}')">删除</button>
@@ -1919,6 +1923,39 @@
                         localStorage.setItem('tempestUser', JSON.stringify(currentUser));
                         renderUserUI();
                     }
+                } catch (err) {
+                    alert('修改失败：' + err.message);
+                }
+            });
+        };
+
+        // 修改用户密码
+        window.changeUserPassword = async function(userId) {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="announce-content" style="max-width: 400px;">
+                    <h3 style="margin-bottom:16px;">修改用户密码</h3>
+                    <label for="newUserPassword">新密码</label>
+                    <input type="password" id="newUserPassword" placeholder="输入新密码" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px;">
+                    <label for="confirmUserPassword">确认密码</label>
+                    <input type="password" id="confirmUserPassword" placeholder="再次输入新密码" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px;">
+                    <div style="display:flex; gap:10px; justify-content:flex-end;">
+                        <button class="btn-sm" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                        <button class="btn-sm" id="confirmChangePasswordBtn">保存</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            overlay.querySelector('#confirmChangePasswordBtn').addEventListener('click', async () => {
+                const newPassword = overlay.querySelector('#newUserPassword').value.trim();
+                const confirmPassword = overlay.querySelector('#confirmUserPassword').value.trim();
+                if (!newPassword) { alert('请输入新密码'); return; }
+                if (newPassword !== confirmPassword) { alert('两次输入的密码不一致'); return; }
+                try {
+                    await api.updateUser(userId, { password: newPassword });
+                    overlay.remove();
+                    alert('密码已更新');
                 } catch (err) {
                     alert('修改失败：' + err.message);
                 }
@@ -2338,7 +2375,17 @@
                 <span class="modal-close">&times;</span>
                 <div class="announce-content">
                     <h2>📢 网站公告</h2>
-                    <p>Tempest Chase V2（公测版）正式发布，网站目前所规划功能与版面设计已全部上线。</p>
+                    <p>Tempest Chase V2Pro（满血版）正式发布，网站目前所规划功能与版面设计已全部上线。</p>
+                    <p>更新内容：
+                    -修改UI面板
+                    -增添地图功能
+                    -增添账户功能
+                    -增添收藏与下载记录功能
+                    -增添上传功能
+                    -增添自定义网站背景功能
+                    -增添管理员模式
+                    -修改了普通用户权限，新注册的普通账户可通过管理员账号以决定是否具备上传功能
+                    -当前后端缺少修改账户信息的接口，普通用户更改账户信息请联系管理员</p>
                     <p style="margin-top: 16px; font-size: 0.9rem; color: #888;">（点击遮罩或右上角关闭按钮退出）</p>
                 </div>
             `;
