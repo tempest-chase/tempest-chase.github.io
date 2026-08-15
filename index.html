@@ -330,13 +330,12 @@
         .batch-settings .batch-row {
             display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
         }
-        /* 保证输入框和按钮高度一致，垂直居中 */
         .batch-settings .batch-row input,
         .batch-settings .batch-row .btn-sm {
             height: 40px;
             box-sizing: border-box;
             margin: 0;
-            line-height: 1.2; /* 修正按钮文字垂直 */
+            line-height: 1.2;
         }
         .batch-settings .batch-row input {
             flex: 1; min-width: 120px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px;
@@ -363,7 +362,6 @@
         body.dark-mode .batch-settings .batch-row .btn-sm { color: #ddd; border-color: #555; }
         body.dark-mode .batch-settings .batch-row .btn-sm:hover { background: rgba(255,255,255,0.1); }
 
-        /* 手机端批量设置：三行布局 */
         @media (max-width: 768px) {
             .batch-settings .batch-row {
                 display: grid;
@@ -572,7 +570,10 @@
         </div>
         <div class="search-section" id="searchSection">
             <div class="search-box-wrapper">
-                <input type="text" id="searchInput" placeholder="搜索相册或照片…">
+                <!-- 修改搜索框，防止自动填充登录信息 -->
+                <input type="text" id="searchInput" placeholder="搜索相册或照片…"
+                       autocomplete="off" name="search_query" role="search"
+                       aria-label="搜索相册或照片" autocorrect="off" autocapitalize="off" spellcheck="false">
                 <button class="search-btn" id="searchBtn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </button>
@@ -2222,6 +2223,11 @@
             }
         }
         initApp();
+
+        // 强制清空搜索框，防止浏览器自动填充
+        window.addEventListener('load', () => {
+            if (searchInput) searchInput.value = '';
+        });
     </script>
 </body>
 </html>
