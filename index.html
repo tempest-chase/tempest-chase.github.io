@@ -903,12 +903,6 @@
             me() {
                 return this.request('/api/auth/me');
             },
-            updateCurrentUser(data) {
-                return this.request('/api/auth/me', {
-                    method: 'PATCH',
-                    body: JSON.stringify(data)
-                });
-            },
 
             getAlbums() {
                 return this.request('/api/albums');
@@ -1021,6 +1015,8 @@
         const uploadDropzone = document.getElementById('uploadDropzone');
         const fileInput = document.getElementById('fileInput');
         const chooseFilesBtn = document.getElementById('chooseFilesBtn');
+        const chooseFolderBtn = document.getElementById('chooseFolderBtn');
+        const folderInput = document.getElementById('folderInput');
         const uploadFileList = document.getElementById('uploadFileList');
         const uploadInfoSection = document.getElementById('uploadInfoSection');
         const submitUploadBtn = document.getElementById('submitUploadBtn');
@@ -1146,6 +1142,16 @@
         });
 
         async function checkAuth() {
+            const cachedUser = localStorage.getItem('tempestUser');
+            if (cachedUser) {
+                try {
+                    currentUser = JSON.parse(cachedUser);
+                    renderUserUI();
+                    return; // 直接使用缓存，不再请求后端
+                } catch (e) {
+                    // 缓存损坏，继续请求后端
+                }
+            }
             try {
                 const user = await api.me();
                 currentUser = user;
@@ -1228,8 +1234,13 @@
                 alert('没有需要修改的内容');
                 return;
             }
+            // 仅管理员可修改自己（调用管理员接口）
+            if (!currentUser.is_admin) {
+                alert('当前后端不支持普通用户自助修改资料，请联系管理员');
+                return;
+            }
             try {
-                const updatedUser = await api.updateCurrentUser(updateData);
+                const updatedUser = await api.updateUser(currentUser.id, updateData);
                 currentUser = updatedUser;
                 localStorage.setItem('tempestUser', JSON.stringify(updatedUser));
                 accountPassword.value = '';
@@ -1307,7 +1318,7 @@
             uploadAlbumSelect.innerHTML = options;
         }
 
-/**
+        /**
          * 如果文件是 PNG，则转换为 JPEG；否则返回原文件。
          * 防止后端不支持 PNG 导致上传失败。
          */
@@ -1409,10 +1420,6 @@
             });
             renderUploadFileList();
         });
-
-        // 获取新增的 DOM 元素
-        const chooseFolderBtn = document.getElementById('chooseFolderBtn');
-        const folderInput = document.getElementById('folderInput');
 
         // 选择文件按钮：触发 fileInput
         chooseFilesBtn.addEventListener('click', () => fileInput.click());
@@ -1626,7 +1633,6 @@
             syncAlbumsBtn.textContent = '同步中...';
             try {
                 for (const album of missing) {
-                    // 创建时使用原始 description（普通字符串），加载后会自动解析
                     await api.createAlbum({
                         id: album.id,
                         title: album.title,
@@ -1870,7 +1876,8 @@
                             <div class="download-title">${escapeHTML(user.name)} (${escapeHTML(user.phone)})</div>
                             <div class="download-time">管理员: ${user.is_admin ? '是' : '否'} | 上传审批: ${user.upload_approved ? '通过' : '未通过'}</div>
                         </div>
-                        <div style="display:flex; gap:8px;">
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="btn-sm" onclick="editUserName('${user.id}', '${escapeHTML(user.name)}')">修改昵称</button>
                             <button class="btn-sm" onclick="toggleApproval('${user.id}', ${!user.upload_approved})">${user.upload_approved ? '撤销审批' : '通过审批'}</button>
                             <button class="btn-sm" onclick="toggleAdmin('${user.id}', ${!user.is_admin})">${user.is_admin ? '撤销管理员' : '设为管理员'}</button>
                             <button class="btn-sm" onclick="deleteUser('${user.id}')">删除</button>
@@ -1881,6 +1888,42 @@
                 adminUsersContainer.innerHTML = `<div class="empty-state">加载失败：${escapeHTML(err.message)}</div>`;
             }
         }
+
+        // 修改用户昵称
+        window.editUserName = async function(userId, currentName) {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="announce-content" style="max-width: 400px;">
+                    <h3 style="margin-bottom:16px;">修改昵称</h3>
+                    <label for="editUserNameInput">新昵称</label>
+                    <input type="text" id="editUserNameInput" value="${escapeHTML(currentName)}" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ddd; border-radius:6px;">
+                    <div style="display:flex; gap:10px; justify-content:flex-end;">
+                        <button class="btn-sm" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                        <button class="btn-sm" id="confirmEditUserNameBtn">保存</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            overlay.querySelector('#confirmEditUserNameBtn').addEventListener('click', async () => {
+                const newName = overlay.querySelector('#editUserNameInput').value.trim();
+                if (!newName) { alert('昵称不能为空'); return; }
+                try {
+                    const updated = await api.updateUser(userId, { name: newName });
+                    overlay.remove();
+                    alert('昵称已更新');
+                    renderAdminUsers();
+                    // 如果修改的是当前登录用户，同步更新本地缓存
+                    if (currentUser && currentUser.id === userId) {
+                        currentUser.name = updated.name;
+                        localStorage.setItem('tempestUser', JSON.stringify(currentUser));
+                        renderUserUI();
+                    }
+                } catch (err) {
+                    alert('修改失败：' + err.message);
+                }
+            });
+        };
 
         // 设置封面
         window.setCover = async function(albumId) {
@@ -2103,7 +2146,6 @@
                 const desc = overlay.querySelector('#newAlbumDesc').value.trim();
                 if (!id || !title) { alert('请填写相册ID和标题'); return; }
                 try {
-                    // 创建时使用普通字符串，加载后会自动解析
                     await api.createAlbum({ id, title, description: desc });
                     overlay.remove();
                     alert('相册创建成功');
