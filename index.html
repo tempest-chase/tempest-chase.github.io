@@ -906,6 +906,17 @@
             me() {
                 return this.request('/api/auth/me');
             },
+            // 用户自助修改自己的资料（通用接口）
+            updateMyProfile(data) {
+                return this.request('/api/auth/me', {
+                    method: 'PATCH',
+                    body: JSON.stringify(data)
+                });
+            },
+            // 兼容旧逻辑：单独修改昵称
+            updateMyName(name) {
+                return this.updateMyProfile({ name });
+            },
 
             getAlbums() {
                 return this.request('/api/albums');
@@ -1224,30 +1235,36 @@
             const newName = accountName.value.trim();
             const newPhone = accountPhone.value.trim();
             const newPassword = accountPassword.value.trim();
-            if (!newName) { alert('姓名不能为空'); return; }
+
+            if (!newName) {
+                alert('姓名不能为空');
+                return;
+            }
+
             if (newPhone && !/^\+?[0-9]{6,20}$/.test(newPhone)) {
                 alert('手机号格式不正确');
                 return;
             }
+
             const updateData = {};
             if (newName !== currentUser.name) updateData.name = newName;
             if (newPhone !== currentUser.phone) updateData.phone = newPhone;
             if (newPassword) updateData.password = newPassword;
+
             if (Object.keys(updateData).length === 0) {
                 alert('没有需要修改的内容');
                 return;
             }
-            // 仅管理员可修改自己（调用管理员接口）
-            if (!currentUser.is_admin) {
-                alert('当前后端不支持普通用户自助修改资料，请联系管理员');
-                return;
-            }
+
             try {
-                const updatedUser = await api.updateUser(currentUser.id, updateData);
+                const updatedUser = await api.updateMyProfile(updateData);
                 currentUser = updatedUser;
                 localStorage.setItem('tempestUser', JSON.stringify(updatedUser));
+                accountName.value = updatedUser.name || '';
+                accountPhone.value = updatedUser.phone || '';
                 accountPassword.value = '';
-                alert('账号信息已更新');
+                alert('资料已更新');
+                renderUserUI();
             } catch (err) {
                 alert('更新失败：' + err.message);
             }
